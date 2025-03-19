@@ -4,61 +4,55 @@ import numpy as np
 # Open webcam
 cap = cv2.VideoCapture(0)
 
-# Define HSV color ranges for yellow and white
+# Define HSV color ranges
+lower_white = np.array([0, 0, 230])  # Very low saturation, very high brightness
+upper_white = np.array([180, 20, 255])  # Only allows pure whites
+
 lower_yellow = np.array([20, 100, 100])
 upper_yellow = np.array([30, 255, 255])
 
-lower_white = np.array([0, 0, 180])   # White has low saturation
-upper_white = np.array([180, 50, 255])  # High brightness
+lower_obstacle = np.array([10, 150, 150])
+upper_obstacle = np.array([30, 255, 255])
+
+def find_objects(mask, color_name, color, frame):
+    """Finds objects in the given mask and draws bounding boxes with labels."""
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    positions = []
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 100:  # Ensures we filter very small noise
+            x, y, w, h = cv2.boundingRect(cnt)
+            cx, cy = x + w // 2, y + h // 2  # Center coordinates
+            positions.append((cx, cy))
+
+            # Draw bounding box and label
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+            cv2.putText(frame, color_name, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+
+    return positions
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    # Convert frame to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Create masks for yellow and white
-    mask_yellow = cv2.inRange(hsv, lower_yellow, upper_yellow)
-    mask_white = cv2.inRange(hsv, lower_white, upper_white)
+    # Create masks for white, yellow balls and obstacles
+    white_mask = cv2.inRange(hsv, lower_white, upper_white)
+    yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+    obstacle_mask = cv2.inRange(hsv, lower_obstacle, upper_obstacle)
 
-    # Apply morphological operations to remove noise
-    mask_yellow = cv2.erode(mask_yellow, None, iterations=2)
-    mask_yellow = cv2.dilate(mask_yellow, None, iterations=2)
-
-    mask_white = cv2.erode(mask_white, None, iterations=2)
-    mask_white = cv2.dilate(mask_white, None, iterations=2)
-
-    # Find contours for both colors
-    contours_yellow, _ = cv2.findContours(mask_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contours_white, _ = cv2.findContours(mask_white, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Function to process detected balls and print location
-    def detect_ball(contours, frame, color_name, draw_color):
-        for contour in contours:
-            ((x, y), radius) = cv2.minEnclosingCircle(contour)
-
-            if 18 <= radius <= 22:  # Approximate pixel size for a 40mm ball
-                cv2.circle(frame, (int(x), int(y)), int(radius), draw_color, 2)
-                cv2.putText(frame, f"{color_name} ({int(x)}, {int(y)})", (int(x) - 30, int(y) - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, draw_color, 2)
-
-                # Print ball color and location in console
-                print(f"{color_name} Ball Detected at: ({int(x)}, {int(y)})")
-
-    # Detect yellow balls
-    detect_ball(contours_yellow, frame, "Yellow", (0, 255, 255))
-
-    # Detect white balls
-    detect_ball(contours_white, frame, "White", (255, 255, 255))
+    # Detect objects
+    white_positions = find_objects(white_mask, "White Ball", (255, 255, 255), frame)
+    yellow_positions = find_objects(yellow_mask, "Yellow Ball", (0, 255, 255), frame)
+    obstacle_positions = find_objects(obstacle_mask, "Obstacle", (0, 0, 255), frame)
 
     # Show results
-    cv2.imshow("Yellow Mask", mask_yellow)
-    cv2.imshow("White Mask", mask_white)
-    cv2.imshow("Detected Balls", frame)
+    cv2.imshow("Processed Frame", frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to exit
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
