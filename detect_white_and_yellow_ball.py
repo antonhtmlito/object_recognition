@@ -11,24 +11,44 @@ upper_white = np.array([180, 20, 255])  # Only allows pure whites
 lower_yellow = np.array([20, 100, 100])
 upper_yellow = np.array([30, 255, 255])
 
-lower_obstacle = np.array([10, 150, 150])
-upper_obstacle = np.array([30, 255, 255])
+# Change obstacle color range (e.g., for red or blue obstacles)
+lower_obstacle = np.array([0, 150, 100])   # Example for detecting RED obstacles
+upper_obstacle = np.array([10, 255, 255])  # Adjust depending on obstacle color
 
-def find_objects(mask, color_name, color, frame):
-    """Finds objects in the given mask and draws bounding boxes with labels."""
+def find_balls(mask, color_name, color, frame):
+    """Finds circular balls using contours and minEnclosingCircle()."""
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     positions = []
 
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 100:  # Ensures we filter very small noise
-            x, y, w, h = cv2.boundingRect(cnt)
-            cx, cy = x + w // 2, y + h // 2  # Center coordinates
-            positions.append((cx, cy))
+        if area > 100:  # Ensures we filter out noise
+            ((x, y), radius) = cv2.minEnclosingCircle(cnt)
+            if 10 <= radius <= 22:  # Ensures it's about 40mm
+                positions.append((int(x), int(y)))
 
-            # Draw bounding box and label
-            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-            cv2.putText(frame, color_name, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+                # Draw the detected ball
+                cv2.circle(frame, (int(x), int(y)), int(radius), color, 2)
+                cv2.putText(frame, f"{color_name} ({int(x)}, {int(y)})", 
+                            (int(x) - 20, int(y) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+
+    return positions
+
+def find_obstacles(mask, frame):
+    """Finds obstacles using bounding boxes (for non-circular objects)."""
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    positions = []
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 200:  # Ensures we filter out small noise
+            x, y, w, h = cv2.boundingRect(cnt)
+            positions.append((x + w // 2, y + h // 2))
+
+            # Draw bounding box
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            cv2.putText(frame, f"Obstacle ({x+w//2}, {y+h//2})", 
+                        (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
     return positions
 
@@ -45,9 +65,19 @@ while True:
     obstacle_mask = cv2.inRange(hsv, lower_obstacle, upper_obstacle)
 
     # Detect objects
-    white_positions = find_objects(white_mask, "White Ball", (255, 255, 255), frame)
-    yellow_positions = find_objects(yellow_mask, "Yellow Ball", (0, 255, 255), frame)
-    obstacle_positions = find_objects(obstacle_mask, "Obstacle", (0, 0, 255), frame)
+    white_positions = find_balls(white_mask, "White Ball", (255, 255, 255), frame)
+    yellow_positions = find_balls(yellow_mask, "Yellow Ball", (0, 255, 255), frame)
+    obstacle_positions = find_obstacles(obstacle_mask, frame)
+
+    # Print ball locations in real-time
+    for pos in white_positions:
+        print(f"White Ball Detected at: {pos}")
+
+    for pos in yellow_positions:
+        print(f"Yellow Ball Detected at: {pos}")
+
+    for pos in obstacle_positions:
+        print(f"Obstacle Detected at: {pos}")
 
     # Show results
     cv2.imshow("Processed Frame", frame)
