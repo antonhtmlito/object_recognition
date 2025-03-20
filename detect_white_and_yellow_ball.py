@@ -4,12 +4,12 @@ import numpy as np
 # Open webcam
 cap = cv2.VideoCapture(0)
 
-# Define HSV color ranges
+# Definer HSV-farveområder (skal justeres efter lysforhold)
 lower_white = np.array([0, 0, 230])  # Very low saturation, very high brightness
 upper_white = np.array([180, 20, 255])  # Only allows pure whites
 
-lower_yellow = np.array([20, 100, 100])
-upper_yellow = np.array([30, 255, 255])
+lower_yellow = np.array([5, 100, 100])
+upper_yellow = np.array([20, 255, 255])
 
 # Change obstacle color range (e.g., for red or blue obstacles)
 lower_obstacle = np.array([0, 150, 100])   # Example for detecting RED obstacles
@@ -24,7 +24,7 @@ def find_balls(mask, color_name, color, frame):
         area = cv2.contourArea(cnt)
         if area > 100:  # Ensures we filter out noise
             ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-            if 18 <= radius <= 22:  # Ensures it's a 40mm ball
+            if 10 <= radius <= 22:  # Ensures it's about 40mm
                 positions.append((int(x), int(y)))
 
                 # Draw the detected ball
@@ -86,4 +86,4 @@ while True:
         break
 
 cap.release()
-cv2.destroyAllWindows()
+cv2.destroyAllWindows() 
