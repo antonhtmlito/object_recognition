@@ -1,0 +1,20 @@
+[
+    {
+        "name": "orangeBall",
+        "type": "ball",
+        "colorLowerBound" :[ 5, 100, 100],
+        "colorUpperBound" :[ 20, 255, 255]  
+    },
+    {
+        "name": "whiteBall",
+        "type": "ball",
+        "colorLowerBound" :[ 0, 0, 230],
+        "colorUpperBound" :[ 180, 20, 255]
+    },
+    {
+        "name": "obstacle",
+        "type": "obstacle",
+        "colorLowerBound" :[ 0, 150, 100],
+        "colorUpperBound" :[ 20, 255, 255]
+    },
+]
