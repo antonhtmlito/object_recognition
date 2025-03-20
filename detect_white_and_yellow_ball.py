@@ -24,7 +24,7 @@ def find_balls(mask, color_name, color, frame):
         area = cv2.contourArea(cnt)
         if area > 100:  # Ensures we filter out noise
             ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-            if 10 <= radius <= 22:  # Ensures it's about 40mm
+            if 18 <= radius <= 22:  # Ensures it's a 40mm ball
                 positions.append((int(x), int(y)))
 
                 # Draw the detected ball
