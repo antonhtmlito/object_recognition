@@ -15,6 +15,6 @@
         "name": "obstacle",
         "type": "obstacle",
         "colorLowerBound" :[ 0, 150, 100],
-        "colorUpperBound" :[ 20, 255, 255]
-    },
+        "colorUpperBound" :[ 10, 255, 255]
+    }
 ]
