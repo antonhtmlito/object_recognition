@@ -22,7 +22,7 @@ def find_balls(mask, color_name, color, frame):
 
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
 
-            if circularity > 0.7:  # Filter for roundness
+            if circularity > 0.8:  # Filter for roundness
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                 positions.append((int(x), int(y)))
 

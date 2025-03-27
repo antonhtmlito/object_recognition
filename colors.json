@@ -8,8 +8,9 @@
     {
         "name": "whiteBall",
         "type": "ball",
-        "colorLowerBound" :[ 0, 0, 230],
-        "colorUpperBound" :[ 180, 20, 255]
+        "colorLowerBound": [0, 0, 180],
+        "colorUpperBound": [180, 50, 255]
+
     },
     {
         "name": "obstacle",
