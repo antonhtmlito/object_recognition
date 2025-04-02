@@ -35,19 +35,29 @@ def find_balls(mask, color_name, color, frame):
 
 def find_obstacles(mask, name, frame):
     """Finds obstacles using bounding boxes (for non-circular objects)."""
+
+    kernel = np.ones((3, 3), np.uint8)
+    mask = cv2.erode(mask, kernel, iterations=1)
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     positions = []
 
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 200:  # Ensures we filter out small noise
-            x, y, w, h = cv2.boundingRect(cnt)
-            positions.append((x + w // 2, y + h // 2))
+        if area > 200:  # Filter small blobs
+           # Get the contour's center using moments
+            M = cv2.moments(cnt)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                positions.append((cx, cy))
 
-            # Draw bounding box
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.putText(frame, f"Obstacle ({x+w//2}, {y+h//2})", 
-                        (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+            # Draw the actual shape (contour)
+            cv2.drawContours(frame, [cnt], -1, (0, 0, 255), 2)
+
+             # Label the shape
+            cv2.putText(frame, f"{name} ({cx}, {cy})", 
+                (cx - 40, cy - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
 
     return positions
 
