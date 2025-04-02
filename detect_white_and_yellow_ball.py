@@ -56,14 +56,22 @@ while True:
     if not ret:
         break
 
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     for obj in object_configs:
         name = obj["name"]
         obj_type = obj["type"]
-        lower = np.array(obj["colorLowerBound"])
-        upper = np.array(obj["colorUpperBound"])
-        mask = cv2.inRange(hsv, lower, upper)
+
+        if "white" in name.lower() and obj_type == "ball":
+            _, mask = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
+            draw_color = (255, 255, 255)
+        else:
+            lower = np.array(obj["colorLowerBound"])
+            upper = np.array(obj["colorUpperBound"])
+            mask = cv2.inRange(hsv, lower, upper)
+            draw_color = (0, 140, 255)  # orange or default for other balls
+
 
         if obj_type == "ball":
             draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255)
