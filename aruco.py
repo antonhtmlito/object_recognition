@@ -3,8 +3,7 @@ import numpy as np
 
 def detect_aruco_markers():
     # Initialize the camera
-    cap = cv2.VideoCapture(2)
-
+    cap = cv2.VideoCapture(1)
 
     # Check if camera opened successfully
     if not cap.isOpened():
@@ -12,7 +11,7 @@ def detect_aruco_markers():
         return
 
     # Create ArUco dictionary (6x6 with 250 markers)
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     parameters = cv2.aruco.DetectorParameters()
 
     # Create the ArUco detector

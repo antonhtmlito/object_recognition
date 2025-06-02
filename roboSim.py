@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 import cv2
 import math
-from time import sleep
+from robodetectíon import getBotPosition
 
 # Pygame setup
 pygame.init()
@@ -71,10 +71,22 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
+cap = cv2.VideoCapture(2)
+if not cap.isOpened():
+    raise Exception("camera not openened")
+
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    botPos = getBotPosition(cap)
+    print(botPos)
+    if botPos is not None:
+        player["x"] = botPos["position"][0]
+        player["y"] = botPos["position"][1]
+        player["rotation"] = botPos["angle"]
 
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
@@ -104,3 +116,4 @@ while running:
     clock.tick(60)
 
 pygame.quit()
+
