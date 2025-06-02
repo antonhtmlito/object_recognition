@@ -2,14 +2,14 @@
     {
         "name": "orangeBall",
         "type": "ball",
-        "colorLowerBound" :[ 5, 70, 70],
-        "colorUpperBound" :[ 30, 255, 255]  
+        "colorLowerBound" :[ 10, 50, 150],
+        "colorUpperBound" :[ 35, 255, 255]  
     },
     {
         "name": "whiteBall",
         "type": "ball",
-        "colorLowerBound": [0, 0, 200],
-        "colorUpperBound": [180, 30, 255]
+        "colorLowerBound": [0, 0, 220],
+        "colorUpperBound": [180, 40, 255]
 
 
     },
