@@ -6,6 +6,7 @@ import cv2
 import math
 from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
+from routing_functions import update_robot_state, update_targets_state, update_obstacle_state, calculate_target, is_path_blocked, find_detour, calculate_angle, calculate_distance
 
 # Pygame setup
 pygame.init()
@@ -41,15 +42,6 @@ mask_surface = pygame.image.frombuffer(
     (width, height),
     'RGBA'
 ).convert_alpha()
-
-player = {
-    "x": 960,
-    "y": 540,
-    "rotation": 0,
-    "width": 60,
-    "height": 90
-    }
-
 
 def cast_rays(player, max_distance=700):
     start_angle = player["rotation"]
@@ -112,6 +104,35 @@ while running:
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
+
+    # Global variables predefined
+    player = {
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "width": 0,
+        "height": 0
+    }
+    targets = {
+        [0, 0]
+    }
+    obstacle = {
+        "x": 0,
+        "y": 0,
+    }
+    robot_x = 0
+    robot_y = 0
+    robot_angle = 0
+    obstacle_x = 0
+    obstacle_y = 0
+    target_x = None
+    target_y = None
+    all_targets = []
+
+# Update states
+    update_robot_state(player)
+    update_targets_state(targets)
+    update_obstacle_state(obstacle)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
