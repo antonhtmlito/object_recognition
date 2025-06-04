@@ -6,6 +6,7 @@ import cv2
 import math
 from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
+from roboController import RoboController
 
 # Pygame setup
 pygame.init()
@@ -50,6 +51,8 @@ player = {
     "height": 90
     }
 
+roboController = RoboController()
+
 
 def cast_rays(player, max_distance=700):
     start_angle = player["rotation"]
@@ -83,6 +86,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.K_UP:
+            running = False
+            print("forward")
 
     botPos = getBotPosition(cap)
     print(botPos)
@@ -124,10 +130,13 @@ while running:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_LEFT]:
-        player["rotation"] = player["rotation"] - 0.01
+        roboController.rotate_counterClockwise(10)
+#        player["rotation"] = player["rotation"] - 0.01
     elif keys[pygame.K_RIGHT]:
-        player["rotation"] = player["rotation"] + 0.01
-#    elif keys[pygame.K_UP]:
+        roboController.rotate_clockwise(10)
+#        player["rotation"] = player["rotation"] + 0.01
+    elif keys[pygame.K_UP]:
+        roboController.forward(2)
 #    elif keys[pygame.K_DOWN]:
 
     pygame.display.flip()
