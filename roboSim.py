@@ -7,6 +7,7 @@ import math
 from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
+from routing_functions import update_robot_state, update_obstacle_state, update_targets_state, calculate_target, calculate_distance, calculate_angle, is_path_blocked, find_detour
 
 # Pygame setup
 pygame.init()
@@ -43,13 +44,29 @@ mask_surface = pygame.image.frombuffer(
     'RGBA'
 ).convert_alpha()
 
+# Global variables predefined
 player = {
-    "x": 960,
-    "y": 540,
+    "x": 0,
+    "y": 0,
     "rotation": 0,
-    "width": 60,
-    "height": 90
+    "width": 0,
+    "height": 0
     }
+obstacle = {
+    "x": 0,
+    "y": 0,
+}
+targets = {
+    []
+}
+robot_x = 0
+robot_y = 0
+robot_angle = 0
+obstacle_x = 0
+obstacle_y = 0
+target_x = None
+target_y = None
+all_targets = []
 
 roboController = RoboController()
 
@@ -118,6 +135,18 @@ while running:
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
+
+# Update data
+    update_robot_state(player)
+    update_obstacle_state(obstacle)
+    update_targets_state(targets)
+
+# Drive to target
+    angle_to_turn = calculate_angle(target_x, target_y)
+    if abs(angle_to_turn) > 2:
+        roboController.rotate_clockwise(angle_to_turn)
+    else:
+        roboController.forward(calculate_distance(target_x, target_y))
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
