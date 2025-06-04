@@ -58,9 +58,11 @@ def find_detour( detour_distance=100):
 
 # Angle from robot to target
 def calculate_angle(target_x, target_y):
+    if target_x is None or target_y is None:
+        return None
     angle_to_target = math.degrees(math.atan2(target_y - robot_y, target_x - robot_x))
-    angle_difference = (angle_to_target - robot_angle + math.radians(360)) % math.radians(360)
-    return angle_difference if angle_difference <= math.radians(180) else angle_difference - math.radians(360)
+    angle_difference = (angle_to_target - robot_angle + 360) % 360
+    return angle_difference if angle_difference <= 180 else angle_difference - 360
 
 # Distance from robot to target
 def calculate_distance(target_x, target_y):

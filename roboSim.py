@@ -57,15 +57,15 @@ obstacle = {
     "y": 0,
 }
 targets = {
-    []
+    "list": []
 }
 robot_x = 0
 robot_y = 0
 robot_angle = 0
 obstacle_x = 0
 obstacle_y = 0
-target_x = None
-target_y = None
+target_x = 100
+target_y = 100
 all_targets = []
 
 roboController = RoboController()
@@ -139,12 +139,16 @@ while running:
 # Update data
     update_robot_state(player)
     update_obstacle_state(obstacle)
-    update_targets_state(targets)
+    #update_targets_state(targets)
+
 
 # Drive to target
     angle_to_turn = calculate_angle(target_x, target_y)
-    if abs(angle_to_turn) > 2:
-        roboController.rotate_clockwise(angle_to_turn)
+    print(angle_to_turn)
+    if angle_to_turn is None:
+        ...
+    elif abs(angle_to_turn) > 2:
+        roboController.rotate_clockwise(int(angle_to_turn))
     else:
         roboController.forward(calculate_distance(target_x, target_y))
 
