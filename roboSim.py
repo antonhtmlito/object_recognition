@@ -1,8 +1,11 @@
+from robodetectíon import getBotPosition
+
 import pygame
 import numpy as np
 import cv2
 import math
 from robodetectíon import getBotPosition
+from detect_white_and_yellow_ball import get_ball_positions
 
 # Pygame setup
 pygame.init()
@@ -71,7 +74,7 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -88,8 +91,23 @@ while running:
         player["y"] = botPos["position"][1]
         player["rotation"] = botPos["angle"]
 
+    ball_positions = get_ball_positions(cap)
+
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
+
+    for color_name, coords in ball_positions.items():
+        # decide Pygame color by inspecting the HSV‐based name
+        if "white" in color_name.lower():
+            py_color = (255, 255, 255)
+        elif "orange" in color_name.lower():
+            py_color = (0, 140, 255)
+        else:
+            py_color = (200, 200, 200)
+
+        for (bx, by) in coords:
+            pygame.draw.circle(screen, py_color, (bx, by), 8)
+
     # Draw player
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)

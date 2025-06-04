@@ -1,26 +1,27 @@
+# detect_white_and_yellow_ball.py
+
 import cv2
 import numpy as np
 import json
 
-# Load object configs
+# ──────────────────────────────────────────────────────────────────────────────
+# Load object configs from colors.json (your HSV thresholds, etc.)
+# ──────────────────────────────────────────────────────────────────────────────
 with open("colors.json", "r") as f:
     object_configs = json.load(f)
 
-# -----------------------------------------------------------------------------
-# Helper function: run exactly the same ball‐detection logic, but return data
-# -----------------------------------------------------------------------------
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) get_ball_positions(cap)
+#
+# Reads exactly one frame from `cap`, runs your existing find_balls logic,
+# and returns a dict of lists of (x,y) positions for every ball type.
+# It does NOT modify or show any windows.
+# ──────────────────────────────────────────────────────────────────────────────
 def get_ball_positions(cap):
-    """
-    Grabs one frame from `cap`, runs your ball‐detection logic, and returns a dict:
-      { 
-        "white ball": [(x1, y1), (x2, y2), …], 
-        "orange ball": [(x3, y3), …],
-        …
-      }
-    If no frame is read, returns {}.  (It does NOT draw or imshow anything.)
-    """
     ret, frame = cap.read()
     if not ret:
+        # If the camera read failed, return an empty dict
         return {}
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -37,11 +38,8 @@ def get_ball_positions(cap):
         upper = np.array(obj["colorUpperBound"])
         mask = cv2.inRange(hsv, lower, upper)
 
-        # (Optional: if you want the same “exclude yellow” logic for white,
-        #  you could uncomment/adjust it here. For now, we match exactly
-        #  what your loop does when "white" in name.lower().)
+        # (Optional) if you want the same yellow‐exclusion for white balls:
         if "white" in name.lower():
-            # If you need to exclude yellow from the white mask:
             # yellow_lower = np.array([20, 100, 100])
             # yellow_upper = np.array([40, 255, 255])
             # yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
@@ -50,6 +48,7 @@ def get_ball_positions(cap):
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         positions = []
+
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > 100:
@@ -59,7 +58,7 @@ def get_ball_positions(cap):
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 8:
+                    if radius > 10:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -69,29 +68,12 @@ def get_ball_positions(cap):
     return ball_positions
 
 
-# -----------------------------------------------------------------------------
-# Everything below here is unchanged from your original script,
-# except that the while‐loop is now guarded by __name__ == "__main__".
-# -----------------------------------------------------------------------------
-
-# Open webcam
-cap = cv2.VideoCapture(0)
-
-# Global HSV for mouse callback
-hsv = None
-
-def mouse_callback(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE and hsv is not None:
-        hsv_val = hsv[y, x]
-        print(f"HSV at ({x},{y}): {hsv_val}")
-
-cv2.namedWindow("Processed Frame")
-cv2.setMouseCallback("Processed Frame", mouse_callback)
-
+# ──────────────────────────────────────────────────────────────────────────────
+# 2) (unchanged) find_balls() and find_obstacles() helpers
+# ──────────────────────────────────────────────────────────────────────────────
 def find_balls(mask, color_name, color, frame):
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    positions = []
-
+    detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
         if area > 100:
@@ -101,13 +83,25 @@ def find_balls(mask, color_name, color, frame):
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
             if circularity > 0.8:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 8:
+                if radius > 10:
                     continue
-                positions.append((int(x), int(y)))
+
+                # Store this (x,y) under the key `color_name`
+                detections.setdefault(color_name, []).append((int(x), int(y)))
+
+                # Draw the circle + label on `frame` as before
                 cv2.circle(frame, (int(x), int(y)), int(radius), color, 2)
-                cv2.putText(frame, f"{color_name} ({int(x)}, {int(y)})",
-                            (int(x) - 20, int(y) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-    return positions
+                cv2.putText(
+                    frame,
+                    f"{color_name} ({int(x)}, {int(y)})",
+                    (int(x) - 20, int(y) - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    color,
+                    2
+                )
+
+    return detections
 
 def find_obstacles(mask, name, frame):
     kernel = np.ones((3, 3), np.uint8)
@@ -124,13 +118,38 @@ def find_obstacles(mask, name, frame):
                 cy = int(M["m01"] / M["m00"])
                 positions.append((cx, cy))
                 cv2.drawContours(frame, [cnt], -1, (0, 0, 255), 2)
-                cv2.putText(frame, f"{name} ({cx}, {cy})",
-                            (cx - 40, cy - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                cv2.putText(
+                    frame,
+                    f"{name} ({cx}, {cy})",
+                    (cx - 40, cy - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (0, 0, 255),
+                    2
+                )
     return positions
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 3) Original “live loop” moved under this guard so it DOES NOT run on import
+# ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    # This block runs only when you execute this script directly.
-    # The “live loop” is untouched, so you still see the same windows/drawings.
+    # Open webcam
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Could not open camera")
+        exit(1)
+
+    # Global HSV for mouse callback
+    hsv = None
+
+    def mouse_callback(event, x, y, flags, param):
+        if event == cv2.EVENT_MOUSEMOVE and hsv is not None:
+            hsv_val = hsv[y, x]
+            print(f"HSV at ({x},{y}): {hsv_val}")
+
+    cv2.namedWindow("Processed Frame")
+    cv2.setMouseCallback("Processed Frame", mouse_callback)
 
     while True:
         ret, frame = cap.read()
@@ -150,11 +169,11 @@ if __name__ == "__main__":
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
-               # yellow_lower = np.array([20, 100, 100])
-               # yellow_upper = np.array([40, 255, 255])
-               # yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
-               # mask = cv2.bitwise_and(mask, cv2.bitwise_not(yellow_mask))
-               white_mask_display = mask.copy()
+                # yellow_lower = np.array([20, 100, 100])
+                # yellow_upper = np.array([40, 255, 255])
+                # yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+                # mask = cv2.bitwise_and(mask, cv2.bitwise_not(yellow_mask))
+                white_mask_display = mask.copy()
 
             draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255)
 
