@@ -70,8 +70,8 @@ robot_y = 0
 robot_angle = 0
 obstacle_x = 0
 obstacle_y = 0
-target_x = 100
-target_y = 100
+target_x = 200
+target_y = 200
 all_targets = []
 
 roboController = RoboController()
