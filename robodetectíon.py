@@ -14,7 +14,7 @@ def calcAngle(corners):
     angle_rad = np.arctan2(dy, dx)
     angle_deg = np.degrees(angle_rad)
     angle_deg = (angle_deg + 360) % 360
-    return angle_deg
+    return angle_rad
 
 
 def getBotPosition(camera):
