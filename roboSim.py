@@ -1,3 +1,5 @@
+import time
+
 from robodetectíon import getBotPosition
 
 import pygame
@@ -14,6 +16,10 @@ pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
+
+# Update interval
+last_update_time = time.time()
+update_interval = 2  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -137,20 +143,30 @@ while running:
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
 # Update data
-    update_robot_state(player)
-    update_obstacle_state(obstacle)
-    #update_targets_state(targets)
+    current_time = time.time()
+    if current_time - last_update_time > update_interval:
+        update_robot_state(player)
+        update_obstacle_state(obstacle)
+        # update_targets_state(targets)
+        last_update_time = current_time
 
+    pygame.draw.circle(screen, "red", (target_x, target_y), 8)
 
 # Drive to target
     angle_to_turn = calculate_angle(target_x, target_y)
-    print(angle_to_turn)
+    print("angle to turn: ", angle_to_turn)
     if angle_to_turn is None:
-        ...
-    elif abs(angle_to_turn) > 2:
-        roboController.rotate_clockwise(int(angle_to_turn))
+        pass
+    elif angle_to_turn > 5:
+        roboController.rotate_clockwise(5)
+        time.sleep(1)
+    elif angle_to_turn < -5:
+        roboController.rotate_counterClockwise(5)
+        time.sleep(1)
     else:
-        roboController.forward(calculate_distance(target_x, target_y))
+        distance = calculate_distance(target_x, target_y)
+        if distance > 5:
+            roboController.forward(0.1)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))

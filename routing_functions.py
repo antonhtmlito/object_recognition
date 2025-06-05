@@ -1,5 +1,12 @@
 import math
 
+robot_x = 0
+robot_y = 0
+robot_angle = 0
+obstacle_x = 0
+obstacle_y = 0
+target_x = 100
+target_y = 100
 # Robot state
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
