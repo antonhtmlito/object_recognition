@@ -13,7 +13,7 @@ import routing_functions
 
 # Pygame setup
 pygame.init()
-screen = pygame.display.set_mode((700, 500))
+screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
 
@@ -92,7 +92,7 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -103,7 +103,7 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            routing_functions.update_targets_state(([mouse_x, mouse_y],))
+            routing_functions.all_targets.append((mouse_x, mouse_y))
             routing_functions.calculate_target()
         if event.type == pygame.K_UP:
             running = False
@@ -146,8 +146,15 @@ while running:
         # update_targets_state(targets)
         last_update_time = current_time
 
+# Draw targets
     for tx, ty in routing_functions.all_targets:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
+
+# Remove targets
+    if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+        if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
+            routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+        routing_functions.calculate_target()
 
 # Drive to target
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
