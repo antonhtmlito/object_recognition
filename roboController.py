@@ -14,6 +14,9 @@ class RoboController:
         clientSocket = socket(AF_INET, SOCK_STREAM)
         clientSocket.connect((self.serverName, self.serverPort))
         clientSocket.send(message.encode())
+        response = clientSocket.recv(1024).decode()
+        if response:
+            print(f"Response from server: {response}")
         clientSocket.close()
 
     def forward(self, amount):
