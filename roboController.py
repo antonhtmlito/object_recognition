@@ -10,14 +10,17 @@ class RoboController:
         value = entry
         print(value)
 
-        message = f"{command}, {value}"  # Ensure correct format with a space after the comma
-        clientSocket = socket(AF_INET, SOCK_STREAM)
-        clientSocket.connect((self.serverName, self.serverPort))
-        clientSocket.send(message.encode())
-        response = clientSocket.recv(1024).decode()
-        if response:
-            print(f"Response from server: {response}")
-        clientSocket.close()
+        try:
+            message = f"{command}, {value}"  # Ensure correct format with a space after the comma
+            clientSocket = socket(AF_INET, SOCK_STREAM)
+            clientSocket.connect((self.serverName, self.serverPort))
+            clientSocket.send(message.encode())
+            response = clientSocket.recv(1024).decode()
+            if response:
+                print(f"Response from server: {response}")
+            clientSocket.close()
+        except Exception as e:
+            ...
 
     def forward(self, amount):
         self.send_command("forward", amount)
