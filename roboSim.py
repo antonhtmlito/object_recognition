@@ -55,8 +55,8 @@ player = {
     "x": 0,
     "y": 0,
     "rotation": 0,
-    "width": 0,
-    "height": 0
+    "width": 30,
+    "height": 50,
     }
 obstacle = {
     "x": 0,
@@ -82,7 +82,7 @@ def cast_rays(player, max_distance=700):
     start_x = player["x"]
     start_y = player["y"]
 
-    for i in range(-5,5):
+    for i in range(-5, 5):
         start_x = player["x"] + math.cos(start_angle) * i * 6
         start_y = player["y"] - math.sin(start_angle) * i * 6
 
@@ -100,7 +100,7 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
