@@ -12,7 +12,7 @@ def update_robot_state(player):
     global robot_x, robot_y, robot_angle
     robot_x = player["x"]
     robot_y = player["y"]
-    robot_angle = math.radians(player["rotation"])
+    robot_angle = (player["rotation"])
 
 # Obstacle state
 def update_obstacle_state(obstacle):
@@ -68,7 +68,7 @@ def calculate_angle(target_x, target_y):
     if target_x is None or target_y is None:
         return None
     angle_to_target = math.degrees(math.atan2(target_y - robot_y, target_x - robot_x))
-    angle_difference = (angle_to_target - robot_angle + 360) % 360
+    angle_difference = (angle_to_target - math.degrees(robot_angle) + 360) % 360
     return angle_difference if angle_difference <= 180 else angle_difference - 360
 
 # Distance from robot to target

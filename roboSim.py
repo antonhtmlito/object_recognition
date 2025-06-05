@@ -19,7 +19,7 @@ running = True
 
 # Update interval
 last_update_time = time.time()
-update_interval = 2  # seconds
+update_interval = 0.5  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -166,7 +166,7 @@ while running:
     else:
         distance = calculate_distance(target_x, target_y)
         if distance > 5:
-            roboController.forward(0.1)
+            roboController.forward(0.5)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
