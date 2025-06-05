@@ -105,7 +105,7 @@ while True:
     cv2.imshow("hsv", hsv)
     cv2.imshow("mask", mask)
     cv2.imshow("frame", frame)
-    cv2.imwrite('obstacle_mask.png', mask)
+#    cv2.imwrite('obstacle_mask.png', mask)
 
     if cv2.waitKey(1) & 0xFF == ord('b'):
         print(frame.shape)
