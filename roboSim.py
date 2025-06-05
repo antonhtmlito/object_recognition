@@ -156,16 +156,16 @@ while running:
     if angle_to_turn is None:
         pass
     elif angle_to_turn > 5:
-        roboController.rotate_clockwise(5)
-        time.sleep(0.5)
+        roboController.rotate_clockwise(angle_to_turn)
+        time.sleep(0.05)
     elif angle_to_turn < -5:
-        roboController.rotate_counterClockwise(5)
-        time.sleep(0.5)
+        roboController.rotate_counterClockwise(abs(angle_to_turn))
+        time.sleep(0.05)
     else:
         distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
         if distance > 5:
             roboController.forward(0.5)
-            time.sleep(0.5)
+            time.sleep(0.05)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
