@@ -9,17 +9,17 @@ import math
 from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
-from routing_functions import update_robot_state, update_obstacle_state, update_targets_state, calculate_target, calculate_distance, calculate_angle, is_path_blocked, find_detour
+import routing_functions
 
 # Pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1920, 1080))
+screen = pygame.display.set_mode((700, 500))
 clock = pygame.time.Clock()
 running = True
 
 # Update interval
 last_update_time = time.time()
-update_interval = 0.5  # seconds
+update_interval = 0.1  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -65,14 +65,6 @@ obstacle = {
 targets = {
     "list": []
 }
-robot_x = 0
-robot_y = 0
-robot_angle = 0
-obstacle_x = 0
-obstacle_y = 0
-target_x = 200
-target_y = 200
-all_targets = []
 
 roboController = RoboController()
 
@@ -100,7 +92,7 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -109,6 +101,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            routing_functions.update_targets_state(([mouse_x, mouse_y],))
+            routing_functions.calculate_target()
         if event.type == pygame.K_UP:
             running = False
             print("forward")
@@ -145,28 +141,31 @@ while running:
 # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
-        update_robot_state(player)
-        update_obstacle_state(obstacle)
+        routing_functions.update_robot_state(player)
+        routing_functions.update_obstacle_state(obstacle)
         # update_targets_state(targets)
         last_update_time = current_time
 
-    pygame.draw.circle(screen, "red", (target_x, target_y), 8)
+    for tx, ty in routing_functions.all_targets:
+        pygame.draw.circle(screen, "red", (tx, ty), 8)
 
 # Drive to target
-    angle_to_turn = calculate_angle(target_x, target_y)
+    angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
     print("angle to turn: ", angle_to_turn)
+    print("targets:", routing_functions.target_x, routing_functions.target_y)
     if angle_to_turn is None:
         pass
     elif angle_to_turn > 5:
         roboController.rotate_clockwise(5)
-        time.sleep(1)
+        time.sleep(0.5)
     elif angle_to_turn < -5:
         roboController.rotate_counterClockwise(5)
-        time.sleep(1)
+        time.sleep(0.5)
     else:
-        distance = calculate_distance(target_x, target_y)
+        distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
         if distance > 5:
             roboController.forward(0.5)
+            time.sleep(0.5)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))

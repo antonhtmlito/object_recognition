@@ -5,8 +5,9 @@ robot_y = 0
 robot_angle = 0
 obstacle_x = 0
 obstacle_y = 0
-target_x = 100
-target_y = 100
+target_x = 300
+target_y = 300
+all_targets = []
 # Robot state
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
