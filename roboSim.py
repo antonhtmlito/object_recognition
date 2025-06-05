@@ -70,7 +70,7 @@ roboController = RoboController()
 
 
 def cast_rays(player, max_distance=700):
-    start_angle = player["rotation"]
+    start_angle = player["rotation"] - (math.pi / 2)
     start_x = player["x"]
     start_y = player["y"]
 
@@ -110,7 +110,7 @@ while running:
             print("forward")
 
     botPos = getBotPosition(cap)
-    print(botPos)
+#    print(botPos)
     if botPos is not None:
         player["x"] = botPos["position"][0]
         player["y"] = botPos["position"][1]
@@ -132,7 +132,6 @@ while running:
 
         for (bx, by) in coords:
             pygame.draw.circle(screen, py_color, (bx, by), 8)
-
     # Draw player
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
@@ -159,7 +158,7 @@ while running:
 
 # Drive to target
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
-    print("angle to turn: ", angle_to_turn)
+    #print("angle to turn: ", angle_to_turn)
     print("targets:", routing_functions.target_x, routing_functions.target_y)
     if angle_to_turn is None:
         pass
@@ -176,7 +175,8 @@ while running:
             time.sleep(0.05)
 
 # Rotate the surface around its center
-    rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
+    rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
+    print("rotation:", math.degrees(player["rotation"] + math.pi))
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
 # Draw the rotated player
