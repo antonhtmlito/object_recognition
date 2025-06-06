@@ -4,7 +4,7 @@ import numpy as np
 
 def calcAngle(corners):
     middle = np.mean(corners, axis=0)
-    mean = np.mean(np.array((corners[1], corners[2])), axis=0)
+    mean = np.mean(np.array((corners[0], corners[1])), axis=0)
 
     corner_for_measure = corners[0]
     corner_for_measure = mean

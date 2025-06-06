@@ -1,3 +1,5 @@
+import time
+
 from robodetectíon import getBotPosition
 
 import pygame
@@ -7,12 +9,17 @@ import math
 from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
+import routing_functions
 
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
+
+# Update interval
+last_update_time = time.time()
+update_interval = 0.1  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -43,23 +50,31 @@ mask_surface = pygame.image.frombuffer(
     'RGBA'
 ).convert_alpha()
 
+# Global variables predefined
 player = {
-    "x": 960,
-    "y": 540,
+    "x": 0,
+    "y": 0,
     "rotation": 0,
-    "width": 60,
-    "height": 90
+    "width": 30,
+    "height": 50,
     }
+obstacle = {
+    "x": 0,
+    "y": 0,
+}
+targets = {
+    "list": []
+}
 
 roboController = RoboController()
 
 
 def cast_rays(player, max_distance=700):
-    start_angle = player["rotation"]
+    start_angle = player["rotation"] - (math.pi / 2)
     start_x = player["x"]
     start_y = player["y"]
 
-    for i in range(-5,5):
+    for i in range(-5, 5):
         start_x = player["x"] + math.cos(start_angle) * i * 6
         start_y = player["y"] - math.sin(start_angle) * i * 6
 
@@ -86,12 +101,16 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            routing_functions.all_targets.append((mouse_x, mouse_y))
+            routing_functions.calculate_target()
         if event.type == pygame.K_UP:
             running = False
             print("forward")
 
     botPos = getBotPosition(cap)
-    print(botPos)
+#    print(botPos)
     if botPos is not None:
         player["x"] = botPos["position"][0]
         player["y"] = botPos["position"][1]
@@ -113,14 +132,51 @@ while running:
 
         for (bx, by) in coords:
             pygame.draw.circle(screen, py_color, (bx, by), 8)
-
     # Draw player
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
+# Update data
+    current_time = time.time()
+    if current_time - last_update_time > update_interval:
+        routing_functions.update_robot_state(player)
+        routing_functions.update_obstacle_state(obstacle)
+        # update_targets_state(targets)
+        last_update_time = current_time
+
+# Draw targets
+    for tx, ty in routing_functions.all_targets:
+        pygame.draw.circle(screen, "red", (tx, ty), 8)
+
+# Remove targets
+    if routing_functions.target_x is not None and routing_functions.target_y is not None:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
+                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+            routing_functions.calculate_target()
+
+# Drive to target
+    angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
+    #print("angle to turn: ", angle_to_turn)
+    print("targets:", routing_functions.target_x, routing_functions.target_y)
+    if angle_to_turn is None:
+        pass
+    elif angle_to_turn > 5:
+        roboController.rotate_clockwise(angle_to_turn)
+        time.sleep(0.05)
+    elif angle_to_turn < -5:
+        roboController.rotate_counterClockwise(abs(angle_to_turn))
+        time.sleep(0.05)
+    else:
+        distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
+        if distance > 5:
+            roboController.forward(0.5)
+            time.sleep(0.05)
+
 # Rotate the surface around its center
-    rotated_surface = pygame.transform.rotate(player_surface, math.degrees(player["rotation"]))
+    rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
+    print("rotation:", math.degrees(player["rotation"] + math.pi))
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
 # Draw the rotated player
