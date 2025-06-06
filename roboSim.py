@@ -161,17 +161,18 @@ while running:
         routing_functions.update_obstacle_state(obstacle)
         # update_targets_state(targets)
         last_update_time = current_time
+        routing_functions.calculate_target()
 
 # Draw targets
     for tx, ty in routing_functions.all_targets:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
 
 # Remove targets
-#    if routing_functions.target_x is not None and routing_functions.target_y is not None:
-#        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
-#            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
-#                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
-#            routing_functions.calculate_target()
+    if routing_functions.target_x is not None and routing_functions.target_y is not None:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
+                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+            routing_functions.calculate_target()
 
 # Drive to target
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
@@ -179,17 +180,17 @@ while running:
     print("targets:", routing_functions.target_x, routing_functions.target_y)
     if angle_to_turn is None:
         pass
-    elif angle_to_turn > 5:
+    elif angle_to_turn > 3:
         roboController.rotate_clockwise(angle_to_turn)
-    #    time.sleep(0.05)
-    elif angle_to_turn < -5:
+        time.sleep(0.05)
+    elif angle_to_turn < -3:
         roboController.rotate_counterClockwise(abs(angle_to_turn))
-    #    time.sleep(0.05)
+        time.sleep(0.05)
     else:
         distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
         if distance > 5:
             roboController.forward(0.5)
-    #        time.sleep(0.05)
+            time.sleep(0.05)
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
@@ -198,7 +199,7 @@ while running:
 
 # Draw the rotated player
     screen.blit(rotated_surface, rotated_rect.topleft)
-    cast_rays(player, max_distance=500)
+    cast_rays(player, max_distance=10)
 
     keys = pygame.key.get_pressed()
 
