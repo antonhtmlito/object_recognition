@@ -1,7 +1,4 @@
 import time
-
-from robodetectíon import getBotPosition
-
 import pygame
 import numpy as np
 import cv2
@@ -199,4 +196,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
