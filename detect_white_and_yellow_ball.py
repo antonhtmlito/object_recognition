@@ -179,8 +179,6 @@ if __name__ == "__main__":
 
             if obj_type == "ball":
                 positions = find_balls(mask, name, draw_color, frame)
-            elif obj_type == "obstacle":
-                positions = find_obstacles(mask, name, frame)
             else:
                 continue
 
