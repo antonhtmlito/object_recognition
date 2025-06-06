@@ -180,18 +180,6 @@ while running:
     screen.blit(rotated_surface, rotated_rect.topleft)
     cast_rays(player, max_distance=500)
 
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_LEFT]:
-        roboController.rotate_counterClockwise(10)
-#        player["rotation"] = player["rotation"] - 0.01
-    elif keys[pygame.K_RIGHT]:
-        roboController.rotate_clockwise(10)
-#        player["rotation"] = player["rotation"] + 0.01
-    elif keys[pygame.K_UP]:
-        roboController.forward(2)
-#    elif keys[pygame.K_DOWN]:
-
     pygame.display.flip()
     clock.tick(60)
 
