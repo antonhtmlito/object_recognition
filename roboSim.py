@@ -119,6 +119,16 @@ while running:
                 routing_functions.all_targets.append((bx, by))
 
     screen.fill("black")
+
+    # Draw a cross obstacle in the center of the screen
+    center_x, center_y = 400, 400
+    pygame.draw.line(screen, "white", (center_x - 50, center_y), (center_x + 50, center_y), 5)
+    pygame.draw.line(screen, "white", (center_x, center_y - 50), (center_x, center_y + 50), 5)
+
+    # Set simulated obstacle coordinates for routing
+    obstacle["x"] = center_x
+    obstacle["y"] = center_y
+
     screen.blit(mask_surface, (0, 0))
 
     # Now draw each ball as before

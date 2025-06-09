@@ -54,6 +54,12 @@ def handle_simulated_routing(player, obstacle, roboController):
 
     tx, ty = routing_functions.target_x, routing_functions.target_y
     if tx is not None and ty is not None:
+        # Obstacle avoidance
+        if routing_functions.is_path_blocked(tx, ty):
+            tx, ty = routing_functions.find_detour()
+            routing_functions.target_x = tx
+            routing_functions.target_y = ty
+
         dx = tx - player["x"]
         dy = ty - player["y"]
         distance = math.hypot(dx, dy)
@@ -67,12 +73,11 @@ def handle_simulated_routing(player, obstacle, roboController):
             angle_diff = angle_to_target - player["rotation"]
             angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
 
-
             TURN_SPEED = 0.1
-            MOVE_THRESHOLD = 0.2
+            MOVE_THRESHOLD = 0.1
 
             if abs(angle_diff) > MOVE_THRESHOLD:
                 player["rotation"] += TURN_SPEED * (1 if angle_diff > 0 else -1)
-            else:
-                player["x"] += math.cos(player["rotation"]) * 2
-                player["y"] += math.sin(player["rotation"]) * 2
+                return
+            player["x"] += math.cos(player["rotation"]) * 2
+            player["y"] += math.sin(player["rotation"]) * 2
