@@ -9,6 +9,8 @@ from roboController import RoboController
 import routing_functions
 import routing_manager
 
+SIMULATION_MODE = True
+
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
@@ -64,26 +66,21 @@ roboController = RoboController()
 
 
 def cast_rays(player, max_distance=700):
-    start_angle = player["rotation"] - (math.pi / 2)
-    start_x = player["x"]
-    start_y = player["y"]
+    start_angle = player["rotation"]
 
     for i in range(-5, 5):
-        start_x = player["x"] + math.cos(start_angle) * i * 6
-        start_y = player["y"] - math.sin(start_angle) * i * 6
+        offset_angle = start_angle + (i * 0.05)
+        ray_start_x = player["x"]
+        ray_start_y = player["y"]
 
         for pixel in range(max_distance):
-            target_x = int(start_x + math.sin(start_angle) * pixel)
-            target_y = int(start_y + math.cos(start_angle) * pixel)
+            target_x = int(ray_start_x + math.cos(offset_angle) * pixel)
+            target_y = int(ray_start_y + math.sin(offset_angle) * pixel)
             if 0 <= target_x < alpha_channel.shape[1] and 0 <= target_y < alpha_channel.shape[0]:
                 if alpha_channel[target_y][target_x] > 0:
-                    print(alpha_channel[target_y][target_x])
-                    print("found")
-                    print(target_x)
-                    print(target_y)
                     break
 
-        pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
+        pygame.draw.line(screen, (255, 50, 50), (ray_start_x, ray_start_y), (target_x, target_y))
 
 
 cap = cv2.VideoCapture(0)
@@ -103,14 +100,17 @@ while running:
             running = False
             print("forward")
 
-    botPos = getBotPosition(cap)
-#    print(botPos)
-    if botPos is not None:
-        player["x"] = botPos["position"][0]
-        player["y"] = botPos["position"][1]
-        player["rotation"] = botPos["angle"]
-
-    ball_positions = get_ball_positions(cap)
+    if SIMULATION_MODE:
+        routing_manager.handle_simulated_routing(player, obstacle, roboController)
+        ball_positions = {}
+    else:
+        botPos = getBotPosition(cap)
+        if botPos is not None:
+            player["x"] = botPos["position"][0]
+            player["y"] = botPos["position"][1]
+            player["rotation"] = botPos["angle"]
+        ball_positions = get_ball_positions(cap)
+        routing_manager.handle_routing(player, obstacle, roboController)
 
     # Add each detected ball position as a target (if it isn’t already in the list)
     for coords in ball_positions.values():
@@ -130,19 +130,8 @@ while running:
         else:
             py_color = (200, 200, 200)
 
-        for (bx, by) in coords:
-            pygame.draw.circle(screen, py_color, (bx, by), 8)
+        # Removed duplicate ball drawing here
 
-        # decide Pygame color by inspecting the HSV‐based name
-        if "white" in color_name.lower():
-            py_color = (255, 255, 255)
-        elif "orange" in color_name.lower():
-            py_color = (0, 140, 255)
-        else:
-            py_color = (200, 200, 200)
-
-        for (bx, by) in coords:
-            pygame.draw.circle(screen, py_color, (bx, by), 8)
     # Draw player
     # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
@@ -153,10 +142,10 @@ while running:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
 
 # handle routing
-    routing_manager.handle_routing(player, obstacle, roboController)
+#    routing_manager.handle_routing(player, obstacle, roboController)
 
 # Rotate the surface around its center
-    rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
+    rotated_surface = pygame.transform.rotate(player_surface, -math.degrees(player["rotation"]))
     print("rotation:", math.degrees(player["rotation"] + math.pi))
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
