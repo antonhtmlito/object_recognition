@@ -90,11 +90,11 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area > 4:
+            if area > 100:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
-                circularity = 1 * np.pi * (area / (perimeter * perimeter))
+                circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                     if radius > 10:
@@ -104,14 +104,7 @@ def get_ball_positions(cap):
         if positions:
             ball_positions[name] = positions
 
-
-    cv2.namedWindow("frame")
-    cv2.setMouseCallback("frame", get_color)
-    cv2.namedWindow("hsv")
-    cv2.setMouseCallback("hsv", get_color)
-
     return ball_positions
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 2) (unchanged) find_balls() and find_obstacles() helpers

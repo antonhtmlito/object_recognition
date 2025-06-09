@@ -8,7 +8,7 @@
     {
         "name": "whiteBall",
         "type": "ball",
-        "colorLowerBound": [0, 0, 200],
+        "colorLowerBound": [98, 1, 107],
         "colorUpperBound": [180, 40, 255]
 
 
