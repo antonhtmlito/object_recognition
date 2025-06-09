@@ -115,10 +115,27 @@ while running:
 
     ball_positions = get_ball_positions(cap)
 
+    # Add each detected ball position as a target (if it isn’t already in the list)
+    for coords in ball_positions.values():
+        for (bx, by) in coords:
+            if (bx, by) not in routing_functions.all_targets:
+                routing_functions.all_targets.append((bx, by))
+
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
 
+    # Now draw each ball as before
     for color_name, coords in ball_positions.items():
+        if "white" in color_name.lower():
+            py_color = (255, 255, 255)
+        elif "orange" in color_name.lower():
+            py_color = (0, 140, 255)
+        else:
+            py_color = (200, 200, 200)
+
+        for (bx, by) in coords:
+            pygame.draw.circle(screen, py_color, (bx, by), 8)
+
         # decide Pygame color by inspecting the HSV‐based name
         if "white" in color_name.lower():
             py_color = (255, 255, 255)
@@ -141,6 +158,7 @@ while running:
         routing_functions.update_obstacle_state(obstacle)
         # update_targets_state(targets)
         last_update_time = current_time
+        routing_functions.calculate_target()
 
 # Draw targets
     for tx, ty in routing_functions.all_targets:
@@ -159,10 +177,10 @@ while running:
     print("targets:", routing_functions.target_x, routing_functions.target_y)
     if angle_to_turn is None:
         pass
-    elif angle_to_turn > 5:
+    elif angle_to_turn > 3:
         roboController.rotate_clockwise(angle_to_turn)
         time.sleep(0.05)
-    elif angle_to_turn < -5:
+    elif angle_to_turn < -3:
         roboController.rotate_counterClockwise(abs(angle_to_turn))
         time.sleep(0.05)
     else:
@@ -178,9 +196,9 @@ while running:
 
 # Draw the rotated player
     screen.blit(rotated_surface, rotated_rect.topleft)
-    cast_rays(player, max_distance=500)
+    cast_rays(player, max_distance=10)
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(20)
 
 pygame.quit()
