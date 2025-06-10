@@ -112,8 +112,8 @@ while running:
     goalPos = getGoalPosition(cap)
 
     if goalPos is not None:
-        goalX = goalPos["goal_A_position"][0]
-        goalY = goalPos["goal_A_position"][1]
+        goalX = goalPos["position"][0]
+        goalY = goalPos["position"][1]
         pygame.draw.circle(screen, (100,100,100), (goalX,goalY))
         print("goalX", goalX, "goalY", goalY)
     botPos = getBotPosition(cap)
