@@ -81,6 +81,18 @@ def handle_simulated_routing(player, obstacle):
         if distance < 1:
             if (tx, ty) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((tx, ty))
+            should_back_up, (perp_dx, perp_dy) = routing_functions.is_facing_wall()
+            if should_back_up:
+                player["x"] -= perp_dx * 50
+                player["y"] -= perp_dy * 50
+                if routing_functions.all_targets:
+                    # Turn toward next target
+                    tx, ty = routing_functions.target_x, routing_functions.target_y
+                    angle = math.atan2(ty - player["y"], tx - player["x"])
+                    player["rotation"] = angle
+                else:
+                    # Turn around
+                    player["rotation"] += math.pi
             routing_functions.calculate_target()
             # Move detour logic here after target recalculation
             tx, ty = routing_functions.target_x, routing_functions.target_y

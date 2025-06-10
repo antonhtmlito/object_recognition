@@ -105,8 +105,14 @@ def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
             wall_dx /= norm
             wall_dy /= norm
 
-            perp_dx = -wall_dy
-            perp_dy = wall_dx
+            if robot_x - target_x <= 0: # right wall
+                perp_dx = -wall_dy
+            if robot_y - target_y <= 0:
+                perp_dy = -wall_dx
+            if robot_x - target_x >= 0:
+                perp_dx = wall_dy
+            if robot_y - target_y >= 0:
+                perp_dy = wall_dx
 
             detour_x = target_x + perp_dx * detour_distance
             detour_y = target_y + perp_dy * detour_distance
@@ -122,3 +128,26 @@ def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
                 pass
             break
     return target_x, target_y
+
+def is_facing_wall(threshold_distance=100, facing_dot_threshold=0.7):
+    for x1, y1, x2, y2 in walls:
+        A = y2 - y1
+        B = x1 - x2
+        C = x2 * y1 - x1 * y2
+        dist_to_wall = abs(A * robot_x + B * robot_y + C) / math.hypot(A, B)
+        if dist_to_wall < threshold_distance:
+            wall_dx = x2 - x1
+            wall_dy = y2 - y1
+            norm = math.hypot(wall_dx, wall_dy)
+            if norm == 0:
+                continue
+            wall_dx /= norm
+            wall_dy /= norm
+            perp_dx = -wall_dy
+            perp_dy = wall_dx
+
+            dot = math.cos(robot_angle) * perp_dx + math.sin(robot_angle) * perp_dy
+            print("dot: ", dot)
+            if dot > facing_dot_threshold:
+                return True, (perp_dx, perp_dy)
+    return False, (0, 0)
