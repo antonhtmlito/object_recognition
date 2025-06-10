@@ -113,7 +113,6 @@ while running:
     if goalPos is not None:
         goalX = goalPos["position"][0]
         goalY = goalPos["position"][1]
-        pygame.draw.circle(screen, (100,100,100), (goalX,goalY), 8)
         print("goalX", goalX, "goalY", goalY)
         
     if event.type == pygame.KEYDOWN:
