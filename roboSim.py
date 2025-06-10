@@ -166,9 +166,6 @@ while running:
     for tx, ty in routing_functions.all_targets:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
 
-# handle routing
-#    routing_manager.handle_routing(player, obstacle, roboController)
-
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
     print("rotation:", math.degrees(player["rotation"] + math.pi))
