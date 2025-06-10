@@ -24,9 +24,13 @@ def handle_routing(player, obstacle, goal, roboController):
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 20 and abs(routing_functions.robot_y - routing_functions.target_y) < 20:
-            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
-                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+        nearby_targets = [
+            target for target in routing_functions.all_targets
+            if abs(routing_functions.robot_x - target[0]) < 20 and abs(routing_functions.robot_y - target[1]) < 20
+        ]
+        for target in nearby_targets:
+            routing_functions.all_targets.remove(target)
+        if nearby_targets:
             routing_functions.calculate_target()
             tx, ty = routing_functions.target_x, routing_functions.target_y
             if tx is not None and ty is not None:
