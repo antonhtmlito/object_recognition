@@ -22,7 +22,7 @@ def getGoalPosition(camera):
     # You MUST change this to the actual ID of your ArUco marker for the goal.
     goal_id = 101  # Example ID for your single goal
 
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_1000)
     parameters = cv2.aruco.DetectorParameters()
     detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
 
@@ -32,21 +32,20 @@ def getGoalPosition(camera):
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
-    goal_position_dict = {}
+    mean = ""
     if ids is not None:
         ids = ids.flatten()
 
         # Iterate through detected markers to find the goal marker
         for i, id_val in enumerate(ids):
             if id_val == goal_id:
+                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 c = corners[i][0]
-                cx = int(c[:, 0].mean())  # Calculate the X-coordinate of the center
-                cy = int(c[:, 1].mean())  # Calculate the Y-coordinate of the center
-                goal_position_dict['goal_A_position'] = (cx, cy)
-                return goal_position_dict  # Return the coordinates immediately once found
+                mean = np.mean(c, axis=0) if len(corners) != 0 else ""
+
 
     # If the goal marker is not found in the current frame
-    return None
+    return {"position": mean.tolist()}
 
 def getBotPosition(camera):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
