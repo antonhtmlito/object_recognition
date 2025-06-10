@@ -45,6 +45,9 @@ def get_color(event, x, y, flags, param):
         np.clip(upper[0], 0, 180)
 
         object_configs[1]["colorLowerBound"] = lower.tolist()
+        with open("colors.json", "w") as f:
+            json.dump(object_configs, f, indent=4)
+
         #object_configs[1]["colorUpperBound"] = upper.tolist()
         print(object_configs[1])
     if event == cv2.EVENT_RBUTTONDOWN:
