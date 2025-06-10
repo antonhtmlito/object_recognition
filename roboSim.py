@@ -9,7 +9,7 @@ from roboController import RoboController
 import routing_functions
 import routing_manager
 
-SIMULATION_MODE = True
+SIMULATION_MODE = False
 
 # Pygame setup
 pygame.init()

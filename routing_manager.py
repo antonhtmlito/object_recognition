@@ -24,7 +24,7 @@ def handle_routing(player, obstacle, roboController):
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 1 and abs(routing_functions.robot_y - routing_functions.target_y) < 1:
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
             routing_functions.calculate_target()
@@ -35,20 +35,83 @@ def handle_routing(player, obstacle, roboController):
 # Drive to target
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
     # print("angle to turn: ", angle_to_turn)
-    print("targets:", routing_functions.target_x, routing_functions.target_y)
-    if angle_to_turn is None:
-        pass
-    elif angle_to_turn > 3:
-        roboController.rotate_clockwise(angle_to_turn)
-        time.sleep(0.05)
-    elif angle_to_turn < -3:
-        roboController.rotate_counterClockwise(abs(angle_to_turn))
-        time.sleep(0.05)
-    else:
-        distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
-        if distance > 5:
-            roboController.forward(0.5)
+    print("target:", routing_functions.target_x, routing_functions.target_y)
+    while routing_functions.target_total > routing_functions.target_goal:
+        routing_functions.target_total = len(routing_functions.all_targets)
+        print("OBS: ", routing_functions.target_total, routing_functions.target_goal)
+
+        if angle_to_turn is None:
+            pass
+        elif angle_to_turn > 3:
+            roboController.rotate_clockwise(angle_to_turn)
             time.sleep(0.05)
+        elif angle_to_turn < -3:
+            roboController.rotate_counterClockwise(abs(angle_to_turn))
+            time.sleep(0.05)
+        else:
+            distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
+            if distance > 5:
+                roboController.forward(0.5)
+                time.sleep(0.05)
+    else:
+        # Insert target perpendicular to wall before goal
+        if not routing_functions.all_targets:
+            min_dist = float('inf')
+            closest_wall = None
+            for x1, y1, x2, y2 in routing_functions.walls:
+                A = y2 - y1
+                B = x1 - x2
+                C = x2 * y1 - x1 * y2
+                dist = abs(A * routing_functions.goal_x + B * routing_functions.goal_y + C) / math.hypot(A, B)
+                if dist < min_dist:
+                    min_dist = dist
+                    closest_wall = (x1, y1, x2, y2)
+
+            if closest_wall:
+                x1, y1, x2, y2 = closest_wall
+                wall_dx = x2 - x1
+                wall_dy = y2 - y1
+                norm = math.hypot(wall_dx, wall_dy)
+                if norm != 0:
+                    wall_dx /= norm
+                    wall_dy /= norm
+                    perp_dx = -wall_dy
+                    perp_dy = wall_dx
+                    detour_x = routing_functions.goal_x + perp_dx * 200
+                    detour_y = routing_functions.goal_y + perp_dy * 200
+                    routing_functions.all_targets.insert(0, (detour_x, detour_y))
+                    routing_functions.calculate_target()
+                    return
+
+        dx = routing_functions.goal_x - player["x"]
+        dy = routing_functions.goal_y - player["y"]
+        angle_to_goal = math.atan2(dy, dx)
+        angle_diff = angle_to_goal - player["rotation"]
+        angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+        print("angle_diff:", angle_diff)
+
+        if angle_diff is None:
+             pass
+        elif angle_diff > 3:
+            roboController.rotate_clockwise(angle_diff)
+            time.sleep(0.05)
+        elif angle_to_turn < -3:
+            roboController.rotate_counterClockwise(abs(angle_diff))
+            time.sleep(0.05)
+            return None
+        else:
+            distance_to_goal = math.sqrt((routing_functions.goal_x - routing_functions.robot_x) ** 2 + (routing_functions.goal_y - routing_functions.robot_y) ** 2)
+            if distance_to_goal > 5:
+                roboController.forward(0.5)
+                time.sleep(0.05)
+        if abs(routing_functions.robot_x - routing_functions.goal_x) <= 5 and abs(
+                routing_functions.robot_y - routing_functions.goal_y) <= 5:
+            # roboController.dropoff()
+            # roboController.dropoff()
+            time.sleep(2)
+            init_targets()
+        else:
+            return None
 
 def handle_simulated_routing(player, obstacle):
     global last_update_time
