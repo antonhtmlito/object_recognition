@@ -35,7 +35,8 @@ def handle_routing(player, obstacle, goal, roboController):
             tx, ty = routing_functions.target_x, routing_functions.target_y
             if tx is not None and ty is not None:
                 routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
-
+        else:
+            routing_functions.calculate_target()
 # Drive to target
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
     # print("angle to turn: ", angle_to_turn)
