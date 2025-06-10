@@ -2,21 +2,43 @@
     {
         "name": "orangeBall",
         "type": "ball",
-        "colorLowerBound" :[ 10, 50, 150],
-        "colorUpperBound" :[ 35, 255, 255]  
+        "colorLowerBound": [
+            10,
+            50,
+            150
+        ],
+        "colorUpperBound": [
+            35,
+            255,
+            255
+        ]
     },
     {
         "name": "whiteBall",
         "type": "ball",
-        "colorLowerBound": [0, 0, 220],
-        "colorUpperBound": [180, 40, 255]
-
-
+        "colorLowerBound": [
+            0,
+            0,
+            220
+        ],
+        "colorUpperBound": [
+            180,
+            40,
+            255
+        ]
     },
     {
         "name": "obstacle",
         "type": "obstacle",
-        "colorLowerBound" :[ 0, 150, 100],
-        "colorUpperBound" :[ 10, 255, 255]
+        "colorLowerBound": [
+            0,
+            215,
+            178
+        ],
+        "colorUpperBound": [
+            24,
+            254,
+            254
+        ]
     }
 ]

@@ -1,4 +1,5 @@
 import time
+import os
 
 from robodetectíon import getBotPosition
 
@@ -10,6 +11,12 @@ from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
+from calibration import load_color_mapping
+
+# Load color mapping
+script_dir = os.path.dirname(os.path.abspath(__file__))
+color_file = os.path.join(script_dir, "colors.json")
+colour_mapping = load_color_mapping(color_file)
 
 # Pygame setup
 pygame.init()
@@ -184,16 +191,6 @@ while running:
     cast_rays(player, max_distance=500)
 
     keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_LEFT]:
-        roboController.rotate_counterClockwise(10)
-#        player["rotation"] = player["rotation"] - 0.01
-    elif keys[pygame.K_RIGHT]:
-        roboController.rotate_clockwise(10)
-#        player["rotation"] = player["rotation"] + 0.01
-    elif keys[pygame.K_UP]:
-        roboController.forward(2)
-#    elif keys[pygame.K_DOWN]:
 
     pygame.display.flip()
     clock.tick(60)
