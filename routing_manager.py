@@ -77,6 +77,8 @@ def handle_simulated_routing(player, obstacle):
         distance = math.hypot(dx, dy)
 
         while routing_functions.target_total > routing_functions.target_goal:
+            print("OBS: ", routing_functions.target_total, routing_functions.target_goal)
+            routing_functions.target_total = len(routing_functions.all_targets)
             if distance < 1:
                 if (tx, ty) in routing_functions.all_targets:
                     routing_functions.all_targets.remove((tx, ty))
@@ -118,19 +120,22 @@ def handle_simulated_routing(player, obstacle):
                 player["y"] += math.sin(player["rotation"]) * 2
                 return None
         else:
-            if routing_functions.goal_x is None or routing_functions.goal_y is None:
-                return None
-            angle_to_goal = routing_functions.calculate_angle(routing_functions.goal_x, routing_functions.goal_y)
-
+            dx = routing_functions.goal_x - player["x"]
+            dy = routing_functions.goal_y - player["y"]
+            angle_to_goal = math.atan2(dy, dx)
+            angle_diff = angle_to_goal - player["rotation"]
+            angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+            print("angle_diff:", angle_diff)
             TURN_SPEED = 0.1
             MOVE_THRESHOLD = 0.1
 
-            if abs(angle_to_goal) > MOVE_THRESHOLD:
+            if abs(angle_diff) > MOVE_THRESHOLD:
                 player["rotation"] += TURN_SPEED * (1 if angle_to_goal > 0 else -1)
                 return None
             player["x"] += math.cos(player["rotation"]) * 2
             player["y"] += math.sin(player["rotation"]) * 2
             if abs(routing_functions.robot_x - routing_functions.goal_x) <= 5 and abs(routing_functions.robot_y - routing_functions.goal_y) <= 5:
+                time.sleep(2)
                 init_targets()
             else:
                 return None
