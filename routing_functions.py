@@ -8,6 +8,12 @@ obstacle_y = 0
 target_x = 300
 target_y = 300
 all_targets = []
+detour_memory = set()
+#last_target_removal_time = 0
+target_total = 0
+target_goal = 0
+goal_x = 0
+goal_y = 0
 # Robot state
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
@@ -72,7 +78,86 @@ def calculate_angle(target_x, target_y):
     angle_difference = (angle_to_target - math.degrees(robot_angle) + 360) % 360
     return angle_difference if angle_difference <= 180 else angle_difference - 360
 
+def init_targets():
+    global target_total
+    target_total = len(all_targets)
+    global target_goal
+    target_goal = target_total - 4
+
 # Distance from robot to target
 def calculate_distance(target_x, target_y):
     distance_to_target = math.sqrt((target_x - robot_x) ** 2 + (target_y - robot_y) ** 2)
     return distance_to_target
+
+# Avoid Walls
+walls = [
+    (0, 0, 0, 600),      # venstre
+    (0, 0, 600, 0),      # øverste
+    (600, 0, 600, 600),  # højre
+    (0, 600, 600, 600)   # bund
+]
+
+def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
+    if target_x is None or target_y is None:
+        return target_x, target_y
+    if (target_x, target_y) in detour_memory:
+        return target_x, target_y
+    for x1, y1, x2, y2 in walls:
+        A = y2 - y1
+        B = x1 - x2
+        C = x2 * y1 - x1 * y2
+        dist = abs(A * target_x + B * target_y + C) / math.hypot(A, B)
+        if dist < wall_threshold:
+            wall_dx = x2 - x1
+            wall_dy = y2 - y1
+            norm = math.hypot(wall_dx, wall_dy)
+            if norm == 0:
+                continue
+            wall_dx /= norm
+            wall_dy /= norm
+
+            if robot_x - target_x <= 0: # right wall
+                perp_dx = -wall_dy
+            if robot_y - target_y <= 0:
+                perp_dy = -wall_dx
+            if robot_x - target_x >= 0: # bottom wall
+                perp_dx = wall_dy
+            if robot_y - target_y >= 0:
+                perp_dy = wall_dx
+
+            detour_x = target_x + perp_dx * detour_distance
+            detour_y = target_y + perp_dy * detour_distance
+            detour = (detour_x, detour_y)
+
+            # Check if detour is already directly before target
+            try:
+                idx = all_targets.index((target_x, target_y))
+                if idx == 0 or all_targets[idx - 1] != detour:
+                    all_targets.insert(idx, detour)
+                    detour_memory.add((target_x, target_y))
+            except ValueError:
+                pass
+            break
+    return target_x, target_y
+
+# def is_facing_wall(threshold_distance=100, facing_dot_threshold=0.7):
+#    for x1, y1, x2, y2 in walls:
+#        A = y2 - y1
+#        B = x1 - x2
+#        C = x2 * y1 - x1 * y2
+#        dist_to_wall = abs(A * robot_x + B * robot_y + C) / math.hypot(A, B)
+#        if dist_to_wall < threshold_distance:
+#            wall_dx = x2 - x1
+#            wall_dy = y2 - y1
+#            norm = math.hypot(wall_dx, wall_dy)
+#            if norm == 0:
+#                continue
+#            wall_dx /= norm
+#            wall_dy /= norm
+#            perp_dx = -wall_dy
+#            perp_dy = wall_dx
+#
+#            dot = math.cos(robot_angle) * perp_dx + math.sin(robot_angle) * perp_dy
+#            if dot > facing_dot_threshold:
+#                return True, (perp_dx, perp_dy)
+#    return False, (0, 0)
