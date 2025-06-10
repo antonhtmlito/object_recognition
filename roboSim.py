@@ -140,7 +140,7 @@ while running:
 
     # Add each detected ball position as a target (if it isn’t already in the list)
     for coords in ball_positions.values():
-        routing_functions.all_targets = []
+        #routing_functions.all_targets = []
         for (bx, by) in coords:
             if (bx, by) not in routing_functions.all_targets:
                 routing_functions.all_targets.append((bx, by))
