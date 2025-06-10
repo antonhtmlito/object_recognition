@@ -61,6 +61,10 @@ obstacle = {
 targets = {
     "list": []
 }
+goal = {
+    "x": 0,
+    "y": 0,
+}
 
 roboController = RoboController()
 
@@ -132,7 +136,7 @@ while running:
             player["y"] = botPos["position"][1]
             player["rotation"] = botPos["angle"]
         ball_positions = get_ball_positions(cap)
-        routing_manager.handle_routing(player, obstacle, roboController)
+        routing_manager.handle_routing(player, obstacle, goal, roboController)
 
     # Add each detected ball position as a target (if it isn’t already in the list)
     for coords in ball_positions.values():
