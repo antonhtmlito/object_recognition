@@ -38,7 +38,7 @@ def handle_routing(player, obstacle, goal, targets, roboController):
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
     # print("angle to turn: ", angle_to_turn)
     print("target:", routing_functions.target_x, routing_functions.target_y)
-    if routing_functions.target_total > routing_functions.target_goal:
+    if routing_functions.target_total > routing_functions.target_goal or len(routing_functions.all_targets) != 0:
         now_time = time.time()
         if now_time - last_obs_update_time > update_interval:
             routing_functions.target_total = len(routing_functions.all_targets)
