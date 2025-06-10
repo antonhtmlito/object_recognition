@@ -17,6 +17,36 @@ def calcAngle(corners):
     return angle_rad
 
 
+def getGoalPosition(camera):
+    # Define the ID for your single goal marker
+    # You MUST change this to the actual ID of your ArUco marker for the goal.
+    goal_id = 101  # Example ID for your single goal
+
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_1000)
+    parameters = cv2.aruco.DetectorParameters()
+    detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+
+    ret, frame = camera.read()
+    if not ret:
+        return None
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    corners, ids, rejected = detector.detectMarkers(gray)
+    mean = ""
+    if ids is not None:
+        ids = ids.flatten()
+
+        # Iterate through detected markers to find the goal marker
+        for i, id_val in enumerate(ids):
+            if id_val == goal_id:
+                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+                c = corners[i][0]
+                mean = np.mean(c, axis=0) if len(corners) != 0 else ""
+
+
+    # If the goal marker is not found in the current frame
+    return {"position": mean.tolist()}
+
 def getBotPosition(camera):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     parameters = cv2.aruco.DetectorParameters()
