@@ -47,17 +47,17 @@ def handle_routing(player, obstacle, goal, roboController):
             return None
         elif angle_to_turn > 3:
             roboController.rotate_clockwise(angle_to_turn)
-            time.sleep(0.05)
+            time.sleep(0.1)
             return None
         elif angle_to_turn < -3:
             roboController.rotate_counterClockwise(abs(angle_to_turn))
-            time.sleep(0.05)
+            time.sleep(0.1)
             return None
         else:
             distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
             if distance > 5:
                 roboController.forward(0.5)
-                time.sleep(0.05)
+                time.sleep(0.1)
                 return None
             return None
     else:
