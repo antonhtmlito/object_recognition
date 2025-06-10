@@ -9,13 +9,14 @@ last_update_time = time.time()
 last_obs_update_time = time.time()
 update_interval = 0.5  # seconds
 
-def handle_routing(player, obstacle, roboController):
+def handle_routing(player, obstacle, goal, targets, roboController):
     global last_update_time, last_obs_update_time
     # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         routing_functions.update_robot_state(player)
         routing_functions.update_obstacle_state(obstacle)
+        routing_functions.update_goal_state(goal)
         # update_targets_state(targets)
         last_update_time = current_time
         routing_functions.calculate_target()

@@ -1,4 +1,5 @@
 import math
+import roboSim
 
 robot_x = 0
 robot_y = 0
@@ -26,6 +27,12 @@ def update_obstacle_state(obstacle):
     global obstacle_x, obstacle_y
     obstacle_x = obstacle["x"]
     obstacle_y = obstacle["y"]
+
+# goal state
+def update_goal_state(goal):
+    global goal_x, goal_y
+    goal_x = roboSim.goalX
+    goal_y = roboSim.goalY
 
 # Target state
 def update_targets_state(targets):
