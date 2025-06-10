@@ -76,3 +76,34 @@ def calculate_angle(target_x, target_y):
 def calculate_distance(target_x, target_y):
     distance_to_target = math.sqrt((target_x - robot_x) ** 2 + (target_y - robot_y) ** 2)
     return distance_to_target
+
+# Avoid Walls
+walls = [
+    (0, 0, 0, 600),      # venstre
+    (0, 0, 600, 0),      # øverste
+    (600, 0, 600, 600),  # højre
+    (0, 600, 600, 600)   # bund
+]
+
+def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
+    for x1, y1, x2, y2 in walls:
+        A = y2 - y1
+        B = x1 - x2
+        C = x2 * y1 - x1 * y2
+        dist = abs(A * target_x + B * target_y + C) / math.hypot(A, B)
+        if dist < wall_threshold:
+            wall_dx = x2 - x1
+            wall_dy = y2 - y1
+            norm = math.hypot(wall_dx, wall_dy)
+            if norm == 0:
+                continue
+            wall_dx /= norm
+            wall_dy /= norm
+
+            perp_dx = -wall_dy
+            perp_dy = wall_dx
+
+            detour_x = target_x + perp_dx * detour_distance
+            detour_y = target_y + perp_dy * detour_distance
+            return detour_x, detour_y
+    return target_x, target_y
