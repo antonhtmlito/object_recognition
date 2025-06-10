@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="189cae2f-1a2d-40e9-afc4-9f41e4068f13" name="Changes" comment="calibrated" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;jonaswoetmann&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/antonhtmlito/object_recognition.git&quot;,
+    &quot;accountId&quot;: &quot;60ad708e-2df5-4497-87c2-259b5441f9a7&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2y2Vzt9haAyerp9F5xMwUOMxIhe" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.detect_white_and_yellow_ball.executor&quot;: &quot;Run&quot;,
+    &quot;Python.roboController.executor&quot;: &quot;Run&quot;,
+    &quot;Python.roboSim.executor&quot;: &quot;Run&quot;,
+    &quot;Python.routing_functions.executor&quot;: &quot;Run&quot;,
+    &quot;Python.routing_manager.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="detect_white_and_yellow_ball" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="object_recognition" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/detect_white_and_yellow_ball.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.detect_white_and_yellow_ball" />
+        <item itemvalue="Python.detect_white_and_yellow_ball" />
+        <item itemvalue="Python.detect_white_and_yellow_ball" />
+        <item itemvalue="Python.detect_white_and_yellow_ball" />
+        <item itemvalue="Python.detect_white_and_yellow_ball" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159" />
+        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="189cae2f-1a2d-40e9-afc4-9f41e4068f13" name="Changes" comment="" />
+      <created>1749032920678</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1749032920678</updated>
+      <workItem from="1749032921708" duration="8031000" />
+      <workItem from="1749040982461" duration="689000" />
+      <workItem from="1749041676029" duration="26888000" />
+      <workItem from="1749488733006" duration="4221000" />
+      <workItem from="1749535894138" duration="22515000" />
+    </task>
+    <task id="LOCAL-00001" summary="Added routing helper functions">
+      <option name="closed" value="true" />
+      <created>1749033552158</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1749033552158</updated>
+    </task>
+    <task id="LOCAL-00002" summary="inserted data into robosim">
+      <option name="closed" value="true" />
+      <created>1749036204759</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749036204759</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added back file">
+      <option name="closed" value="true" />
+      <created>1749038130429</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1749038130429</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749039020300</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1749039020300</updated>
+    </task>
+    <task id="LOCAL-00005" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749041495674</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1749041495674</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749118171978</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1749118171978</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749118742213</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1749118742213</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749119348109</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1749119348109</updated>
+    </task>
+    <task id="LOCAL-00009" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749123152728</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1749123152728</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749124203482</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1749124203482</updated>
+    </task>
+    <task id="LOCAL-00011" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749126003968</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1749126003968</updated>
+    </task>
+    <task id="LOCAL-00012" summary="added auto routing">
+      <option name="closed" value="true" />
+      <created>1749126658317</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1749126658317</updated>
+    </task>
+    <task id="LOCAL-00013" summary="removed lines">
+      <option name="closed" value="true" />
+      <created>1749215157626</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1749215157626</updated>
+    </task>
+    <task id="LOCAL-00014" summary="removed lines">
+      <option name="closed" value="true" />
+      <created>1749215222309</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1749215222309</updated>
+    </task>
+    <task id="LOCAL-00015" summary="took routing of the while loop">
+      <option name="closed" value="true" />
+      <created>1749489674659</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749489674659</updated>
+    </task>
+    <task id="LOCAL-00016" summary="created a sim for routing dev">
+      <option name="closed" value="true" />
+      <created>1749491227696</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749491227696</updated>
+    </task>
+    <task id="LOCAL-00017" summary="added obstacle">
+      <option name="closed" value="true" />
+      <created>1749493012259</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749493012259</updated>
+    </task>
+    <task id="LOCAL-00018" summary="added wall avoidance">
+      <option name="closed" value="true" />
+      <created>1749536969133</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1749536969133</updated>
+    </task>
+    <task id="LOCAL-00019" summary="added checkpoint routing">
+      <option name="closed" value="true" />
+      <created>1749540069000</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1749540069000</updated>
+    </task>
+    <task id="LOCAL-00020" summary="fixed checkpoint locations">
+      <option name="closed" value="true" />
+      <created>1749546654431</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1749546654431</updated>
+    </task>
+    <task id="LOCAL-00021" summary="commented out back up">
+      <option name="closed" value="true" />
+      <created>1749549558633</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1749549558633</updated>
+    </task>
+    <task id="LOCAL-00022" summary="started goal routing">
+      <option name="closed" value="true" />
+      <created>1749553066906</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1749553066906</updated>
+    </task>
+    <task id="LOCAL-00023" summary="fixed goal routing">
+      <option name="closed" value="true" />
+      <created>1749555643193</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1749555643193</updated>
+    </task>
+    <task id="LOCAL-00024" summary="added goal routing for real robot">
+      <option name="closed" value="true" />
+      <created>1749558795477</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1749558795477</updated>
+    </task>
+    <task id="LOCAL-00025" summary="merged main and autoRouting">
+      <option name="closed" value="true" />
+      <created>1749559204580</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1749559204580</updated>
+    </task>
+    <task id="LOCAL-00026" summary="updates target_total less often">
+      <option name="closed" value="true" />
+      <created>1749560151475</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1749560151475</updated>
+    </task>
+    <task id="LOCAL-00027" summary="updates target_total less often">
+      <option name="closed" value="true" />
+      <created>1749560715563</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1749560715563</updated>
+    </task>
+    <task id="LOCAL-00028" summary="fixed endless loop">
+      <option name="closed" value="true" />
+      <created>1749561834912</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1749561834912</updated>
+    </task>
+    <task id="LOCAL-00029" summary="calibrated">
+      <option name="closed" value="true" />
+      <created>1749562112902</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1749562112902</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added routing helper functions" />
+    <MESSAGE value="inserted data into robosim" />
+    <MESSAGE value="added back file" />
+    <MESSAGE value="added auto routing" />
+    <MESSAGE value="removed lines" />
+    <MESSAGE value="took routing of the while loop" />
+    <MESSAGE value="created a sim for routing dev" />
+    <MESSAGE value="added obstacle" />
+    <MESSAGE value="added wall avoidance" />
+    <MESSAGE value="added checkpoint routing" />
+    <MESSAGE value="fixed checkpoint locations" />
+    <MESSAGE value="commented out back up" />
+    <MESSAGE value="started goal routing" />
+    <MESSAGE value="fixed goal routing" />
+    <MESSAGE value="added goal routing for real robot" />
+    <MESSAGE value="merged main and autoRouting" />
+    <MESSAGE value="updates target_total less often" />
+    <MESSAGE value="fixed endless loop" />
+    <MESSAGE value="calibrated" />
+    <option name="LAST_COMMIT_MESSAGE" value="calibrated" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/object_recognition$routing_manager.coverage" NAME="routing_manager Coverage Results" MODIFIED="1749491805324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/object_recognition$roboController.coverage" NAME="roboController Coverage Results" MODIFIED="1749560600656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/object_recognition$detect_white_and_yellow_ball.coverage" NAME="detect_white_and_yellow_ball Coverage Results" MODIFIED="1749561998545" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/object_recognition$routing_functions.coverage" NAME="routing_functions Coverage Results" MODIFIED="1749120936548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/object_recognition$roboSim.coverage" NAME="roboSim Coverage Results" MODIFIED="1749562038301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
