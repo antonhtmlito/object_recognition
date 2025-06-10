@@ -2,8 +2,6 @@ import routing_functions
 import time
 import math
 
-from routing_functions import init_targets
-
 # Update interval
 last_update_time = time.time()
 last_obs_update_time = time.time()
@@ -118,7 +116,7 @@ def handle_routing(player, obstacle, goal, targets, roboController):
             # roboController.dropoff()
             # roboController.dropoff()
             time.sleep(2)
-            init_targets()
+            routing_functions.init_targets()
             return None
         else:
             return None
