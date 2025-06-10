@@ -6,11 +6,12 @@ from routing_functions import init_targets
 
 # Update interval
 last_update_time = time.time()
-update_interval = 0.1  # seconds
+last_obs_update_time = time.time()
+update_interval = 0.5  # seconds
 
 def handle_routing(player, obstacle, roboController):
-    global last_update_time
-# Update data
+    global last_update_time, last_obs_update_time
+    # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         routing_functions.update_robot_state(player)
@@ -37,8 +38,11 @@ def handle_routing(player, obstacle, roboController):
     # print("angle to turn: ", angle_to_turn)
     print("target:", routing_functions.target_x, routing_functions.target_y)
     while routing_functions.target_total > routing_functions.target_goal:
-        routing_functions.target_total = len(routing_functions.all_targets)
-        print("OBS: ", routing_functions.target_total, routing_functions.target_goal)
+        now_time = time.time()
+        if now_time - last_obs_update_time > update_interval:
+            routing_functions.target_total = len(routing_functions.all_targets)
+            print("OBS: ", routing_functions.target_total, routing_functions.target_goal)
+            last_obs_update_time = now_time
 
         if angle_to_turn is None:
             pass
