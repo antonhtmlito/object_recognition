@@ -31,14 +31,14 @@
         "name": "obstacle",
         "type": "obstacle",
         "colorLowerBound": [
-            0,
-            215,
-            178
+            1,
+            157,
+            53
         ],
         "colorUpperBound": [
-            24,
-            254,
-            254
+            15,
+            237,
+            203
         ]
     }
 ]
