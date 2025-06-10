@@ -17,7 +17,7 @@ def handle_routing(player, obstacle, goal, roboController):
         routing_functions.update_goal_state(goal)
         # update_targets_state(targets)
         last_update_time = current_time
-        routing_functions.calculate_target()
+        #routing_functions.calculate_target()
         tx, ty = routing_functions.target_x, routing_functions.target_y
         if tx is not None and ty is not None:
             routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
@@ -91,7 +91,7 @@ def handle_routing(player, obstacle, goal, roboController):
                     detour_x = routing_functions.goal_x + perp_dx * 200
                     detour_y = routing_functions.goal_y + perp_dy * 200
                     routing_functions.all_targets.insert(0, (detour_x, detour_y))
-                    routing_functions.calculate_target()
+                    #routing_functions.calculate_target()
                     return None
 
         dx = routing_functions.goal_x - player["x"]
