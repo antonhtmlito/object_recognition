@@ -132,7 +132,7 @@ def get_ball_positions(cap):
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 10:
+                    if radius > 50:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -156,7 +156,7 @@ def find_balls(mask, color_name, color, frame):
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
             if circularity > 0.7:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 10:
+                if radius > 50:
                     continue
 
                 # Store this (x,y) under the key `color_name`

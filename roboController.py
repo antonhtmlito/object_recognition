@@ -12,6 +12,7 @@ class RoboController:
         #return  # For debugging purposes, you can remove this line later
         try:
             message = f"{command}, {value}"  # Ensure correct format with a space after the comma
+            print("Sending command:", message)
             clientSocket = socket(AF_INET, SOCK_STREAM)
             clientSocket.connect((self.serverName, self.serverPort))
             clientSocket.send(message.encode())
