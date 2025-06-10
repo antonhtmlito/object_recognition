@@ -96,6 +96,7 @@ def init_targets():
     target_total = len(all_targets)
     global target_goal
     target_goal = target_total - 4
+    print("Total targets:", target_total)
 
 # Distance from robot to target
 def calculate_distance(target_x, target_y):
