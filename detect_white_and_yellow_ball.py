@@ -127,7 +127,7 @@ def get_ball_positions(cap):
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.7:
+                if circularity > 0.5:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                     if radius > 10:
                         continue
@@ -223,8 +223,8 @@ if __name__ == "__main__":
     #cv2.namedWindow("Processed Frame")
     #cv2.setMouseCallback("Processed Frame", mouse_callback)
 
-    cv2.namedWindow("frame")
-    cv2.setMouseCallback("frame", get_color)
+    cv2.namedWindow("Processed Frame")
+    cv2.setMouseCallback("Processed Frame", get_color)
     cv2.namedWindow("hsv")
     cv2.setMouseCallback("hsv", get_color)
 
