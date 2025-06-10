@@ -46,7 +46,7 @@ def getGoalPosition(camera):
 
 
     # If the goal marker is not found in the current frame
-    return {"position": None}
+    return None
 
 def getBotPosition(camera):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
