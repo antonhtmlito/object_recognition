@@ -9,9 +9,10 @@ class RoboController:
     def send_command(self, command, entry):
         value = entry
         print(value)
-        #return  # For debugging purposes, you can remove this line later
+        return  # For debugging purposes, you can remove this line later
         try:
             message = f"{command}, {value}"  # Ensure correct format with a space after the comma
+            print("Sending command:", message)
             clientSocket = socket(AF_INET, SOCK_STREAM)
             clientSocket.connect((self.serverName, self.serverPort))
             clientSocket.send(message.encode())
@@ -33,3 +34,6 @@ class RoboController:
 
     def rotate_counterClockwise(self, amountRad):
         self.send_command("counterclockwise", amountRad)
+    
+    def dropoff(self):
+        self.send_command("dropoff")
