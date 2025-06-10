@@ -48,8 +48,8 @@ mask_surface = pygame.image.frombuffer(
 
 # Global variables predefined
 player = {
-    "x": 0,
-    "y": 0,
+    "x": 300,
+    "y": 300,
     "rotation": 0,
     "width": 30,
     "height": 50,
@@ -101,7 +101,12 @@ while running:
             print("forward")
 
     if SIMULATION_MODE:
-        routing_manager.handle_simulated_routing(player, obstacle, roboController)
+        routing_manager.handle_simulated_routing(player, obstacle)
+        tx, ty = routing_functions.target_x, routing_functions.target_y
+        # Wall avoidance
+        tx, ty = routing_functions.avoid_walls(tx, ty)
+        routing_functions.target_x = tx
+        routing_functions.target_y = ty
         ball_positions = {}
     else:
         botPos = getBotPosition(cap)
@@ -162,6 +167,12 @@ while running:
 # Draw the rotated player
     screen.blit(rotated_surface, rotated_rect.topleft)
     cast_rays(player, max_distance=10)
+
+    # Draw walls (600x600 boundary)
+    pygame.draw.line(screen, (255, 255, 255), (0, 0), (600, 0), 2)       # Top
+    pygame.draw.line(screen, (255, 255, 255), (0, 0), (0, 600), 2)       # Left
+    pygame.draw.line(screen, (255, 255, 255), (600, 0), (600, 600), 2)   # Right
+    pygame.draw.line(screen, (255, 255, 255), (0, 600), (600, 600), 2)   # Bottom
 
     pygame.display.flip()
     clock.tick(20)

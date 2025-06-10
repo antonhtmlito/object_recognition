@@ -8,6 +8,7 @@ obstacle_y = 0
 target_x = 300
 target_y = 300
 all_targets = []
+detour_memory = set()
 # Robot state
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
@@ -86,6 +87,10 @@ walls = [
 ]
 
 def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
+    if target_x is None or target_y is None:
+        return target_x, target_y
+    if (target_x, target_y) in detour_memory:
+        return target_x, target_y
     for x1, y1, x2, y2 in walls:
         A = y2 - y1
         B = x1 - x2
@@ -105,5 +110,15 @@ def avoid_walls(target_x, target_y, wall_threshold=100, detour_distance=200):
 
             detour_x = target_x + perp_dx * detour_distance
             detour_y = target_y + perp_dy * detour_distance
-            return detour_x, detour_y
+            detour = (detour_x, detour_y)
+
+            # Check if detour is already directly before target
+            try:
+                idx = all_targets.index((target_x, target_y))
+                if idx == 0 or all_targets[idx - 1] != detour:
+                    all_targets.insert(idx, detour)
+                    detour_memory.add((target_x, target_y))
+            except ValueError:
+                pass
+            break
     return target_x, target_y
