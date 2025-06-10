@@ -42,6 +42,7 @@ def getGoalPosition(camera):
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 c = corners[i][0]
                 mean = np.mean(c, axis=0) if len(corners) != 0 else ""
+                break
 
 
     # If the goal marker is not found in the current frame
