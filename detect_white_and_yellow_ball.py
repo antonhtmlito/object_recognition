@@ -122,7 +122,6 @@ def get_ball_positions(cap):
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         positions = []
-
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > 100:
@@ -132,7 +131,7 @@ def get_ball_positions(cap):
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.5:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 10:
+                    if radius > 100:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -270,6 +269,12 @@ if __name__ == "__main__":
         cv2.imshow("Processed Frame", frame)
         if white_mask_display is not None:
             cv2.imshow("White Mask", white_mask_display)
+
+            contours, _ = cv2.findContours(white_mask_display, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            test = cv2.cvtColor(white_mask_display, cv2.COLOR_GRAY2BGR)
+            cv2.drawContours(test, contours, -1, (0, 255, 0), 3)
+        cv2.imshow("test", test)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
