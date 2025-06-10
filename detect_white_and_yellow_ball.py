@@ -130,7 +130,7 @@ def get_ball_positions(cap):
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.5:
+                if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                     if radius > 10:
                         continue
@@ -239,6 +239,7 @@ if __name__ == "__main__":
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         white_mask_display = None  # For optional mask visualization
+        orange_mask_display = None
 
         for obj in object_configs:
             name = obj["name"]
@@ -250,11 +251,10 @@ if __name__ == "__main__":
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
-                # yellow_lower = np.array([20, 100, 100])
-                # yellow_upper = np.array([40, 255, 255])
-                # yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
-                # mask = cv2.bitwise_and(mask, cv2.bitwise_not(yellow_mask))
                 white_mask_display = mask.copy()
+
+            elif "orange" in name.lower():
+                orange_mask_display = mask.copy()
 
             draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255)
 
@@ -270,6 +270,9 @@ if __name__ == "__main__":
         cv2.imshow("Processed Frame", frame)
         if white_mask_display is not None:
             cv2.imshow("White Mask", white_mask_display)
+
+        if orange_mask_display is not None:
+            cv2.imshow("Orange Mask", orange_mask_display)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
