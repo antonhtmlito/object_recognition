@@ -1,5 +1,8 @@
 import math
-import roboSim
+
+import cv2
+
+import robodetectíon
 
 robot_x = 0
 robot_y = 0
@@ -30,9 +33,11 @@ def update_obstacle_state(obstacle):
 
 # goal state
 def update_goal_state(goal):
+    cap = cv2.VideoCapture(0)
     global goal_x, goal_y
-    goal_x = roboSim.goalX
-    goal_y = roboSim.goalY
+    goalPos= robodetectíon.getGoalPosition(cap)
+    goal_x = goalPos["position"][0]
+    goal_y = goalPos["position"][1]
 
 # Target state
 def update_targets_state(targets):
