@@ -7,7 +7,7 @@ last_update_time = time.time()
 last_obs_update_time = time.time()
 update_interval = 0.5  # seconds
 
-def handle_routing(player, obstacle, goal, targets, roboController):
+def handle_routing(player, obstacle, goal, roboController):
     global last_update_time, last_obs_update_time
     # Update data
     current_time = time.time()
