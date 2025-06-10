@@ -37,7 +37,7 @@ def handle_routing(player, obstacle, roboController):
     angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
     # print("angle to turn: ", angle_to_turn)
     print("target:", routing_functions.target_x, routing_functions.target_y)
-    while routing_functions.target_total > routing_functions.target_goal:
+    if routing_functions.target_total > routing_functions.target_goal:
         now_time = time.time()
         if now_time - last_obs_update_time > update_interval:
             routing_functions.target_total = len(routing_functions.all_targets)
@@ -45,18 +45,22 @@ def handle_routing(player, obstacle, roboController):
             last_obs_update_time = now_time
 
         if angle_to_turn is None:
-            pass
+            return None
         elif angle_to_turn > 3:
             roboController.rotate_clockwise(angle_to_turn)
             time.sleep(0.05)
+            return None
         elif angle_to_turn < -3:
             roboController.rotate_counterClockwise(abs(angle_to_turn))
             time.sleep(0.05)
+            return None
         else:
             distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
             if distance > 5:
                 roboController.forward(0.5)
                 time.sleep(0.05)
+                return None
+            return None
     else:
         # Insert target perpendicular to wall before goal
         if not routing_functions.all_targets:
@@ -85,7 +89,7 @@ def handle_routing(player, obstacle, roboController):
                     detour_y = routing_functions.goal_y + perp_dy * 200
                     routing_functions.all_targets.insert(0, (detour_x, detour_y))
                     routing_functions.calculate_target()
-                    return
+                    return None
 
         dx = routing_functions.goal_x - player["x"]
         dy = routing_functions.goal_y - player["y"]
@@ -114,6 +118,7 @@ def handle_routing(player, obstacle, roboController):
             # roboController.dropoff()
             time.sleep(2)
             init_targets()
+            return None
         else:
             return None
 
