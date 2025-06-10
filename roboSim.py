@@ -18,6 +18,20 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 color_file = os.path.join(script_dir, "colors.json")
 colour_mapping = load_color_mapping(color_file)
 
+if colour_mapping:
+    for obj in colour_mapping:
+        if obj.get("name") == "obstacle":
+            obstacle_color = obj
+            print(f"Obstacle color: {obstacle_color}")
+            break
+
+if obstacle_color is None:
+    print("Error: Obstacle color not found in color mapping")
+    exit(1)
+
+lower_bound = np.array(obstacle_color["colorLowerBound"])
+upper_bound = np.array(obstacle_color["colorUpperBound"])
+
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
