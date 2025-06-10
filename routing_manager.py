@@ -16,7 +16,6 @@ def handle_routing(player, obstacle, roboController):
         # update_targets_state(targets)
         last_update_time = current_time
         routing_functions.calculate_target()
-        # Move detour logic here to execute immediately when real target is assigned
         tx, ty = routing_functions.target_x, routing_functions.target_y
         if tx is not None and ty is not None:
             routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
@@ -27,7 +26,6 @@ def handle_routing(player, obstacle, roboController):
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
             routing_functions.calculate_target()
-            # Move detour logic here as well after target recalculation
             tx, ty = routing_functions.target_x, routing_functions.target_y
             if tx is not None and ty is not None:
                 routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
@@ -59,13 +57,11 @@ def handle_simulated_routing(player, obstacle):
         routing_functions.update_obstacle_state(obstacle)
         last_update_time = current_time
         routing_functions.calculate_target()
-        # Move detour logic here to execute immediately when real target is assigned
         tx, ty = routing_functions.target_x, routing_functions.target_y
         if tx is not None and ty is not None:
             routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
 
     tx, ty = routing_functions.target_x, routing_functions.target_y
-    # Wall avoidance handled above
 
     if tx is not None and ty is not None:
         # Obstacle avoidance
@@ -81,20 +77,23 @@ def handle_simulated_routing(player, obstacle):
         if distance < 1:
             if (tx, ty) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((tx, ty))
-            should_back_up, (perp_dx, perp_dy) = routing_functions.is_facing_wall()
-            if should_back_up:
-                player["x"] -= perp_dx * 50
-                player["y"] -= perp_dy * 50
-                if routing_functions.all_targets:
-                    # Turn toward next target
-                    tx, ty = routing_functions.target_x, routing_functions.target_y
-                    angle = math.atan2(ty - player["y"], tx - player["x"])
-                    player["rotation"] = angle
-                else:
-                    # Turn around
-                    player["rotation"] += math.pi
+            #    routing_functions.last_target_removal_time = time.time()
+            #should_back_up, (perp_dx, perp_dy) = routing_functions.is_facing_wall()
+            #time_diff = time.time() - routing_functions.last_target_removal_time
+            #print("time diff:", time_diff)
+            #print("should back up:", should_back_up)
+            #if should_back_up and time_diff < 2:
+            #    player["x"] -= perp_dx * 50
+            #    player["y"] -= perp_dy * 50
+            #    if routing_functions.all_targets:
+            #        # Turn toward next target
+            #        tx, ty = routing_functions.target_x, routing_functions.target_y
+            #        angle = math.atan2(ty - player["y"], tx - player["x"])
+            #        player["rotation"] = angle
+            #    else:
+            #        # Turn around
+            #        player["rotation"] += math.pi
             routing_functions.calculate_target()
-            # Move detour logic here after target recalculation
             tx, ty = routing_functions.target_x, routing_functions.target_y
             if tx is not None and ty is not None:
                 routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
