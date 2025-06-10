@@ -2,6 +2,8 @@ import routing_functions
 import time
 import math
 
+from routing_functions import init_targets
+
 # Update interval
 last_update_time = time.time()
 update_interval = 0.1  # seconds
@@ -74,39 +76,64 @@ def handle_simulated_routing(player, obstacle):
         dy = ty - player["y"]
         distance = math.hypot(dx, dy)
 
-        if distance < 1:
-            if (tx, ty) in routing_functions.all_targets:
-                routing_functions.all_targets.remove((tx, ty))
-            #    routing_functions.last_target_removal_time = time.time()
-            #should_back_up, (perp_dx, perp_dy) = routing_functions.is_facing_wall()
-            #time_diff = time.time() - routing_functions.last_target_removal_time
-            #print("time diff:", time_diff)
-            #print("should back up:", should_back_up)
-            #if should_back_up and time_diff < 2:
-            #    player["x"] -= perp_dx * 50
-            #    player["y"] -= perp_dy * 50
-            #    if routing_functions.all_targets:
-            #        # Turn toward next target
-            #        tx, ty = routing_functions.target_x, routing_functions.target_y
-            #        angle = math.atan2(ty - player["y"], tx - player["x"])
-            #        player["rotation"] = angle
-            #    else:
-            #        # Turn around
-            #        player["rotation"] += math.pi
-            routing_functions.calculate_target()
-            tx, ty = routing_functions.target_x, routing_functions.target_y
-            if tx is not None and ty is not None:
-                routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
+        while routing_functions.target_total > routing_functions.target_goal:
+            if distance < 1:
+                if (tx, ty) in routing_functions.all_targets:
+                    routing_functions.all_targets.remove((tx, ty))
+                #    routing_functions.last_target_removal_time = time.time()
+                #should_back_up, (perp_dx, perp_dy) = routing_functions.is_facing_wall()
+                #time_diff = time.time() - routing_functions.last_target_removal_time
+                #print("time diff:", time_diff)
+                #print("should back up:", should_back_up)
+                #if should_back_up and time_diff < 2:
+                #    player["x"] -= perp_dx * 50
+                #    player["y"] -= perp_dy * 50
+                #    if routing_functions.all_targets:
+                #        # Turn toward next target
+                #        tx, ty = routing_functions.target_x, routing_functions.target_y
+                #        angle = math.atan2(ty - player["y"], tx - player["x"])
+                #        player["rotation"] = angle
+                #    else:
+                #        # Turn around
+                #        player["rotation"] += math.pi
+                routing_functions.calculate_target()
+                tx, ty = routing_functions.target_x, routing_functions.target_y
+                if tx is not None and ty is not None:
+                    routing_functions.target_x, routing_functions.target_y = routing_functions.avoid_walls(tx, ty)
+                    return None
+                else:
+                    return None
+            else:
+                angle_to_target = math.atan2(dy, dx)
+                angle_diff = angle_to_target - player["rotation"]
+                angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+
+                TURN_SPEED = 0.1
+                MOVE_THRESHOLD = 0.1
+
+                if abs(angle_diff) > MOVE_THRESHOLD:
+                    player["rotation"] += TURN_SPEED * (1 if angle_diff > 0 else -1)
+                    return None
+                player["x"] += math.cos(player["rotation"]) * 2
+                player["y"] += math.sin(player["rotation"]) * 2
+                return None
         else:
-            angle_to_target = math.atan2(dy, dx)
-            angle_diff = angle_to_target - player["rotation"]
-            angle_diff = (angle_diff + math.pi) % (2 * math.pi) - math.pi
+            if routing_functions.goal_x is None or routing_functions.goal_y is None:
+                return None
+            angle_to_goal = routing_functions.calculate_angle(routing_functions.goal_x, routing_functions.goal_y)
 
             TURN_SPEED = 0.1
             MOVE_THRESHOLD = 0.1
 
-            if abs(angle_diff) > MOVE_THRESHOLD:
-                player["rotation"] += TURN_SPEED * (1 if angle_diff > 0 else -1)
-                return
+            if abs(angle_to_goal) > MOVE_THRESHOLD:
+                player["rotation"] += TURN_SPEED * (1 if angle_to_goal > 0 else -1)
+                return None
             player["x"] += math.cos(player["rotation"]) * 2
             player["y"] += math.sin(player["rotation"]) * 2
+            if abs(routing_functions.robot_x - routing_functions.goal_x) <= 5 and abs(routing_functions.robot_y - routing_functions.goal_y) <= 5:
+                init_targets()
+            else:
+                return None
+
+    else:
+        return None

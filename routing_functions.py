@@ -10,6 +10,10 @@ target_y = 300
 all_targets = []
 detour_memory = set()
 #last_target_removal_time = 0
+target_total = 0
+target_goal = 0
+goal_x = 0
+goal_y = 0
 # Robot state
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
@@ -73,6 +77,12 @@ def calculate_angle(target_x, target_y):
     angle_to_target = math.degrees(math.atan2(target_y - robot_y, target_x - robot_x))
     angle_difference = (angle_to_target - math.degrees(robot_angle) + 360) % 360
     return angle_difference if angle_difference <= 180 else angle_difference - 360
+
+def init_targets():
+    global target_total
+    target_total = len(all_targets)
+    global target_goal
+    target_goal = target_total - 4
 
 # Distance from robot to target
 def calculate_distance(target_x, target_y):

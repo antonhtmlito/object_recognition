@@ -87,7 +87,7 @@ cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
-
+routing_functions.init_targets()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -99,6 +99,10 @@ while running:
         if event.type == pygame.K_UP:
             running = False
             print("forward")
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_k:
+                routing_functions.init_targets()
+                print("targets: ", len(routing_functions.all_targets))
 
     if SIMULATION_MODE:
         routing_manager.handle_simulated_routing(player, obstacle)
