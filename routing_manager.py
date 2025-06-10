@@ -49,11 +49,11 @@ def handle_routing(player, obstacle, goal, roboController):
 
         if angle_to_turn is None:
             return None
-        elif angle_to_turn > 5:
+        elif angle_to_turn > 2:
             roboController.rotate_clockwise(angle_to_turn)
             time.sleep(0.1)
             return None
-        elif angle_to_turn < -5:
+        elif angle_to_turn < -2:
             roboController.rotate_counterClockwise(abs(angle_to_turn))
             time.sleep(0.1)
             return None
