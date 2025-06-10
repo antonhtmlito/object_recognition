@@ -36,8 +36,9 @@ def update_goal_state(goal):
     cap = cv2.VideoCapture(0)
     global goal_x, goal_y
     goalPos= robodetectíon.getGoalPosition(cap)
-    goal_x = goalPos["position"][0]
-    goal_y = goalPos["position"][1]
+    if goalPos is not None:
+        goal_x = goalPos["position"][0]
+        goal_y = goalPos["position"][1]
 
 # Target state
 def update_targets_state(targets):
