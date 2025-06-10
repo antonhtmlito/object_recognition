@@ -113,8 +113,8 @@ def handle_routing(player, obstacle, goal, roboController):
                 time.sleep(0.05)
         if abs(routing_functions.robot_x - routing_functions.goal_x) <= 5 and abs(
                 routing_functions.robot_y - routing_functions.goal_y) <= 5:
-            # roboController.dropoff()
-            # roboController.dropoff()
+            roboController.dropoff()
+            roboController.dropoff()
             time.sleep(2)
             routing_functions.init_targets()
             return None
