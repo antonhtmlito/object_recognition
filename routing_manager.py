@@ -101,16 +101,16 @@ def handle_routing(player, obstacle, goal, roboController):
              pass
         elif angle_diff > 3:
             roboController.rotate_clockwise(angle_diff)
-            time.sleep(0.05)
+            time.sleep(0.5)
         elif angle_to_turn < -3:
             roboController.rotate_counterClockwise(abs(angle_diff))
-            time.sleep(0.05)
+            time.sleep(0.5)
             return None
         else:
             distance_to_goal = math.sqrt((routing_functions.goal_x - routing_functions.robot_x) ** 2 + (routing_functions.goal_y - routing_functions.robot_y) ** 2)
             if distance_to_goal > 5:
                 roboController.forward(0.5)
-                time.sleep(0.05)
+                time.sleep(0.5)
         if abs(routing_functions.robot_x - routing_functions.goal_x) <= 5 and abs(
                 routing_functions.robot_y - routing_functions.goal_y) <= 5:
             roboController.dropoff()
