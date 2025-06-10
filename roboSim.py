@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import math
 from robodetectíon import getBotPosition
+from robodetectíon import getGoalPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
@@ -103,6 +104,13 @@ while running:
         if event.type == pygame.K_UP:
             running = False
             print("forward")
+    goalPos = getGoalPosition(cap)
+
+    if goalPos is not None:
+        goalX = goalPos["position"][0]
+        goalY = goalPos["position"][1]
+        pygame.draw.circle(screen, (100,100,100), (goalX,goalY))
+        print("goalX", goalX, "goalY", goalY)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_k:
                 routing_functions.init_targets()
