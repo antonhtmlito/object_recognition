@@ -22,6 +22,8 @@ while True:
     # Find markører
     corners, ids, _ = aruco.detectMarkers(frame, aruco_dict, parameters=parameters)
 
+    target_coordinates = {}
+
     # Tegn alle fundne markører
     if ids is not None:
         ids = ids.flatten()
@@ -38,7 +40,7 @@ while True:
             cy = int(c[:, 1].mean())
             marker_centers[id_val] = (cx, cy)
             if id_val in [målA_id, målB_id]:
-                mål_firkanter[id_val] = corners[i][0].astype(int)
+                mål_firkanter[id_val] = corners[i][0]
 
             # Skriv ID på billedet
             cv2.putText(frame, f"ID:{id_val}", (cx - 10, cy - 10),
@@ -54,6 +56,9 @@ while True:
                 cv2.circle(frame, marker_centers[målB_id], 10, (255, 0, 0), -1)
                 cv2.putText(frame, "Mål B", (marker_centers[målB_id][0] + 10, marker_centers[målB_id][1]),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+
+            if target_coordinates:
+                print("Target Coordinates:", target_coordinates)
 
     cv2.imshow("Banetegning via ArUco", frame)
 
