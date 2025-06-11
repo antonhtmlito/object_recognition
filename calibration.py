@@ -70,10 +70,10 @@ def get_color(event, x, y, flags, param):
         # upper mapping is to ensure that the upper bound is not wrapped to the lowest value
         if upper[0] > 179 - hueChange:
             upper[0] = 179 - hueChange - 1
-        if upper[1] > 179 - SaturationChange:
-            upper[1] = 179 - SaturationChange - 1
-        if upper[2] > 179 - ValueChange:
-            upper[2] = 179 - ValueChange - 1
+        if upper[1] > 255 - SaturationChange:
+            upper[1] = 255 - SaturationChange - 1
+        if upper[2] > 255 - ValueChange:
+            upper[2] = 255 - ValueChange - 1
         np.add.at(upper, [0, 1, 2], [hueChange, SaturationChange, ValueChange])
         np.clip(upper[0], 0, 180)
 
@@ -102,8 +102,13 @@ while True:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, lower_bound, upper_bound)
 
+    #morphology
+    kernel = np.ones((3, 3), np.uint8)
+    mask_clean = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask_clean = cv2.morphologyEx(mask_clean, cv2.MORPH_CLOSE, kernel)
+
     cv2.imshow("hsv", hsv)
-    cv2.imshow("mask", mask)
+    cv2.imshow("mask", mask_clean)
     cv2.imshow("frame", frame)
 #    cv2.imwrite('obstacle_mask.png', mask)
 
