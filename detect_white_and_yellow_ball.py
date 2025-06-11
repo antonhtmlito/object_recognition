@@ -35,14 +35,14 @@ def get_color(event, x, y, flags, param):
 
         upper = mouseClickColour.copy()
         # upper mapping is to ensure that the upper bound is not wrapped to the lowest value
-        if upper[0] > 255 - hueChange:
-            upper[0] = 255 - hueChange - 1
+        if upper[0] > 179 - hueChange:
+            upper[0] = 179 - hueChange - 1
         if upper[1] > 255 - SaturationChange:
             upper[1] = 255 - SaturationChange - 1
         if upper[2] > 255 - ValueChange:
             upper[2] = 255 - ValueChange - 1
         np.add.at(upper, [0, 1, 2], [hueChange, SaturationChange, ValueChange])
-        np.clip(upper[0], 0, 180)
+        np.clip(upper[0], 0, 179)
 
         object_configs[1]["colorLowerBound"] = lower.tolist()
         with open("colors.json", "w") as f:
@@ -71,18 +71,18 @@ def get_color(event, x, y, flags, param):
 
         upper = mouseClickColour.copy()
         # upper mapping is to ensure that the upper bound is not wrapped to the lowest value
-        if upper[0] > 255 - hueChange:
-            upper[0] = 255 - hueChange - 1
+        if upper[0] > 179 - hueChange:
+            upper[0] = 179 - hueChange - 1
         if upper[1] > 255 - SaturationChange:
             upper[1] = 255 - SaturationChange - 1
         if upper[2] > 255 - ValueChange:
             upper[2] = 255 - ValueChange - 1
         np.add.at(upper, [0, 1, 2], [hueChange, SaturationChange, ValueChange])
-        np.clip(upper[0], 0, 180)
+        np.clip(upper[0], 0, 179)
 
         #object_configs[0]["colorLowerBound"] = lower.tolist()
-        object_configs[0]["colorUpperBound"] = upper.tolist()
-        print(object_configs[0])
+        object_configs[1]["colorUpperBound"] = upper.tolist()
+        print(object_configs[1])
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -113,26 +113,32 @@ def get_ball_positions(cap):
         mask = cv2.inRange(hsv, lower, upper)
 
         # (Optional) if you want the same yellow‐exclusion for white balls:
-        if "white" in name.lower():
+       # if "white" in name.lower():
             # yellow_lower = np.array([20, 100, 100])
             # yellow_upper = np.array([40, 255, 255])
             # yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
             # mask = cv2.bitwise_and(mask, cv2.bitwise_not(yellow_mask))
-            pass
+        #    pass
+
+        # Morphological operations
+        kernel = np.ones((3, 3), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         positions = []
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area > 100:
+            if area > 50:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.8:
+                if circularity > 0.75:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 50:
+                    if radius > 40:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -149,14 +155,14 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 100:
+        if area > 50:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
-            if circularity > 0.7:
+            if circularity > 0.75:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 50:
+                if radius > 40:
                     continue
 
                 # Store this (x,y) under the key `color_name`
@@ -236,7 +242,7 @@ if __name__ == "__main__":
         ret, frame = cap.read()
         if not ret:
             break
-
+        
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         white_mask_display = None  # For optional mask visualization
         orange_mask_display = None
@@ -248,6 +254,11 @@ if __name__ == "__main__":
             lower = np.array(obj["colorLowerBound"])
             upper = np.array(obj["colorUpperBound"])
             mask = cv2.inRange(hsv, lower, upper)
+
+            # Add morphology to clean mask
+            kernel = np.ones((3, 3), np.uint8)  # You can tweak kernel size
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
@@ -270,6 +281,7 @@ if __name__ == "__main__":
         cv2.imshow("Processed Frame", frame)
         if white_mask_display is not None:
             cv2.imshow("White Mask", white_mask_display)
+
 
         if orange_mask_display is not None:
             cv2.imshow("Orange Mask", orange_mask_display)
