@@ -17,14 +17,14 @@
         "name": "whiteBall",
         "type": "ball",
         "colorLowerBound": [
-            3,
-            44,
-            137
+            0,
+            0,
+            180
         ],
         "colorUpperBound": [
-            12,
-            40,
-            254
+            180,
+            35,
+            255
         ]
     },
     {

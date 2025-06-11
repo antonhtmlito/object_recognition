@@ -16,7 +16,7 @@ running = True
 
 # Update interval
 last_update_time = time.time()
-update_interval = 2  # seconds
+update_interval = 4  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -174,7 +174,7 @@ while running:
                 if distance > 5:
                     roboController.forward(0.5)
         else:
-            routing_functions.calculate_target
+            routing_functions.calculate_target()
 
         last_update_time = current_time
 
