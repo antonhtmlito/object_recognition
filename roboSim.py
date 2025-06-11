@@ -16,7 +16,7 @@ running = True
 
 # Update interval
 last_update_time = time.time()
-update_interval = 4  # seconds
+update_interval = 2  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -89,7 +89,7 @@ def cast_rays(player, max_distance=700):
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -166,9 +166,9 @@ while running:
             print("targets:", routing_functions.target_x, routing_functions.target_y)
             if angle_to_turn is None:
                 pass
-            elif angle_to_turn > 1:
+            elif angle_to_turn > 3:
                 roboController.rotate_clockwise(angle_to_turn)
-            elif angle_to_turn < -1:
+            elif angle_to_turn < -3:
                 roboController.rotate_counterClockwise(abs(angle_to_turn))
             else:
                 if distance > 5:

@@ -1,5 +1,9 @@
 import math
 
+import cv2
+
+import robodetectíon
+
 robot_x = 0
 robot_y = 0
 robot_angle = 0
@@ -26,6 +30,15 @@ def update_obstacle_state(obstacle):
     global obstacle_x, obstacle_y
     obstacle_x = obstacle["x"]
     obstacle_y = obstacle["y"]
+
+# goal state
+def update_goal_state(goal):
+    cap = cv2.VideoCapture(0)
+    global goal_x, goal_y
+    goalPos= robodetectíon.getGoalPosition(cap)
+    if goalPos is not None:
+        goal_x = goalPos["position"][0]
+        goal_y = goalPos["position"][1]
 
 # Target state
 def update_targets_state(targets):
@@ -83,6 +96,7 @@ def init_targets():
     target_total = len(all_targets)
     global target_goal
     target_goal = target_total - 4
+    print("Total targets:", target_total)
 
 # Distance from robot to target
 def calculate_distance(target_x, target_y):
