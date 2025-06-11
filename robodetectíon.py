@@ -18,9 +18,7 @@ def calcAngle(corners):
 
 
 def getGoalPosition(camera):
-    # Define the ID for your single goal marker
-    # You MUST change this to the actual ID of your ArUco marker for the goal.
-    goal_id = 101  # Example ID for your single goal
+    goal_id = 101  # ID for goal aruco marker
 
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_1000)
     parameters = cv2.aruco.DetectorParameters()
