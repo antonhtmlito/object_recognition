@@ -173,9 +173,10 @@ while running:
             else:
                 if distance > 5:
                     roboController.forward(0.5)
+        else:
+            routing_functions.calculate_target
 
         last_update_time = current_time
-        routing_functions.calculate_target()
 
 # Draw targets
     for tx, ty in routing_functions.all_targets:
