@@ -166,9 +166,9 @@ while running:
             print("targets:", routing_functions.target_x, routing_functions.target_y)
             if angle_to_turn is None:
                 pass
-            elif angle_to_turn > 3:
+            elif angle_to_turn > 1:
                 roboController.rotate_clockwise(angle_to_turn)
-            elif angle_to_turn < -3:
+            elif angle_to_turn < -1:
                 roboController.rotate_counterClockwise(abs(angle_to_turn))
             else:
                 if distance > 5:
