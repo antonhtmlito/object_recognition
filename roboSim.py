@@ -93,7 +93,8 @@ cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
-
+routing_functions.init_targets()
+routing_functions.calculate_target()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
