@@ -1,21 +1,22 @@
+import time
 import pygame
 import numpy as np
 import cv2
 import math
 from robodetectíon import getBotPosition
-from robodetectíon import getGoalPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
-import routing_manager
-
-SIMULATION_MODE = False
 
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
+
+# Update interval
+last_update_time = time.time()
+update_interval = 2  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -92,7 +93,7 @@ cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
-routing_functions.init_targets()
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -104,34 +105,15 @@ while running:
         if event.type == pygame.K_UP:
             running = False
             print("forward")
-    goalPos = getGoalPosition(cap)
 
-    if goalPos is not None:
-        goalX = goalPos["position"][0]
-        goalY = goalPos["position"][1]
-        pygame.draw.circle(screen, (100,100,100), (goalX,goalY))
-        print("goalX", goalX, "goalY", goalY)
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_k:
-                routing_functions.init_targets()
-                print("targets: ", len(routing_functions.all_targets))
+    botPos = getBotPosition(cap)
+#    print(botPos)
+    if botPos is not None:
+        player["x"] = botPos["position"][0]
+        player["y"] = botPos["position"][1]
+        player["rotation"] = botPos["angle"]
 
-    if SIMULATION_MODE:
-        routing_manager.handle_simulated_routing(player, obstacle)
-        tx, ty = routing_functions.target_x, routing_functions.target_y
-        # Wall avoidance
-        tx, ty = routing_functions.avoid_walls(tx, ty)
-        routing_functions.target_x = tx
-        routing_functions.target_y = ty
-        ball_positions = {}
-    else:
-        botPos = getBotPosition(cap)
-        if botPos is not None:
-            player["x"] = botPos["position"][0]
-            player["y"] = botPos["position"][1]
-            player["rotation"] = botPos["angle"]
-        ball_positions = get_ball_positions(cap)
-        routing_manager.handle_routing(player, obstacle, roboController)
+    ball_positions = get_ball_positions(cap)
 
     # Add each detected ball position as a target (if it isn’t already in the list)
     for coords in ball_positions.values():
@@ -169,9 +151,42 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
+# Update data
+    current_time = time.time()
+    if current_time - last_update_time > update_interval:
+        routing_functions.update_robot_state(player)
+        routing_functions.update_obstacle_state(obstacle)
+        # update_targets_state(targets)
+
+        if routing_functions.target_x is not None and routing_functions.target_y is not None:
+            # Drive to target
+            angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
+            distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
+            #print("angle to turn: ", angle_to_turn)
+            print("targets:", routing_functions.target_x, routing_functions.target_y)
+            if angle_to_turn is None:
+                pass
+            elif angle_to_turn > 3:
+                roboController.rotate_clockwise(angle_to_turn)
+            elif angle_to_turn < -3:
+                roboController.rotate_counterClockwise(abs(angle_to_turn))
+            else:
+                if distance > 5:
+                    roboController.forward(0.5)
+
+        last_update_time = current_time
+        routing_functions.calculate_target()
+
 # Draw targets
     for tx, ty in routing_functions.all_targets:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
+
+# Remove targets
+    if routing_functions.target_x is not None and routing_functions.target_y is not None:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
+                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+            routing_functions.calculate_target()
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
@@ -184,14 +199,14 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_LEFT]:
-        roboController.rotate_counterClockwise(10)
+   # if keys[pygame.K_LEFT]:
+     #   roboController.rotate_counterClockwise(10)
 #        player["rotation"] = player["rotation"] - 0.01
-    elif keys[pygame.K_RIGHT]:
-        roboController.rotate_clockwise(10)
+   # elif keys[pygame.K_RIGHT]:
+    #    roboController.rotate_clockwise(10)
 #        player["rotation"] = player["rotation"] + 0.01
-    elif keys[pygame.K_UP]:
-        roboController.forward(2)
+    #elif keys[pygame.K_UP]:
+    #    roboController.forward(2)
 #    elif keys[pygame.K_DOWN]:
 
     pygame.display.flip()

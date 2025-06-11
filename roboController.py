@@ -2,14 +2,14 @@ from socket import *
 
 
 class RoboController:
-    def __init__(self, serverName = "172.20.10.3", serverPort = 8080):
+    def __init__(self, serverName = "192.168.1.210", serverPort = 8080):
         self.serverName = serverName
         self.serverPort = serverPort
 
     def send_command(self, command, entry):
         value = entry
         print(value)
-        return  # For debugging purposes, you can remove this line later
+        #return  # For debugging purposes, you can remove this line later
         try:
             message = f"{command}, {value}"  # Ensure correct format with a space after the comma
             print("Sending command:", message)
