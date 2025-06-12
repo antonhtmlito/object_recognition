@@ -1,79 +1,114 @@
 import cv2
 import numpy as np
+import math
 
-def detect_aruco_markers():
-    # Initialize the camera
-    cap = cv2.VideoCapture(1)
+# Dine corner-IDs
+CORNER_IDS = {110, 120, 130, 140}
+ROBOT_ID = 1
 
-    # Check if camera opened successfully
-    if not cap.isOpened():
-        print("Error: Could not open camera")
-        return
+def get_arena_corners(frame, camera_mtx=None, dist_coeffs=None):
+    if camera_mtx is not None and dist_coeffs is not None:
+        frame = cv2.undistort(frame, camera_mtx, dist_coeffs)
 
-    # Create ArUco dictionary (6x6 with 250 markers)
-    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
-    parameters = cv2.aruco.DetectorParameters()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Create the ArUco detector
-    detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+    params = cv2.aruco.DetectorParameters()
 
-    try:
-        while True:
-            # Read frame from camera
-            ret, frame = cap.read()
-            if not ret:
-                print("Error: Can't receive frame")
-                break
+    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=params)
+    if ids is None:
+        return {}
 
-            # Convert frame to grayscale
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    ids = ids.flatten()
+    pts = {}
+    for corner, mid in zip(corners, ids):
+        if mid in CORNER_IDS:
+            c = corner.reshape((4, 2))
+            center = c.mean(axis=0).astype(int)
+            pts[mid] = tuple(center)
 
-            # Detect the markers
-            corners, ids, rejected = detector.detectMarkers(gray)
+    return pts
 
-            # If markers are detected
-            if ids is not None:
-                # Draw detected markers
-                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+def get_robot_position(frame, robot_id=ROBOT_ID):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-                # Print the detected markers
-                print("Detected markers:", ids)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+    params = cv2.aruco.DetectorParameters()
 
-                # If exactly 3 markers are detected, draw a rectangle and triangle
-                if len(ids) == 3:
-                    # Get the centers of the markers
-                    centers = []
-                    for corner in corners:
-                        center = np.mean(corner[0], axis=0)
-                        centers.append(center)
+    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=params)
 
-                    # Convert centers to numpy array
-                    centers = np.array(centers, dtype=np.int32)
+    if ids is None:
+        return None
 
-                    # Find the bounding rectangle
-                    x, y, w, h = cv2.boundingRect(centers)
+    ids = ids.flatten()
 
-                    # Draw the rectangle
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    for corner, mid in zip(corners, ids):
+        if mid == robot_id:
+            c = corner.reshape((4, 2))
+            center = c.mean(axis=0).astype(int)
+            return tuple(center)
 
-                    # Draw lines between markers to show triangle
-                    for i in range(3):
-                        pt1 = tuple(centers[i])
-                        pt2 = tuple(centers[(i + 1) % 3])
-                        cv2.line(frame, pt1, pt2, (0, 0, 255), 2)
+    return None
 
-            # Display the frame
-            cv2.imshow('Detected Markers', frame)
+def is_inside_arena(point, arena_polygon):
+    contour = np.array(arena_polygon, dtype=np.int32)
+    return cv2.pointPolygonTest(contour, point, False) >= 0
 
-            # Break loop on 'q' press
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
 
-    finally:
-        # Release resources
-        cap.release()
-        cv2.destroyAllWindows()
+def detect_and_draw_arena(frame, camera_mtx=None, dist_coeffs=None):
+    out = frame.copy()
 
+    gray = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
+    aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
+    params = cv2.aruco.DetectorParameters()
+    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=params)
+
+    if ids is not None:
+        cv2.aruco.drawDetectedMarkers(out, corners, ids, (255, 0, 0))
+
+    pts = get_arena_corners(frame, camera_mtx, dist_coeffs)
+
+    if set(pts.keys()) == CORNER_IDS:
+        vals = np.array(list(pts.values()))
+        cx, cy = vals[:, 0].mean(), vals[:, 1].mean()
+
+        order = sorted(pts.keys(), key=lambda mid: math.atan2(pts[mid][1] - cy, pts[mid][0] - cx))
+        polygon = [pts[mid] for mid in order] + [pts[order[0]]]
+
+        cv2.polylines(out, [np.array(polygon, dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=3)
+
+        robot_pos = get_robot_position(frame)
+        if robot_pos:
+            robot_pos = tuple(map(int, robot_pos))
+            if is_inside_arena(tuple(robot_pos), polygon):
+                color = (0, 255, 0)
+            else:
+                color = (0, 0, 255)
+                print("Robot uden for arenaen!")
+
+            cv2.circle(out, robot_pos, 10, color, -1)
+
+    return out
 
 if __name__ == "__main__":
-    detect_aruco_markers()
+    cap = cv2.VideoCapture(0)
+
+    try:
+        mtx = np.load("camera_mtx.npy")
+        dist = np.load("dist_coeffs.npy")
+    except FileNotFoundError:
+        mtx = dist = None
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        out = detect_and_draw_arena(frame, camera_mtx=mtx, dist_coeffs=dist)
+        cv2.imshow("ArUco Arena", out)
+
+        if cv2.waitKey(1) & 0xFF in (27, ord('q')):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
