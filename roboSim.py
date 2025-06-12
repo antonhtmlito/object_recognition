@@ -185,14 +185,13 @@ while running:
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 50 and abs(routing_functions.robot_y - routing_functions.target_y) < 50:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 200 and abs(routing_functions.robot_y - routing_functions.target_y) < 200:
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
             routing_functions.calculate_target()
 
 # Rotate the surface around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
-    print("rotation:", math.degrees(player["rotation"] + math.pi))
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
 # Draw the rotated player

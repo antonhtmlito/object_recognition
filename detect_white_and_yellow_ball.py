@@ -29,8 +29,8 @@ def get_color(event, x, y, flags, param):
     clicked_hsv = temp_hsv[y][x]
     print("HSV clicked:", clicked_hsv)
 
-    hueChange = 90
-    satChange = 30
+    hueChange = 20
+    satChange = 40
     valChange = 100
 
     # Convert to numpy array for math
@@ -75,6 +75,7 @@ def get_ball_positions(cap):
         return {}
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #hsv = cv2.GaussianBlur(hsv, (11, 11), 0) can be added to smooth edges and blend colors
     ball_positions = {}
 
     for obj in object_configs:
@@ -97,7 +98,7 @@ def get_ball_positions(cap):
         #    pass
 
         # Morphological operations
-        kernel = np.ones((5, 5), np.uint8)
+        kernel = np.ones((2, 2), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
@@ -107,14 +108,14 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area > 200:
+            if area > 250:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.7:
+                if circularity > 0.75:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 250:
+                    if radius > 200:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -131,14 +132,14 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 200:
+        if area > 250:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
-            if circularity > 0.7:
+            if circularity > 0.75:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 250:
+                if radius > 200:
                     continue
 
                 # Store this (x,y) under the key `color_name`
@@ -220,6 +221,7 @@ if __name__ == "__main__":
             break
         
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        #hsv = cv2.GaussianBlur(hsv, (7, 7), 0) can be added to smooth edges and blend colors
         white_mask_display = None  # For optional mask visualization
         orange_mask_display = None
 
@@ -232,7 +234,7 @@ if __name__ == "__main__":
             mask = cv2.inRange(hsv, lower, upper)
 
             # Add morphology to clean mask
-            kernel = np.ones((5, 5), np.uint8)  # You can tweak kernel size
+            kernel = np.ones((2, 2), np.uint8)  # You can tweak kernel size
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
             mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
