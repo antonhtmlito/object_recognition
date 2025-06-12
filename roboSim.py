@@ -7,6 +7,7 @@ from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
+from target_tracking import update_target_candidates
 
 # Pygame setup
 pygame.init()
@@ -94,7 +95,6 @@ if not cap.isOpened():
     raise Exception("camera not openened")
 
 routing_functions.init_targets()
-routing_functions.calculate_target()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -116,11 +116,8 @@ while running:
 
     ball_positions = get_ball_positions(cap)
 
-    # Add each detected ball position as a target (if it isn’t already in the list)
-    for coords in ball_positions.values():
-        for (bx, by) in coords:
-            if (bx, by) not in routing_functions.all_targets:
-                routing_functions.all_targets.append((bx, by))
+    # managing targets
+    update_target_candidates(ball_positions, routing_functions.all_targets)
 
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
@@ -172,12 +169,15 @@ while running:
             elif angle_to_turn < -3:
                 roboController.rotate_counterClockwise(abs(angle_to_turn))
             else:
-                if distance > 5:
+                if distance > 3:
                     roboController.forward(0.5)
         else:
             routing_functions.calculate_target()
 
         last_update_time = current_time
+
+    if routing_functions.target_x is None and routing_functions.target_y is None:
+        routing_functions.calculate_target()
 
 # Draw targets
     for tx, ty in routing_functions.all_targets:
@@ -185,7 +185,7 @@ while running:
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 200 and abs(routing_functions.robot_y - routing_functions.target_y) < 200:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 100 and abs(routing_functions.robot_y - routing_functions.target_y) < 100:
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
             routing_functions.calculate_target()

@@ -75,7 +75,8 @@ def get_ball_positions(cap):
         return {}
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    #hsv = cv2.GaussianBlur(hsv, (11, 11), 0) can be added to smooth edges and blend colors
+    #can be added to smooth edges and blend colors
+    hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
     ball_positions = {}
 
     for obj in object_configs:
@@ -108,14 +109,14 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area > 250:
+            if 270 < area > 230:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.75:
+                if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 200:
+                    if radius > 150:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -132,14 +133,14 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 250:
+        if 270 < area > 230:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
-            if circularity > 0.75:
+            if circularity > 0.8:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 200:
+                if radius > 150:
                     continue
 
                 # Store this (x,y) under the key `color_name`
@@ -221,7 +222,8 @@ if __name__ == "__main__":
             break
         
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        #hsv = cv2.GaussianBlur(hsv, (7, 7), 0) can be added to smooth edges and blend colors
+        #can be added to smooth edges and blend colors
+        hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
         white_mask_display = None  # For optional mask visualization
         orange_mask_display = None
 
@@ -236,7 +238,7 @@ if __name__ == "__main__":
             # Add morphology to clean mask
             kernel = np.ones((2, 2), np.uint8)  # You can tweak kernel size
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
+            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
