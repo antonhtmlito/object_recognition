@@ -7,6 +7,7 @@ from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
+from aruco import get_arena_corners, is_inside_arena
 
 # Pygame setup
 pygame.init()
@@ -107,12 +108,33 @@ while running:
             running = False
             print("forward")
 
+    ret, frame = cap.read()
+    if not ret:
+        continue
+
+    # 🔁 Opdater arena polygon hver frame
+    arena_corners = get_arena_corners(frame)
+    polygon = []
+    if set(arena_corners.keys()) == {110, 120, 130, 140}:
+        vals = list(arena_corners.values())
+        cx = sum(p[0] for p in vals) / 4
+        cy = sum(p[1] for p in vals) / 4
+        ordered = sorted(arena_corners.items(), key=lambda item: math.atan2(item[1][1]-cy, item[1][0]-cx))
+        polygon = [p for _, p in ordered]
+
     botPos = getBotPosition(cap)
 #    print(botPos)
     if botPos is not None:
-        player["x"] = botPos["position"][0]
-        player["y"] = botPos["position"][1]
-        player["rotation"] = botPos["angle"]
+        player["x"] = botPos[0]
+        player["y"] = botPos[1]
+        if len(botPos) > 2:
+            player["rotation"] = botPos[2]
+
+        # Tjek om robot er inde i arenaen
+        if polygon and not is_inside_arena((player["x"], player["y"]), polygon):
+            print("🚨 Robot er uden for arenaen – stopper al bevægelse!")
+            roboController.stop()
+            continue  # skip resten af loopet
 
     ball_positions = get_ball_positions(cap)
 
@@ -124,6 +146,20 @@ while running:
 
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
+
+    # Tegn polygon i pygame
+    if polygon:
+        pygame.draw.polygon(screen, (0, 255, 0), polygon, 3)
+
+    # Tegn polygon i OpenCV og vis den
+    if polygon:
+        poly_np = np.array(polygon, dtype=np.int32)
+        cv2.polylines(frame, [poly_np], isClosed=True, color=(0, 255, 0), thickness=3)
+
+    # Vis OpenCV-vindue med arena og robot
+    cv2.imshow("Detected Markers", frame)
+    if cv2.waitKey(1) & 0xFF in (27, ord('q')):
+        running = False
 
     # Now draw each ball as before
     for color_name, coords in ball_positions.items():
