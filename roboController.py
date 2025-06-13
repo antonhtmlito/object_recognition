@@ -6,15 +6,18 @@ class RoboController:
         self.serverName = serverName
         self.serverPort = serverPort
 
-    def send_command(self, command, entry):
+    def send_command(self, command, entry=None):
         value = entry
         print(value)
         #return  # For debugging purposes, you can remove this line later
         try:
-            message = f"{command}, {entry}" if entry is not None else command  # Ensure correct format with a space after the comma
+            if entry is not None:
+                message = f"{command}, {entry}" # Ensure correct format with a space after the comma
+            else: 
+                message = f"{command}"
             print("Sending command:", message)
             clientSocket = socket(AF_INET, SOCK_STREAM)
-            clientSocket.settimeout(3)
+            clientSocket.settimeout(10)
             clientSocket.connect((self.serverName, self.serverPort))
             clientSocket.send(message.encode())
             response = clientSocket.recv(1024).decode()
@@ -22,7 +25,7 @@ class RoboController:
                 print(f"Response from server: {response}")
             clientSocket.close()
         except Exception as e:
-            ...
+            print(e)
 
     def forward(self, amount):
         self.send_command("forward", amount)

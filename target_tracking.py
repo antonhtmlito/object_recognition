@@ -2,7 +2,7 @@ from collections import defaultdict
 import math
 
 # Constants
-PROMOTE_AFTER = 10
+PROMOTE_AFTER = 20
 MAX_DISTANCE = 50
 
 # Global tracker

@@ -19,11 +19,11 @@
         "colorLowerBound": [
             0,
             18,
-            145
+            155
         ],
         "colorUpperBound": [
-            30,
-            104,
+            34,
+            99,
             255
         ]
     },

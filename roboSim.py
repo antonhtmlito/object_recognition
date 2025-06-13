@@ -8,6 +8,7 @@ from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
 from target_tracking import update_target_candidates
+import route_goal
 
 # Pygame setup
 pygame.init()
@@ -17,7 +18,7 @@ running = True
 
 # Update interval
 last_update_time = time.time()
-update_interval = 2  # seconds
+update_interval = 1  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -82,9 +83,9 @@ def cast_rays(player, max_distance=700):
             if 0 <= target_x < alpha_channel.shape[1] and 0 <= target_y < alpha_channel.shape[0]:
                 if alpha_channel[target_y][target_x] > 0:
                     print(alpha_channel[target_y][target_x])
-                    print("found")
-                    print(target_x)
-                    print(target_y)
+                    #print("found")
+                    #print(target_x)
+                    #print(target_y)
                     break
 
         pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
@@ -93,6 +94,9 @@ def cast_rays(player, max_distance=700):
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
+
+score = False
+ballcount = 0
 
 routing_functions.init_targets()
 while running:
@@ -149,30 +153,28 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
+    if ballcount == 4:
+        score = True
 # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         routing_functions.update_robot_state(player)
         routing_functions.update_obstacle_state(obstacle)
+        print("balls collected",ballcount)
         # update_targets_state(targets)
 
-        if routing_functions.target_x is not None and routing_functions.target_y is not None:
+        if routing_functions.target_x is not None and routing_functions.target_y is not None and score is not True:
             # Drive to target
             angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
             distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
             #print("angle to turn: ", angle_to_turn)
             print("targets:", routing_functions.target_x, routing_functions.target_y)
-            if angle_to_turn is None:
-                pass
-            elif angle_to_turn > 3:
-                roboController.rotate_clockwise(angle_to_turn)
-            elif angle_to_turn < -3:
-                roboController.rotate_counterClockwise(abs(angle_to_turn))
-            else:
-                if distance > 3:
-                    roboController.forward(0.5)
-        else:
-            routing_functions.calculate_target()
+            routing_functions.drive(angle_to_turn, distance)
+        elif score == True:
+            if route_goal.go_to_goal(cap):
+                score = False
+                ballcount = 0
+
 
         last_update_time = current_time
 
@@ -185,9 +187,10 @@ while running:
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 100 and abs(routing_functions.robot_y - routing_functions.target_y) < 100:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 60 and abs(routing_functions.robot_y - routing_functions.target_y) < 60:
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+                ballcount = ballcount+1
             routing_functions.calculate_target()
 
 # Rotate the surface around its center
