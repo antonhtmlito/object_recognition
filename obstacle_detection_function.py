@@ -30,7 +30,7 @@ def get_obstacles(cam):
         for obj in colour_mapping:
             if obj.get("name") == "obstacle":
                 obstacle_color = obj
-                print(f"Obstacle color: {obstacle_color}")
+#                print(f"Obstacle color: {obstacle_color}")
                 break
 
     if obstacle_color is None:
@@ -76,10 +76,22 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((1920, 1080))
     clock = pygame.time.Clock()
+    pygame.display.set_caption("Obstacle Detection")
 
     while True:
         screen.fill("black")
         surface = get_surface(get_obstacles(capt))
-        screen.blit(surface, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        # Draw the surface on the screen
+        if surface is not None:
+            # Ensure the surface is not None before blitting
+            if surface.get_size() != screen.get_size():
+                surface = pygame.transform.scale(surface, screen.get_size())
+            # Blit the surface onto the screen
+            screen.blit(surface, (0, 0))
         pygame.display.flip()
         clock.tick(60)
