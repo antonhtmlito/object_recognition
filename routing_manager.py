@@ -5,6 +5,7 @@ import time
 last_update_time = time.time()
 update_interval = 0.1  # seconds
 
+
 def handle_routing(player, obstacle, roboController):
     global last_update_time
 # Update data
