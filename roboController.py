@@ -2,7 +2,7 @@ from socket import *
 
 
 class RoboController:
-    def __init__(self, serverName = "192.168.0.184", serverPort = 8080):
+    def __init__(self, serverName = "172.20.10.3", serverPort = 8080):
         self.serverName = serverName
         self.serverPort = serverPort
 

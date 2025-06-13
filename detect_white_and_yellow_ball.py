@@ -76,7 +76,7 @@ def get_ball_positions(cap):
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #can be added to smooth edges and blend colors
-    hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
+    hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
     ball_positions = {}
 
     for obj in object_configs:
@@ -194,7 +194,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -223,7 +223,7 @@ if __name__ == "__main__":
         
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #can be added to smooth edges and blend colors
-        hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
+        hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
         white_mask_display = None  # For optional mask visualization
         orange_mask_display = None
 
