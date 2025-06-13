@@ -69,7 +69,7 @@ def get_surface(mask):
 
 
 if __name__ == "__main__":
-    capt = cv2.VideoCapture(2)
+    capt = cv2.VideoCapture(0)
     if not capt.isOpened():
         raise Exception("Camera not opened")
 
