@@ -3,6 +3,7 @@ import json
 import os
 import numpy as np
 
+print("calibration.py loaded")
 
 def load_color_mapping(file_path):
     try:
@@ -80,6 +81,8 @@ def get_color(event, x, y, flags, param):
         colour_mapping[2]["colorLowerBound"] = lower.tolist()
         colour_mapping[2]["colorUpperBound"] = upper.tolist()
         print(colour_mapping[2])
+        with open(color_file, "w") as f:
+            json.dump(colour_mapping, f, indent=4)
 
 
 cv2.namedWindow("frame")

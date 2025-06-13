@@ -1,4 +1,7 @@
 import time
+
+from obstacle_detection_function import get_obstacles, get_surface
+
 import pygame
 import numpy as np
 import cv2
@@ -203,6 +206,7 @@ while running:
 
     keys = pygame.key.get_pressed()
 
+<<<<<<< HEAD
    # if keys[pygame.K_LEFT]:
      #   roboController.rotate_counterClockwise(10)
 #        player["rotation"] = player["rotation"] - 0.01
@@ -213,6 +217,8 @@ while running:
     #    roboController.forward(2)
 #    elif keys[pygame.K_DOWN]:
 
+=======
+>>>>>>> autoWalls
     pygame.display.flip()
     clock.tick(20)
 
