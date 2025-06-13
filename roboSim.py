@@ -153,7 +153,7 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
-    if ballcount == 4:
+    if ballcount >= 4:
         score = True
 # Update data
     current_time = time.time()
