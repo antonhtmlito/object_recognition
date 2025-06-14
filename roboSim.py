@@ -99,9 +99,6 @@ while running:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             routing_functions.all_targets.append((mouse_x, mouse_y))
             routing_functions.calculate_target()
-        if event.type == pygame.K_UP:
-            running = False
-            print("forward")
 
     botPos = getBotPosition(cap)
 #    print(botPos)
