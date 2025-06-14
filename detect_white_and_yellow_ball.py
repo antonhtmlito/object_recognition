@@ -4,11 +4,22 @@ import cv2
 import numpy as np
 import json
 
+area_low  = 230
+area_high = 270
+radius_low = 150
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Load object configs from colors.json (your HSV thresholds, etc.)
 # ──────────────────────────────────────────────────────────────────────────────
 with open("colors.json", "r") as f:
     object_configs = json.load(f)
+
+with open("config.json", "r") as f:
+    size_configs = json.load(f)
+    params = {
+    item["name"]: int(item["value"])  # convert to int if needed
+    for item in size_configs
+}
 
 # ──────────────────────────────────────────────────────────────────────────────
 # get the color from mouse picked object
@@ -109,14 +120,14 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if 270 < area > 230:
+            if params["area_high"] < area > params["area_low"]:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.8:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 150:
+                    if radius > params["radius_low"]:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -133,14 +144,14 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if 270 < area > 230:
+        if params["area_high"] < area > params["area_low"]:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
             if circularity > 0.8:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 150:
+                if radius > params["radius_low"]:
                     continue
 
                 # Store this (x,y) under the key `color_name`

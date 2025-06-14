@@ -1,0 +1,14 @@
+[
+    {
+        "name": "area_low",
+        "value": 230
+    },
+    {
+        "name": "area_high",
+        "value": 270
+    },
+    {
+        "name": "radius_low",
+        "value": "150"
+    }
+]
