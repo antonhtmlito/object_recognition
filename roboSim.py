@@ -1,5 +1,4 @@
 import time
-
 from obstacle_detection_function import get_obstacles, get_surface
 
 import pygame
@@ -122,6 +121,10 @@ while running:
         player["rotation"] = botPos["angle"]
 
     ball_positions = get_ball_positions(cap)
+    
+    mask_surface = get_surface(get_obstacles(cap))
+    mask_surface = pygame.transform.scale(mask_surface, (1920, 1080))
+
 
     # managing targets
     update_target_candidates(ball_positions, routing_functions.all_targets)
@@ -206,7 +209,6 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-<<<<<<< HEAD
    # if keys[pygame.K_LEFT]:
      #   roboController.rotate_counterClockwise(10)
 #        player["rotation"] = player["rotation"] - 0.01
@@ -217,8 +219,6 @@ while running:
     #    roboController.forward(2)
 #    elif keys[pygame.K_DOWN]:
 
-=======
->>>>>>> autoWalls
     pygame.display.flip()
     clock.tick(20)
 
