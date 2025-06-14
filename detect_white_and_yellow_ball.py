@@ -247,7 +247,7 @@ if __name__ == "__main__":
             elif "orange" in name.lower():
                 orange_mask_display = mask.copy()
 
-            draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255)
+            draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255) if "orange" in name.lower() else (0,0,0)
 
             if obj_type == "ball":
                 positions = find_balls(mask, name, draw_color, frame)
