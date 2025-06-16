@@ -2,17 +2,22 @@ from socket import *
 
 
 class RoboController:
-    def __init__(self, serverName = "172.20.10.3", serverPort = 8080):
+    def __init__(self, serverName = "192.168.0.40", serverPort = 8080):
         self.serverName = serverName
         self.serverPort = serverPort
 
-    def send_command(self, command, entry):
+    def send_command(self, command, entry=None):
         value = entry
         print(value)
         return  # For debugging purposes, you can remove this line later
         try:
-            message = f"{command}, {value}"  # Ensure correct format with a space after the comma
+            if entry is not None:
+                message = f"{command}, {entry}" # Ensure correct format with a space after the comma
+            else: 
+                message = f"{command}"
+            print("Sending command:", message)
             clientSocket = socket(AF_INET, SOCK_STREAM)
+            clientSocket.settimeout(10)
             clientSocket.connect((self.serverName, self.serverPort))
             clientSocket.send(message.encode())
             response = clientSocket.recv(1024).decode()
@@ -20,7 +25,7 @@ class RoboController:
                 print(f"Response from server: {response}")
             clientSocket.close()
         except Exception as e:
-            ...
+            print(e)
 
     def forward(self, amount):
         self.send_command("forward", amount)
@@ -33,3 +38,6 @@ class RoboController:
 
     def rotate_counterClockwise(self, amountRad):
         self.send_command("counterclockwise", amountRad)
+
+    def dropoff(self):
+        self.send_command("dropoff")

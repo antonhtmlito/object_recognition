@@ -1,4 +1,6 @@
 import time
+from obstacle_detection_function import get_obstacles, get_surface
+
 import pygame
 import numpy as np
 import cv2
@@ -7,13 +9,19 @@ from robodetectíon import getBotPosition
 from detect_white_and_yellow_ball import get_ball_positions
 from roboController import RoboController
 import routing_functions
-import routing_manager
+from target_tracking import update_target_candidates
+from ray_functions import cast_rays, cast_ray_at_angle
+import route_goal
 
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
 clock = pygame.time.Clock()
 running = True
+
+# Update interval
+last_update_time = time.time()
+update_interval = 1  # seconds
 
 # Load image
 file = "obstacle_mask.png"
@@ -63,34 +71,14 @@ targets = {
 roboController = RoboController()
 
 
-def cast_rays(player, max_distance=700):
-    start_angle = player["rotation"] - (math.pi / 2)
-    start_x = player["x"]
-    start_y = player["y"]
-
-    for i in range(-5, 5):
-        start_x = player["x"] + math.cos(start_angle) * i * 6
-        start_y = player["y"] - math.sin(start_angle) * i * 6
-
-        for pixel in range(max_distance):
-            target_x = int(start_x + math.sin(start_angle) * pixel)
-            target_y = int(start_y + math.cos(start_angle) * pixel)
-            if 0 <= target_x < alpha_channel.shape[1] and 0 <= target_y < alpha_channel.shape[0]:
-                if alpha_channel[target_y][target_x] > 0:
-                    print(alpha_channel[target_y][target_x])
-                    print("found")
-                    print(target_x)
-                    print(target_y)
-                    break
-
-        pygame.draw.line(screen, (255, 50, 50), (start_x, start_y), (target_x, target_y))
-
-
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
+score = False
+ballcount = 0
 
+routing_functions.init_targets()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -109,11 +97,10 @@ while running:
 
     ball_positions = get_ball_positions(cap)
 
-    # Add each detected ball position as a target (if it isn’t already in the list)
-    for coords in ball_positions.values():
-        for (bx, by) in coords:
-            if (bx, by) not in routing_functions.all_targets:
-                routing_functions.all_targets.append((bx, by))
+
+
+    # managing targets
+    update_target_candidates(ball_positions, routing_functions.all_targets)
 
     screen.fill("black")
     screen.blit(mask_surface, (0, 0))
@@ -145,21 +132,65 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
+    if ballcount >= 4:
+        score = True
+# Update data
+    current_time = time.time()
+    if current_time - last_update_time > update_interval:
+        routing_functions.update_robot_state(player)
+        routing_functions.update_obstacle_state(obstacle)
+        print("balls collected",ballcount)
+        # update_targets_state(targets)
+
+        if routing_functions.target_x is not None and routing_functions.target_y is not None and score is not True:
+            # Drive to target
+            angle_to_turn = routing_functions.calculate_angle(routing_functions.target_x, routing_functions.target_y)
+            distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
+            #print("angle to turn: ", angle_to_turn)
+            print("targets:", routing_functions.target_x, routing_functions.target_y)
+            routing_functions.drive(angle_to_turn, distance)
+        elif score == True:
+            if route_goal.go_to_goal(cap):
+                score = False
+                ballcount = 0
+
+        mask_surface = get_surface(get_obstacles(cap))
+        #mask_surface = pygame.transform.scale(mask_surface, (1920, 1080))
+        mask_surface = mask_surface.convert_alpha()
+
+
+        last_update_time = current_time
+
+    if routing_functions.target_x is None and routing_functions.target_y is None:
+        routing_functions.calculate_target()
+
 # Draw targets
     for tx, ty in routing_functions.all_targets:
         pygame.draw.circle(screen, "red", (tx, ty), 8)
 
-# handle routing
-    routing_manager.handle_routing(player, obstacle, roboController)
+# Remove targets
+    if routing_functions.target_x is not None and routing_functions.target_y is not None:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 60 and abs(routing_functions.robot_y - routing_functions.target_y) < 60:
+            if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
+                routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
+                ballcount = ballcount+1
+            routing_functions.calculate_target()
 
-# Rotate the surface around its center
+# Rotate the robot around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
-    print("rotation:", math.degrees(player["rotation"] + math.pi))
+    rotated_surface = pygame.transform.flip(rotated_surface, False, True)
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
 # Draw the rotated player
     screen.blit(rotated_surface, rotated_rect.topleft)
-    cast_rays(player, max_distance=10)
+
+    mask = pygame.mask.from_surface(mask_surface)
+    cast_rays(player, max_distance=500, screen=screen, mask=mask, num_rays=180)
+    cv2.imshow("mask", get_obstacles(cap))
+    print(type(alpha_channel))
+    np.savetxt("alpha_channel.txt", alpha_channel, fmt='%d')
+
+    keys = pygame.key.get_pressed()
 
     pygame.display.flip()
     clock.tick(20)

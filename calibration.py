@@ -3,6 +3,7 @@ import json
 import os
 import numpy as np
 
+print("calibration.py loaded")
 
 def load_color_mapping(file_path):
     try:
@@ -40,7 +41,7 @@ lower_bound = np.array(obstacle_color["colorLowerBound"])
 upper_bound = np.array(obstacle_color["colorUpperBound"])
 
 # Open video capture
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Error: Could not open video capture")
     exit(1)
@@ -54,8 +55,8 @@ def get_color(event, x, y, flags, param):
         print(mouseClickColour)
         lower = mouseClickColour.copy()
         # below mapping is to ensure that the lower bound is not wrapped to the highest value
-        hueChange = 12
-        SaturationChange = 40
+        hueChange = 30
+        SaturationChange = 60
         ValueChange = 75
 
         if lower[0] < hueChange:
@@ -68,8 +69,8 @@ def get_color(event, x, y, flags, param):
 
         upper = mouseClickColour.copy()
         # upper mapping is to ensure that the upper bound is not wrapped to the lowest value
-        if upper[0] > 255 - hueChange:
-            upper[0] = 255 - hueChange - 1
+        if upper[0] > 179 - hueChange:
+            upper[0] = 179 - hueChange - 1
         if upper[1] > 255 - SaturationChange:
             upper[1] = 255 - SaturationChange - 1
         if upper[2] > 255 - ValueChange:
@@ -80,6 +81,8 @@ def get_color(event, x, y, flags, param):
         colour_mapping[2]["colorLowerBound"] = lower.tolist()
         colour_mapping[2]["colorUpperBound"] = upper.tolist()
         print(colour_mapping[2])
+        with open(color_file, "w") as f:
+            json.dump(colour_mapping, f, indent=4)
 
 
 cv2.namedWindow("frame")
