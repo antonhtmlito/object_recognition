@@ -32,13 +32,13 @@
         "type": "obstacle",
         "colorLowerBound": [
             1,
-            173,
-            83
+            130,
+            81
         ],
         "colorUpperBound": [
-            12,
-            253,
-            233
+            30,
+            250,
+            231
         ]
     }
 ]

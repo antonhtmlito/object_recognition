@@ -62,7 +62,7 @@ def getBotPosition(camera):
     mean = ""
     if ids is not None:
         for i, marker_id in enumerate(ids.flatten()):
-            if marker_id == 3:
+            if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)

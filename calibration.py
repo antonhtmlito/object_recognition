@@ -55,8 +55,8 @@ def get_color(event, x, y, flags, param):
         print(mouseClickColour)
         lower = mouseClickColour.copy()
         # below mapping is to ensure that the lower bound is not wrapped to the highest value
-        hueChange = 12
-        SaturationChange = 40
+        hueChange = 30
+        SaturationChange = 60
         ValueChange = 75
 
         if lower[0] < hueChange:
