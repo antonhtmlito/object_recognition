@@ -4,12 +4,12 @@
         "type": "ball",
         "colorLowerBound": [
             0,
-            85,
+            126,
             155
         ],
         "colorUpperBound": [
-            21,
-            169,
+            30,
+            215,
             255
         ]
     },
@@ -17,14 +17,13 @@
         "name": "whiteBall",
         "type": "ball",
         "colorLowerBound": [
-            80,
             0,
-            19,
+            11,
             155
         ],
         "colorUpperBound": [
-            46,
-            97,
+            34,
+            100,
             255
         ]
     },
@@ -32,9 +31,9 @@
         "name": "obstacle",
         "type": "obstacle",
         "colorLowerBound": [
-            167,
-            129,
-            18
+            168,
+            135,
+            12
         ],
         "colorUpperBound": [
             179,

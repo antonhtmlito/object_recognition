@@ -68,6 +68,18 @@ def get_color(event, x, y, flags, param):
 
     print("🧾 Updated config:", object_configs[selected_index])
 
+
+#warm overlay post process frame
+def warm_frame(frame, red_gain=1.1, blue_gain=0.9):
+    # Convert to float for precision
+    frame = frame.astype(np.float32)
+    # Scale R and B channels
+    frame[:, :, 2] *= red_gain   # Red channel
+    frame[:, :, 0] *= blue_gain  # Blue channel
+    # Clip and convert back
+    frame = np.clip(frame, 0, 255).astype(np.uint8)
+    return frame
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 1) get_ball_positions(cap)
 #
@@ -81,6 +93,7 @@ def get_ball_positions(cap):
         # If the camera read failed, return an empty dict
         return {}
 
+    frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #can be added to smooth edges and blend colors
     hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
@@ -201,7 +214,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -224,16 +237,6 @@ if __name__ == "__main__":
     cv2.setMouseCallback("Processed Frame", get_color)
     #cv2.namedWindow("hsv")
     #cv2.setMouseCallback("hsv", get_color)
-
-    def warm_frame(frame, red_gain=1.1, blue_gain=0.9):
-        # Convert to float for precision
-        frame = frame.astype(np.float32)
-        # Scale R and B channels
-        frame[:, :, 2] *= red_gain   # Red channel
-        frame[:, :, 0] *= blue_gain  # Blue channel
-        # Clip and convert back
-        frame = np.clip(frame, 0, 255).astype(np.uint8)
-        return frame
 
     while True:
         ret, frame = cap.read()
@@ -267,8 +270,8 @@ if __name__ == "__main__":
             if "white" in name.lower():
                 white_mask_display = mask.copy()
 
-           # elif "orange" in name.lower():
-               # orange_mask_display = mask.copy()
+            elif "orange" in name.lower():
+                orange_mask_display = mask.copy()
 
             draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255) if "orange" in name.lower() else (0,0,0)
 
