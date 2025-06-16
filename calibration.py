@@ -41,48 +41,55 @@ lower_bound = np.array(obstacle_color["colorLowerBound"])
 upper_bound = np.array(obstacle_color["colorUpperBound"])
 
 # Open video capture
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     print("Error: Could not open video capture")
     exit(1)
 
 
 def get_color(event, x, y, flags, param):
+    global frame
+
+    if event not in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN]:
+        return
+
+    print("BGR clicked:", frame[y][x])
+    temp_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    clicked_hsv = temp_hsv[y][x]
+    print("HSV clicked:", clicked_hsv)
+
+    hueChange = 10
+    satChange = 100
+    valChange = 150
+
+    # Convert to numpy array for math
+    hsv_arr = np.array(clicked_hsv, dtype=int)
+
+    # Calculate bounds
+    lower = hsv_arr - np.array([hueChange, satChange, valChange])
+    upper = hsv_arr + np.array([hueChange, satChange, valChange])
+
+
+    # Clamp to valid HSV ranges
+    lower = np.clip(lower, [0, 0, 0], [179, 255, 255])
+    upper = np.clip(upper, [0, 0, 0], [179, 255, 255])
+
+    # Ensure lower is really ≤ upper (in case math makes it invalid)
+    lower = np.minimum(lower, upper)
+    upper = np.maximum(lower, upper)
+
     if event == cv2.EVENT_LBUTTONDOWN:
-        print(frame[y][x])
-        tempFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mouseClickColour = tempFrame[y][x]
-        print(mouseClickColour)
-        lower = mouseClickColour.copy()
-        # below mapping is to ensure that the lower bound is not wrapped to the highest value
-        hueChange = 30
-        SaturationChange = 60
-        ValueChange = 75
-
-        if lower[0] < hueChange:
-            lower[0] = hueChange + 1
-        if lower[1] < SaturationChange:
-            lower[1] = SaturationChange + 1
-        if lower[2] < ValueChange:
-            lower[2] = ValueChange + 1
-        np.subtract.at(lower, [0, 1, 2], [hueChange, SaturationChange, ValueChange])
-
-        upper = mouseClickColour.copy()
-        # upper mapping is to ensure that the upper bound is not wrapped to the lowest value
-        if upper[0] > 179 - hueChange:
-            upper[0] = 179 - hueChange - 1
-        if upper[1] > 255 - SaturationChange:
-            upper[1] = 255 - SaturationChange - 1
-        if upper[2] > 255 - ValueChange:
-            upper[2] = 255 - ValueChange - 1
-        np.add.at(upper, [0, 1, 2], [hueChange, SaturationChange, ValueChange])
-        np.clip(upper[0], 0, 180)
-
         colour_mapping[2]["colorLowerBound"] = lower.tolist()
+        print("✅ Lower bound set to:", lower.tolist())
+    elif event == cv2.EVENT_RBUTTONDOWN:
         colour_mapping[2]["colorUpperBound"] = upper.tolist()
-        print(colour_mapping[2])
-        with open(color_file, "w") as f:
-            json.dump(colour_mapping, f, indent=4)
+        print("✅ Upper bound set to:", upper.tolist())
+
+    # Save immediately
+    with open("colors.json", "w") as f:
+        json.dump(colour_mapping, f, indent=4)
+
+    print("🧾 Updated config:", colour_mapping[2])
 
 
 cv2.namedWindow("frame")
@@ -103,9 +110,15 @@ while True:
     upper_bound = np.array(obstacle_color["colorUpperBound"])
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_bound, upper_bound)
+    hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
 
-    cv2.imshow("hsv", hsv)
+    mask = cv2.inRange(hsv, lower_bound, upper_bound)
+    # Morphological operations
+    kernel = np.ones((4, 4), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    #cv2.imshow("hsv", hsv)
     cv2.imshow("mask", mask)
     cv2.imshow("frame", frame)
 #    cv2.imwrite('obstacle_mask.png', mask)

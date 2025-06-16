@@ -3,13 +3,19 @@
 import cv2
 import numpy as np
 import json
+import values
+
+area_low  = 230
+area_high = 270
+radius_low = 150
+selected_index = 0  
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Load object configs from colors.json (your HSV thresholds, etc.)
 # ──────────────────────────────────────────────────────────────────────────────
 with open("colors.json", "r") as f:
     object_configs = json.load(f)
-
 # ──────────────────────────────────────────────────────────────────────────────
 # get the color from mouse picked object
 # ──────────────────────────────────────────────────────────────────────────────
@@ -19,14 +25,15 @@ with open("colors.json", "r") as f:
 # Left-click updates lower bound, right-click updates upper bound
 # ────────────────────────────────────────────────────────────────
 def get_color(event, x, y, flags, param):
-    global frame
+    global frame, selected_index
 
     if event not in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN]:
         return
+    
+    cfg = object_configs[selected_index]
 
     print("BGR clicked:", frame[y][x])
-    temp_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    clicked_hsv = temp_hsv[y][x]
+    clicked_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)[y, x]
     print("HSV clicked:", clicked_hsv)
 
     hueChange = 20
@@ -49,17 +56,29 @@ def get_color(event, x, y, flags, param):
     upper = np.maximum(lower, upper)
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        object_configs[1]["colorLowerBound"] = lower.tolist()
-        print("✅ Lower bound set to:", lower.tolist())
+        cfg["colorLowerBound"] = lower.tolist()
+        print(f"✅ [{cfg['name']}] lower bound → {lower}")
     elif event == cv2.EVENT_RBUTTONDOWN:
-        object_configs[1]["colorUpperBound"] = upper.tolist()
-        print("✅ Upper bound set to:", upper.tolist())
+        cfg["colorUpperBound"] = upper.tolist()
+        print(f"✅ [{cfg['name']}] upper bound → {upper}")
 
     # Save immediately
-    with open("colors.json", "w") as f:
+    with open("colors.json","w") as f:
         json.dump(object_configs, f, indent=4)
 
-    print("🧾 Updated config:", object_configs[1])
+    print("🧾 Updated config:", object_configs[selected_index])
+
+
+#warm overlay post process frame
+def warm_frame(frame, red_gain=1.1, blue_gain=0.9):
+    # Convert to float for precision
+    frame = frame.astype(np.float32)
+    # Scale R and B channels
+    frame[:, :, 2] *= red_gain   # Red channel
+    frame[:, :, 0] *= blue_gain  # Blue channel
+    # Clip and convert back
+    frame = np.clip(frame, 0, 255).astype(np.uint8)
+    return frame
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 1) get_ball_positions(cap)
@@ -74,6 +93,7 @@ def get_ball_positions(cap):
         # If the camera read failed, return an empty dict
         return {}
 
+    frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #can be added to smooth edges and blend colors
     hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
@@ -109,14 +129,14 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if 270 < area > 230:
+            if values.values.area_high < area > values.values.area_low:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
                 if circularity > 0.7:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                    if radius > 150:
+                    if radius > values.values.radius_low:
                         continue
                     positions.append((int(x), int(y)))
 
@@ -133,14 +153,14 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if 270 < area > 230:
+        if values.values.area_high < area > values.values.area_low:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
-            if circularity > 0.8:
+            if circularity > 0.7:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-                if radius > 150:
+                if radius > values.values.radius_low:
                     continue
 
                 # Store this (x,y) under the key `color_name`
@@ -194,10 +214,13 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
+
+    selected_index = 0
+    names = [obj["name"] for obj in object_configs]
 
     # Global HSV for mouse callback
     hsv = None
@@ -212,15 +235,14 @@ if __name__ == "__main__":
 
     cv2.namedWindow("Processed Frame")
     cv2.setMouseCallback("Processed Frame", get_color)
-    cv2.namedWindow("hsv")
-    cv2.setMouseCallback("hsv", get_color)
-
+    #cv2.namedWindow("hsv")
+    #cv2.setMouseCallback("hsv", get_color)
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        
+        frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #can be added to smooth edges and blend colors
         hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
@@ -231,14 +253,18 @@ if __name__ == "__main__":
             name = obj["name"]
             obj_type = obj["type"]
 
-            lower = np.array(obj["colorLowerBound"])
-            upper = np.array(obj["colorUpperBound"])
+            raw_lo = obj["colorLowerBound"]
+            raw_hi = obj["colorUpperBound"]
+
+            lower = ( int(raw_lo[0]), int(raw_lo[1]), int(raw_lo[2]) )
+            upper = ( int(raw_hi[0]), int(raw_hi[1]), int(raw_hi[2]) )
+
             mask = cv2.inRange(hsv, lower, upper)
 
             # Add morphology to clean mask
             kernel = np.ones((2, 2), np.uint8)  # You can tweak kernel size
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
-            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
@@ -247,18 +273,19 @@ if __name__ == "__main__":
             elif "orange" in name.lower():
                 orange_mask_display = mask.copy()
 
-            draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255)
+            draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255) if "orange" in name.lower() else (0,0,0)
 
             if obj_type == "ball":
                 positions = find_balls(mask, name, draw_color, frame)
             else:
                 continue
 
-            for pos in positions:
-                print(f"{name} detected at: {pos}")
+        #    for pos in positions:
+        #        print(f"{name} detected at: {pos}")
 
         # Display processed frame
         cv2.imshow("Processed Frame", frame)
+
         if white_mask_display is not None:
             cv2.imshow("White Mask", white_mask_display)
 
@@ -266,7 +293,17 @@ if __name__ == "__main__":
         if orange_mask_display is not None:
             cv2.imshow("Orange Mask", orange_mask_display)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == ord('w'):
+            selected_index = 1
+            print(f"🔘 Now calibrating {names[selected_index]}")
+        elif key == ord('o'):
+            selected_index = 0
+            print(f"🔘 Now calibrating {names[selected_index]}")
+
+        # 3) quit on 'q'
+        if key == ord('q'):
             break
 
     cap.release()

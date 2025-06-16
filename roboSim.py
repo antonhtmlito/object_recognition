@@ -71,7 +71,7 @@ targets = {
 roboController = RoboController()
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -168,7 +168,7 @@ while running:
 
 # Remove targets
     if routing_functions.target_x is not None and routing_functions.target_y is not None:
-        if abs(routing_functions.robot_x - routing_functions.target_x) < 60 and abs(routing_functions.robot_y - routing_functions.target_y) < 60:
+        if abs(routing_functions.robot_x - routing_functions.target_x) < 100 and abs(routing_functions.robot_y - routing_functions.target_y) < 100:
             if (routing_functions.target_x, routing_functions.target_y) in routing_functions.all_targets:
                 routing_functions.all_targets.remove((routing_functions.target_x, routing_functions.target_y))
                 ballcount = ballcount+1

@@ -2,8 +2,8 @@ from collections import defaultdict
 import math
 
 # Constants
-PROMOTE_AFTER = 20
-MAX_DISTANCE = 200
+PROMOTE_AFTER = 30
+MAX_DISTANCE = 150
 
 # Global tracker
 target_candidates = defaultdict(dict)
