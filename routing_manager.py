@@ -9,6 +9,7 @@ last_update_time = time.time()
 last_obs_update_time = time.time()
 update_interval = 0.5  # seconds
 
+
 def handle_routing(player, obstacle, roboController):
     global last_update_time, last_obs_update_time
     # Update data
@@ -213,4 +214,7 @@ def handle_simulated_routing(player, obstacle):
                 return None
 
     else:
-        return None
+        distance = routing_functions.calculate_distance(routing_functions.target_x, routing_functions.target_y)
+        if distance > 5:
+            roboController.forward(0.5)
+            time.sleep(0.05)
