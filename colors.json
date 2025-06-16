@@ -4,12 +4,12 @@
         "type": "ball",
         "colorLowerBound": [
             0,
-            126,
+            161,
             155
         ],
         "colorUpperBound": [
-            30,
-            215,
+            29,
+            247,
             255
         ]
     },
@@ -18,12 +18,12 @@
         "type": "ball",
         "colorLowerBound": [
             0,
-            11,
-            155
+            52,
+            132
         ],
         "colorUpperBound": [
-            34,
-            100,
+            28,
+            128,
             255
         ]
     },

@@ -29,8 +29,10 @@ def drive(angle_to_turn, distance):
         roboController.rotate_clockwise(angle_to_turn)
     elif angle_to_turn < -3:
         roboController.rotate_counterClockwise(abs(angle_to_turn))
-    elif distance > 3:
+    elif distance > 50:
         roboController.forward(0.5)
+    elif distance < 50 and distance > 3:
+        roboController.forward(0.1)    
 
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
