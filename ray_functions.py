@@ -14,11 +14,12 @@ def cast_rays(player, max_distance=700, screen=None, mask=None, num_rays=90):
 
 
 def cast_ray_at_angle(player, screen, angle, max_distance, mask):
+    angle = math.radians(angle)
     dy = math.sin(angle)
     dx = math.cos(angle)
     origin = (int(player["x"]), int(player["y"]))
 
-    for distance in range(0, max_distance, 5):  # step size 5 pixels
+    for distance in range(0, max_distance, 2):  # step size 5 pixels
         target_x = int(origin[0] + dx * distance)
         target_y = int(origin[1] + dy * distance)
 
@@ -27,8 +28,9 @@ def cast_ray_at_angle(player, screen, angle, max_distance, mask):
 
         if mask.get_at((target_x, target_y)):
             pygame.draw.line(screen, (255, 50, 50), origin, (target_x, target_y))
-            break  # hit detected, stop this ray
+            return (target_x, target_y)
     else:
         end_x = int(origin[0] + dx * max_distance)
         end_y = int(origin[1] + dy * max_distance)
         pygame.draw.line(screen, (100, 100, 100), origin, (end_x, end_y))
+    return None

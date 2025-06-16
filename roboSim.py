@@ -98,7 +98,6 @@ while running:
     ball_positions = get_ball_positions(cap)
 
 
-
     # managing targets
     update_target_candidates(ball_positions, routing_functions.all_targets)
 
@@ -158,7 +157,6 @@ while running:
         #mask_surface = pygame.transform.scale(mask_surface, (1920, 1080))
         mask_surface = mask_surface.convert_alpha()
 
-
         last_update_time = current_time
 
     if routing_functions.target_x is None and routing_functions.target_y is None:
@@ -186,9 +184,6 @@ while running:
 
     mask = pygame.mask.from_surface(mask_surface)
     cast_rays(player, max_distance=500, screen=screen, mask=mask, num_rays=180)
-    cv2.imshow("mask", get_obstacles(cap))
-    print(type(alpha_channel))
-    np.savetxt("alpha_channel.txt", alpha_channel, fmt='%d')
 
     keys = pygame.key.get_pressed()
 

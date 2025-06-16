@@ -48,6 +48,7 @@ def getGoalPosition(camera):
     # If the goal marker is not found in the current frame
     return None
 
+
 def getBotPosition(camera):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
     parameters = cv2.aruco.DetectorParameters()
@@ -62,7 +63,7 @@ def getBotPosition(camera):
     mean = ""
     if ids is not None:
         for i, marker_id in enumerate(ids.flatten()):
-            if marker_id == 4:
+            if marker_id == 5:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)

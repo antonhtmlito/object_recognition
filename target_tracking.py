@@ -8,6 +8,7 @@ MAX_DISTANCE = 200
 # Global tracker
 target_candidates = defaultdict(dict)
 
+
 def update_target_candidates(ball_positions, all_targets):
     global target_candidates
 
@@ -27,7 +28,7 @@ def update_target_candidates(ball_positions, all_targets):
             if not found_similar:
                 target_candidates[color_name][(bx, by)] = 1
                 current_frame_hits.add((bx, by))
-        #if we want to delete targets after not being seen
+        # if we want to delete targets after not being seen
         for pos in list(target_candidates[color_name].keys()):
             if pos not in current_frame_hits:
                 target_candidates[color_name][pos] -= 1

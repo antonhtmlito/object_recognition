@@ -114,7 +114,7 @@ def get_ball_positions(cap):
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.8:
+                if circularity > 0.7:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                     if radius > 150:
                         continue
