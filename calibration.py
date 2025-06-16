@@ -68,6 +68,7 @@ def get_color(event, x, y, flags, param):
     lower = hsv_arr - np.array([hueChange, satChange, valChange])
     upper = hsv_arr + np.array([hueChange, satChange, valChange])
 
+
     # Clamp to valid HSV ranges
     lower = np.clip(lower, [0, 0, 0], [179, 255, 255])
     upper = np.clip(upper, [0, 0, 0], [179, 255, 255])
