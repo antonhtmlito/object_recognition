@@ -8,6 +8,8 @@ import values
 area_low  = 230
 area_high = 270
 radius_low = 150
+selected_index = 0  
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Load object configs from colors.json (your HSV thresholds, etc.)
@@ -23,14 +25,15 @@ with open("colors.json", "r") as f:
 # Left-click updates lower bound, right-click updates upper bound
 # ────────────────────────────────────────────────────────────────
 def get_color(event, x, y, flags, param):
-    global frame
+    global frame, selected_index
 
     if event not in [cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN]:
         return
+    
+    cfg = object_configs[selected_index]
 
     print("BGR clicked:", frame[y][x])
-    temp_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    clicked_hsv = temp_hsv[y][x]
+    clicked_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)[y, x]
     print("HSV clicked:", clicked_hsv)
 
     hueChange = 20
@@ -53,17 +56,17 @@ def get_color(event, x, y, flags, param):
     upper = np.maximum(lower, upper)
 
     if event == cv2.EVENT_LBUTTONDOWN:
-        object_configs[1]["colorLowerBound"] = lower.tolist()
-        print("✅ Lower bound set to:", lower.tolist())
+        cfg["colorLowerBound"] = lower.tolist()
+        print(f"✅ [{cfg['name']}] lower bound → {lower}")
     elif event == cv2.EVENT_RBUTTONDOWN:
-        object_configs[1]["colorUpperBound"] = upper.tolist()
-        print("✅ Upper bound set to:", upper.tolist())
+        cfg["colorUpperBound"] = upper.tolist()
+        print(f"✅ [{cfg['name']}] upper bound → {upper}")
 
     # Save immediately
-    with open("colors.json", "w") as f:
+    with open("colors.json","w") as f:
         json.dump(object_configs, f, indent=4)
 
-    print("🧾 Updated config:", object_configs[1])
+    print("🧾 Updated config:", object_configs[selected_index])
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 1) get_ball_positions(cap)
@@ -203,6 +206,9 @@ if __name__ == "__main__":
         print("Could not open camera")
         exit(1)
 
+    selected_index = 0
+    names = [obj["name"] for obj in object_configs]
+
     # Global HSV for mouse callback
     hsv = None
 
@@ -258,11 +264,12 @@ if __name__ == "__main__":
             else:
                 continue
 
-            for pos in positions:
-                print(f"{name} detected at: {pos}")
+        #    for pos in positions:
+        #        print(f"{name} detected at: {pos}")
 
         # Display processed frame
         cv2.imshow("Processed Frame", frame)
+
         if white_mask_display is not None:
             cv2.imshow("White Mask", white_mask_display)
 
@@ -270,7 +277,17 @@ if __name__ == "__main__":
         if orange_mask_display is not None:
             cv2.imshow("Orange Mask", orange_mask_display)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        key = cv2.waitKey(1) & 0xFF
+
+        if key == ord('w'):
+            selected_index = 1
+            print(f"🔘 Now calibrating {names[selected_index]}")
+        elif key == ord('o'):
+            selected_index = 0
+            print(f"🔘 Now calibrating {names[selected_index]}")
+
+        # 3) quit on 'q'
+        if key == ord('q'):
             break
 
     cap.release()
