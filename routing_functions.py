@@ -3,6 +3,9 @@ import math
 import cv2
 
 import robodetectíon
+from roboController import RoboController
+
+roboController = RoboController()
 
 robot_x = 0
 robot_y = 0
@@ -19,6 +22,16 @@ target_goal = 0
 goal_x = 0
 goal_y = 0
 # Robot state
+def drive(angle_to_turn, distance):
+    if angle_to_turn is None:
+        pass
+    elif angle_to_turn > 3:
+        roboController.rotate_clockwise(angle_to_turn)
+    elif angle_to_turn < -3:
+        roboController.rotate_counterClockwise(abs(angle_to_turn))
+    elif distance > 3:
+        roboController.forward(0.5)
+
 def update_robot_state(player):
     global robot_x, robot_y, robot_angle
     robot_x = player["x"]
@@ -30,15 +43,6 @@ def update_obstacle_state(obstacle):
     global obstacle_x, obstacle_y
     obstacle_x = obstacle["x"]
     obstacle_y = obstacle["y"]
-
-# goal state
-def update_goal_state(goal):
-    cap = cv2.VideoCapture(0)
-    global goal_x, goal_y
-    goalPos= robodetectíon.getGoalPosition(cap)
-    if goalPos is not None:
-        goal_x = goalPos["position"][0]
-        goal_y = goalPos["position"][1]
 
 # Target state
 def update_targets_state(targets):

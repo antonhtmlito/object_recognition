@@ -42,11 +42,12 @@ def getGoalPosition(camera):
             if id_val == goal_id:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 c = corners[i][0]
-                mean = np.mean(c, axis=0) if len(corners) != 0 else ""
+                mean = np.mean(c, axis=0)
+                return {"position": mean.tolist()}
 
 
     # If the goal marker is not found in the current frame
-    return {"position": mean.tolist()}
+    return None
 
 def getBotPosition(camera):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)

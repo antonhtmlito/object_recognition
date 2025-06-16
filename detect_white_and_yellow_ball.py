@@ -121,7 +121,7 @@ def get_ball_positions(cap):
                 if perimeter == 0:
                     continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
-                if circularity > 0.8:
+                if circularity > 0.7:
                     ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                     if radius > values.values.radius_low:
                         continue
@@ -145,7 +145,7 @@ def find_balls(mask, color_name, color, frame):
             if perimeter == 0:
                 continue
             circularity = 4 * np.pi * (area / (perimeter * perimeter))
-            if circularity > 0.8:
+            if circularity > 0.7:
                 ((x, y), radius) = cv2.minEnclosingCircle(cnt)
                 if radius > values.values.radius_low:
                     continue
@@ -201,7 +201,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -222,15 +222,24 @@ if __name__ == "__main__":
 
     cv2.namedWindow("Processed Frame")
     cv2.setMouseCallback("Processed Frame", get_color)
-    cv2.namedWindow("hsv")
-    cv2.setMouseCallback("hsv", get_color)
+    #cv2.namedWindow("hsv")
+    #cv2.setMouseCallback("hsv", get_color)
 
+    def warm_frame(frame, red_gain=1.1, blue_gain=0.9):
+        # Convert to float for precision
+        frame = frame.astype(np.float32)
+        # Scale R and B channels
+        frame[:, :, 2] *= red_gain   # Red channel
+        frame[:, :, 0] *= blue_gain  # Blue channel
+        # Clip and convert back
+        frame = np.clip(frame, 0, 255).astype(np.uint8)
+        return frame
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        
+        frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #can be added to smooth edges and blend colors
         hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
@@ -248,14 +257,14 @@ if __name__ == "__main__":
             # Add morphology to clean mask
             kernel = np.ones((2, 2), np.uint8)  # You can tweak kernel size
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
-            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
                 white_mask_display = mask.copy()
 
-            elif "orange" in name.lower():
-                orange_mask_display = mask.copy()
+           # elif "orange" in name.lower():
+               # orange_mask_display = mask.copy()
 
             draw_color = (255, 255, 255) if "white" in name.lower() else (0, 140, 255) if "orange" in name.lower() else (0,0,0)
 

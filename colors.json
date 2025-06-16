@@ -19,11 +19,12 @@
         "colorLowerBound": [
             80,
             0,
-            128
+            19,
+            155
         ],
         "colorUpperBound": [
-            121,
-            58,
+            46,
+            97,
             255
         ]
     },
@@ -31,14 +32,14 @@
         "name": "obstacle",
         "type": "obstacle",
         "colorLowerBound": [
-            99,
-            1,
-            110
+            167,
+            129,
+            18
         ],
         "colorUpperBound": [
-            10,
-            255,
-            255
+            179,
+            247,
+            230
         ]
     }
 ]
