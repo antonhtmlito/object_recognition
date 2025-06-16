@@ -201,7 +201,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -250,8 +250,12 @@ if __name__ == "__main__":
             name = obj["name"]
             obj_type = obj["type"]
 
-            lower = np.array(obj["colorLowerBound"])
-            upper = np.array(obj["colorUpperBound"])
+            raw_lo = obj["colorLowerBound"]
+            raw_hi = obj["colorUpperBound"]
+
+            lower = ( int(raw_lo[0]), int(raw_lo[1]), int(raw_lo[2]) )
+            upper = ( int(raw_hi[0]), int(raw_hi[1]), int(raw_hi[2]) )
+
             mask = cv2.inRange(hsv, lower, upper)
 
             # Add morphology to clean mask
