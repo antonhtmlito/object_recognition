@@ -40,7 +40,7 @@ lower_bound = np.array(obstacle_color["colorLowerBound"])
 upper_bound = np.array(obstacle_color["colorUpperBound"])
 
 # Open video capture
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     print("Error: Could not open video capture")
     exit(1)
@@ -54,9 +54,9 @@ def get_color(event, x, y, flags, param):
         print(mouseClickColour)
         lower = mouseClickColour.copy()
         # below mapping is to ensure that the lower bound is not wrapped to the highest value
-        hueChange = 12
-        SaturationChange = 40
-        ValueChange = 75
+        hueChange = 10
+        SaturationChange = 100
+        ValueChange = 150
 
         if lower[0] < hueChange:
             lower[0] = hueChange + 1

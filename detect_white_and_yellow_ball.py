@@ -194,7 +194,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -238,7 +238,7 @@ if __name__ == "__main__":
             # Add morphology to clean mask
             kernel = np.ones((2, 2), np.uint8)  # You can tweak kernel size
             mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # Remove noise
-            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Close small holes
 
             # Handle special case for white balls (exclude yellow tones)
             if "white" in name.lower():
