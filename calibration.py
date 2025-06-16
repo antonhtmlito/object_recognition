@@ -3,6 +3,7 @@ import json
 import os
 import numpy as np
 
+print("calibration.py loaded")
 
 def load_color_mapping(file_path):
     try:
