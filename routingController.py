@@ -4,7 +4,8 @@ from obstacle_controller import Obstacle_Controller
 from ballController import BallController
 from ray_functions import cast_ray_at_angle
 import time
-
+import Target
+import robodetectíon
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -14,7 +15,8 @@ class RoutingController:
                  roboController: RoboController,
                  obstacle_controller: Obstacle_Controller,
                  ballController: BallController,
-                 screen
+                 screen,
+                 camera
                  ):
         self.robot = robot
         self.state = "goToBall"
@@ -25,6 +27,7 @@ class RoutingController:
         self.storedBalls = 0
         self.screen = screen
         self.degree = 0
+        self.camera = camera
 
     def handleTick(self, time):
         """ handles the actions for a given tick in the simulation
@@ -34,7 +37,14 @@ class RoutingController:
             self.setCurrentTarget()  #Leave empty to auto calculate best target
 
         if self.storedBalls >= 4:
-            ...  # Drive to goal
+            goalpos = robodetectíon.getGoalPosition(self.camera)
+            if goalpos is not None:
+                goal_x = goalpos["position"][0]
+                goal_y = goalpos["position"][1]
+            target = Target(targetType="goal", x=goal_x, y=goal_y)
+            if self.currentTarget != target:
+                self.setCurrentTarget(target)
+            self.driveToCurrentTarget()
         else:
             self.driveToCurrentTarget()
 
@@ -49,15 +59,15 @@ class RoutingController:
             self.handle_detour(angle)
         angle = angle["angleToTurn"]
         if angle > -3 and angle < 3:
-            self.roboController.forward(0.1)
+            self.roboController.forward(0.3)
         else:
             print("in else")
             if angle < 0:
                 print("rotate counter")
-                self.roboController.rotate_counterClockwise(angle)
+                self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate")
-                self.roboController.rotate_clockwise(angle)
+                self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
         self.handleTargetCollision()

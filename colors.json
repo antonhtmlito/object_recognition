@@ -31,9 +31,9 @@
         "name": "obstacle",
         "type": "obstacle",
         "colorLowerBound": [
-            162,
-            111,
-            23
+            163,
+            130,
+            37
         ],
         "colorUpperBound": [
             179,

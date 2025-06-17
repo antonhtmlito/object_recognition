@@ -55,7 +55,8 @@ routingController = RoutingController(
         roboController=roboController,
         ballController=ballController,
         obstacle_controller=obstacleController,
-        screen=screen
+        screen=screen,
+        camera=cap
         )
 
 while running:
@@ -82,7 +83,7 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
-# Update data
+    # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         # run this every second
@@ -92,7 +93,7 @@ while running:
         last_update_time = current_time
 
 
-# Rotate the robot around its center
+    # Rotate the robot around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
     rotated_surface = pygame.transform.flip(rotated_surface, False, True)
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
@@ -101,7 +102,7 @@ while running:
         print(target)
         pygame.draw.circle(screen, "red", (target[0], target[1]), 5)
 
-# Draw the rotated player
+    # Draw the rotated player
     screen.blit(obstacleController.surface, (0, 0))
     screen.blit(rotated_surface, rotated_rect.topleft)
 
