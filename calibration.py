@@ -2,6 +2,7 @@ import cv2
 import json
 import os
 import numpy as np
+from detect_white_and_yellow_ball import warm_frame
 
 print("calibration.py loaded")
 
@@ -108,7 +109,7 @@ while True:
 # Convert bounds to NumPy arrays dupe to remove
     lower_bound = np.array(obstacle_color["colorLowerBound"])
     upper_bound = np.array(obstacle_color["colorUpperBound"])
-
+    frame = warm_frame(frame, red_gain=0.9, blue_gain=1.1)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
 
