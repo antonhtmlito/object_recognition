@@ -1,4 +1,4 @@
-valid_types = ["whiteBall", "orangeBall", "checkpoint"]
+valid_types = ["whiteBall", "orangeBall", "checkpoint","goal"]
 
 
 class Target:

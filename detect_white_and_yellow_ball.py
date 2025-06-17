@@ -92,6 +92,16 @@ def get_ball_positions(cap):
     if not ret:
         # If the camera read failed, return an empty dict
         return {}
+    
+        # Load calibration data
+    data = np.load("calibration_data.npz")
+    mtx = data["mtx"]
+    dist = data["dist"]
+
+    h, w = frame.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
 
     frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -242,7 +252,7 @@ if __name__ == "__main__":
         # frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #can be added to smooth edges and blend colors
-        hsv = cv2.GaussianBlur(hsv, (7, 7), 0)
+        hsv = cv2.GaussianBlur(hsv, (5, 5), 0)
         white_mask_display = None  # For optional mask visualization
         orange_mask_display = None
 
