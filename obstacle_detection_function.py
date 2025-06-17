@@ -46,7 +46,12 @@ def get_obstacles(cam):
         raise Exception("no open cam")
 
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
     mask = cv2.inRange(hsv, lower_bound, upper_bound)
+    # Morphological operations
+    kernel = np.ones((4, 4), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
     return mask
 
@@ -69,7 +74,7 @@ def get_surface(mask):
 
 
 if __name__ == "__main__":
-    capt = cv2.VideoCapture(0)
+    capt = cv2.VideoCapture(1)
     if not capt.isOpened():
         raise Exception("Camera not opened")
 

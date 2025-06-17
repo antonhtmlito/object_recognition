@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import values
 
-DEFAULT_ROBOT_ID = 3
-DEFAULT_GOAL_ID = 101
+DEFAULT_ROBOT_ID = 4
+DEFAULT_GOAL_ID = 102
 
 def calcAngle(corners):
     middle = np.mean(corners, axis=0)
@@ -64,7 +64,7 @@ def getBotPosition(camera):
     mean = ""
     if ids is not None:
         for i, marker_id in enumerate(ids.flatten()):
-            if marker_id == 5:
+            if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
