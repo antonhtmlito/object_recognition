@@ -7,13 +7,14 @@ import math
 
 
 class BallController:
-    def __init__(self, camera, max_distance=200, promote_after=1):
+    def __init__(self, camera, screen, max_distance=200, promote_after=1):
         self.camera = camera
         self.balls = get_ball_positions(camera)
         self.targets = []
         self.target_candidates = defaultdict(dict)
         self.max_distance = max_distance
         self.promote_after = promote_after
+        self.screen = screen
 
     def handleTick(self, time=1):
         self.update_ball_positions()
@@ -62,7 +63,8 @@ class BallController:
 
             for pos, hits in list(self.target_candidates[color_name].items()):
                 if hits >= self.promote_after and pos not in self.targets:
-                    target = Target(targetType=color_name, x=pos[0], y=pos[1])
+                    target = Target(targetType=color_name, wallType="free", x=pos[0], y=pos[1])
+                    target.check_wall_ball()
                     self.targets.append(target)
                     print(f"🎯 Promoted target {color_name} at {pos}")
                     del self.target_candidates[color_name][pos]

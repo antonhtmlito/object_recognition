@@ -57,7 +57,29 @@ class RoutingController:
         if hit is not None:
             self.handle_detour(angle)
         angle = angle["angleToTurn"]
-        if angle > -3 and angle < 3:
+        if -3 < angle < 3:
+            if self.currentTarget.approach_angle is not None:
+                angle_rad = math.radians(self.currentTarget.approach_angle)
+                checkpoint_x = self.currentTarget.x - 100 * math.cos(angle_rad)
+                checkpoint_y = self.currentTarget.y - 100 * math.sin(angle_rad)
+                checkpoint = (checkpoint_x, checkpoint_y)
+
+                distance_to_checkpoint = math.dist((self.robot["x"], self.robot["y"]), checkpoint)
+
+                if distance_to_checkpoint > 5:
+                    checkpoint_angle = math.degrees(math.atan2(
+                        checkpoint[1] - self.robot["y"],
+                        checkpoint[0] - self.robot["x"]))
+                    angle_diff = (checkpoint_angle - math.degrees(self.robot["rotation"]) + 360) % 360
+                    angle_diff = angle_diff if angle_diff <= 180 else angle_diff - 360
+
+                    if -3 < angle_diff < 3:
+                        self.roboController.forward(0.1)
+                    elif angle_diff < 0:
+                        self.roboController.rotate_counterClockwise(abs(angle_diff))
+                    else:
+                        self.roboController.rotate_clockwise(angle_diff)
+                    return
             self.roboController.forward(0.3)
         else:
             print("in else")
@@ -72,6 +94,7 @@ class RoutingController:
         self.handleTargetCollision()
 
     def handle_detour(self, angle):
+        ...
         
 
     def handleTargetCollision(self):
