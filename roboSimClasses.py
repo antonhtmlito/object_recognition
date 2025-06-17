@@ -35,9 +35,10 @@ player = {
     "height": 50,
     }
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise Exception("camera not openened")
+
 
 roboController = RoboController()
 

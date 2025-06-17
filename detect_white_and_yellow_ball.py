@@ -221,7 +221,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
@@ -249,7 +249,15 @@ if __name__ == "__main__":
         ret, frame = cap.read()
         if not ret:
             break
-        # frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
+        data = np.load("calibration_data.npz")
+        mtx = data["mtx"]
+        dist = data["dist"]
+
+        h, w = frame.shape[:2]
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+        frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+        frame = warm_frame(frame, red_gain=1.2, blue_gain=0.8)
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #can be added to smooth edges and blend colors
         hsv = cv2.GaussianBlur(hsv, (5, 5), 0)
