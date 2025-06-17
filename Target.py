@@ -9,3 +9,6 @@ class Target:
         self.x = x
         self.y = y
         self.position = (x, y)
+
+    def __repr__(self):
+        return f"Target(type={self.targetType}, position=({self.x}, {self.y}))"

@@ -1,5 +1,6 @@
 from detect_white_and_yellow_ball import get_ball_positions
 from collections import defaultdict
+from Target import Target
 import math
 
 # Mostly just a quick adaptations from the target_tracking.py file
@@ -28,6 +29,13 @@ class BallController:
             if math.dist(target, ballPosition) <= 50:
                 self.targets.remove(target)
 
+    def add_target(self, targetType, x, y):
+        """ Adds a target to the targets list if it does not already exist"""
+        for target in self.targets:
+            if target.targetType == targetType and (target.x, target.y) == (x, y):
+                return
+        target = Target(targetType=targetType, x=x, y=y)
+
     def update_target_candidates(self, ball_positions):
         for color_name, coords in ball_positions.items():
             current_frame_hits = set()
@@ -54,7 +62,8 @@ class BallController:
 
             for pos, hits in list(self.target_candidates[color_name].items()):
                 if hits >= self.promote_after and pos not in self.targets:
-                    self.targets.append(pos)
+                    target = Target(targetType=color_name, x=pos[0], y=pos[1])
+                    self.targets.append(target)
                     print(f"🎯 Promoted target {color_name} at {pos}")
                     del self.target_candidates[color_name][pos]
         print(self.targets)
