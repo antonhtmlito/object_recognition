@@ -3,13 +3,13 @@
         "name": "orangeBall",
         "type": "ball",
         "colorLowerBound": [
-            0,
-            137,
-            155
+            4,
+            21,
+            138
         ],
         "colorUpperBound": [
-            31,
-            255,
+            46,
+            84,
             255
         ]
     },
@@ -17,13 +17,13 @@
         "name": "whiteBall",
         "type": "ball",
         "colorLowerBound": [
-            0,
-            48,
-            138
+            4,
+            5,
+            139
         ],
         "colorUpperBound": [
-            32,
-            127,
+            44,
+            86,
             255
         ]
     },

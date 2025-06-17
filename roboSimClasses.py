@@ -35,7 +35,7 @@ player = {
     "height": 50,
     }
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -99,7 +99,7 @@ while running:
 
     for target in ballController.targets:
         print(target)
-        pygame.draw.circle(screen, "red", (target[0], target[1]), 5)
+        pygame.draw.circle(screen, "red", (target.x, target.y), 5)
 
 # Draw the rotated player
     screen.blit(obstacleController.surface, (0, 0))

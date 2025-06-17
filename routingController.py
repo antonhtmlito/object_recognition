@@ -18,13 +18,12 @@ class RoutingController:
                  ):
         self.robot = robot
         self.state = "goToBall"
-        self.currentTarget = None  # should be (x, y)
+        self.currentTarget = None  # should be a Target object
         self.roboController = roboController
         self.obstacle_controller = obstacle_controller
         self.ballController = ballController
         self.storedBalls = 0
         self.screen = screen
-        self.degree = 0
 
     def handleTick(self, time):
         """ handles the actions for a given tick in the simulation
@@ -63,20 +62,20 @@ class RoutingController:
         self.handleTargetCollision()
 
     def handle_detour(self, angle):
-        if angle["angleToTurn"] > 45:
-            self.roboController.forward(0.5)
-        else:
-            if angle["angleToTurn"] > 0:
-                self.roboController.rotate_clockwise(45)
-            else:
-                self.roboController.rotate_counterClockwise(45)
-            self.roboController.forward(0.5)
+        
 
     def handleTargetCollision(self):
         """ Does checks for if a ball is colelcted or not and handles that """
-        if self.getDistanceToCurrentTarget() < 50:
+        if self.getDistanceToCurrentTarget() < 30:
             self.ballController.delete_target_at(self.currentTarget)
-            self.storedBalls += 1
+            if self.currentTarget.targetType == "whiteBall":
+                print("collected white ball")
+                self.storedBalls += 1
+            if self.currentTarget.targetType == "orangeBall":
+                print("collected orange ball")
+                self.storedBalls += 1
+            if self.currentTarget.targetType == "checkpoint":
+                print("reached checkpoint")
             self.currentTarget = None
         else:
             ...
@@ -98,7 +97,7 @@ class RoutingController:
         smallest_dist = 999999
         best_target = None
         for target in self.ballController.targets:
-            distance = math.dist(target, (self.robot["x"], self.robot["y"]))
+            distance = math.dist(target.position, (self.robot["x"], self.robot["y"]))
             if distance is None:
                 return None
             if smallest_dist > distance:
@@ -110,7 +109,9 @@ class RoutingController:
         """ Finds the angle which to turn to get to the current Target"""
         if self.currentTarget is None:
             return None
-        angle_to_target = math.degrees(math.atan2(self.currentTarget[1] - self.robot["y"], self.currentTarget[0] - self.robot["x"]))
+        angle_to_target = math.degrees(math.atan2(
+            self.currentTarget.position[1] - self.robot["y"],
+            self.currentTarget.position[0] - self.robot["x"]))
         angle_difference = (angle_to_target - math.degrees(self.robot["rotation"]) + 360) % 360
         angle_difference = angle_difference if angle_difference <= 180 else angle_difference - 360
         angle_dict = {"angleTarget": angle_to_target, "angleToTurn": angle_difference}
@@ -121,7 +122,7 @@ class RoutingController:
             return None
         distance = math.dist(
                     (self.robot["x"], self.robot["y"]),
-                    self.currentTarget
+                    self.currentTarget.position
                     )
         return distance
 
