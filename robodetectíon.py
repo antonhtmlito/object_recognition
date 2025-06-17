@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 import values
 
-DEFAULT_ROBOT_ID = 3
-DEFAULT_GOAL_ID = 101
+DEFAULT_ROBOT_ID = 4
+DEFAULT_GOAL_ID = 102
 
 def calcAngle(corners):
     middle = np.mean(corners, axis=0)

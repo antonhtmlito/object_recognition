@@ -10,6 +10,7 @@ class RoboController:
         value = entry
         print(value)
         # return  # For debugging purposes, you can remove this line later
+        
         try:
             if entry is not None:
                 message = f"{command}, {entry}" # Ensure correct format with a space after the comma
