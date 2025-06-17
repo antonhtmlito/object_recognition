@@ -90,7 +90,7 @@ while running:
         # run this every second
         obstacleController.update_obstacles()
         ballController.handleTick()
-        routingController.handleTick(time=1) # TODO: Proper time
+        routingController.handleTick(time=0.5) # TODO: Proper time
         last_update_time = current_time
 
 
