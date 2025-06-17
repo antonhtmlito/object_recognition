@@ -5,7 +5,7 @@ from ballController import BallController
 from ray_functions import cast_ray_at_angle
 from Target import Target
 import time
-import Target
+from Target import Target
 import robodetectíon
 
 # targets are in the form (x,y) or [x,y]
@@ -41,7 +41,7 @@ class RoutingController:
             if goalpos is not None:
                 goal_x = goalpos["position"][0]
                 goal_y = goalpos["position"][1]
-            target = Target(targetType="goal", x=goal_x, y=goal_y)
+                target = Target(targetType="goal", x=goal_x, y=goal_y)
             if self.currentTarget != target:
                 self.setCurrentTarget(target)
             self.driveToCurrentTarget()
@@ -105,16 +105,20 @@ class RoutingController:
 
     def handleTargetCollision(self):
         """ Does checks for if a ball is colelcted or not and handles that """
-        if self.getDistanceToCurrentTarget() < 30:
-            self.ballController.delete_target_at(self.currentTarget)
+        if self.getDistanceToCurrentTarget() < 50:
             if self.currentTarget.targetType == "whiteBall":
+                self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
                 self.storedBalls += 1
             if self.currentTarget.targetType == "orangeBall":
+                self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
             if self.currentTarget.targetType == "checkpoint":
                 print("reached checkpoint")
+            if self.currentTarget.targetType == "goal":
+                self.roboController.dropoff()
+                print("scored a goal")
             self.currentTarget = None
         else:
             ...

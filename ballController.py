@@ -7,7 +7,7 @@ import math
 
 
 class BallController:
-    def __init__(self, camera, max_distance=200, promote_after=1):
+    def __init__(self, camera, max_distance=200, promote_after=5):
         self.camera = camera
         self.balls = get_ball_positions(camera)
         self.targets = []
@@ -26,7 +26,8 @@ class BallController:
     def delete_target_at(self, ballPosition):
         """ deletes a target at a given position with the balls position represented as a tuple (x,y)"""
         for target in self.targets[:]:  # weird syntax creates a shallow copy making the iteration not recaclulate when removing an element during
-            if math.dist(target, ballPosition) <= 50:
+            print(target.position, ballPosition)
+            if math.dist(target.position, ballPosition.position) <= 50:
                 self.targets.remove(target)
 
     def add_target(self, targetType, x, y):

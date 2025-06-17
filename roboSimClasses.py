@@ -35,9 +35,10 @@ player = {
     "height": 50,
     }
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise Exception("camera not openened")
+
 
 roboController = RoboController()
 
@@ -89,7 +90,7 @@ while running:
         # run this every second
         obstacleController.update_obstacles()
         ballController.handleTick()
-        routingController.handleTick(time=1) # TODO: Proper time
+        routingController.handleTick(time=0.5) # TODO: Proper time
         last_update_time = current_time
 
 
