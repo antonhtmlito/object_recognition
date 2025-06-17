@@ -6,7 +6,7 @@ import math
 
 
 class BallController:
-    def __init__(self, camera, max_distance=200, promote_after=5):
+    def __init__(self, camera, max_distance=200, promote_after=1):
         self.camera = camera
         self.balls = get_ball_positions(camera)
         self.targets = []

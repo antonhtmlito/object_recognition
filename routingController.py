@@ -36,33 +36,48 @@ class RoutingController:
         if self.storedBalls >= 4:
             ...  # Drive to goal
         else:
-            print("driving to target", self.currentTarget)
             self.driveToCurrentTarget()
-
 
     def driveToCurrentTarget(self):
         """ makes the robot drive to the current target """
         angle = self.getAngleToCurrentTarget()
-        print("angle: ", angle)
         if angle is None:
             return
-        self.checkCollisionsForAngle(angle=angle)
-        if angle > -3 or angle < 3:
+        print("angle to rotate", angle)
+        hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
+        if hit is not None:
+            self.handle_detour(angle)
+        angle = angle["angleToTurn"]
+        if angle > -3 and angle < 3:
             self.roboController.forward(0.1)
         else:
+            print("in else")
             if angle < 0:
-                self.roboController.rotate_counterClockwise(math.radians(angle))
+                print("rotate counter")
+                self.roboController.rotate_counterClockwise(angle)
             elif angle > 0:
-                self.roboController.rotate_clockwise(math.radians(angle))
+                print("rotate")
+                self.roboController.rotate_clockwise(angle)
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
         self.handleTargetCollision()
+
+    def handle_detour(self, angle):
+        if angle["angleToTurn"] > 45:
+            self.roboController.forward(0.5)
+        else:
+            if angle["angleToTurn"] > 0:
+                self.roboController.rotate_clockwise(45)
+            else:
+                self.roboController.rotate_counterClockwise(45)
+            self.roboController.forward(0.5)
 
     def handleTargetCollision(self):
         """ Does checks for if a ball is colelcted or not and handles that """
         if self.getDistanceToCurrentTarget() < 50:
             self.ballController.delete_target_at(self.currentTarget)
             self.storedBalls += 1
+            self.currentTarget = None
         else:
             ...
 
@@ -83,14 +98,12 @@ class RoutingController:
         smallest_dist = 999999
         best_target = None
         for target in self.ballController.targets:
-            print("targets in target finding loop: ", target)
             distance = math.dist(target, (self.robot["x"], self.robot["y"]))
             if distance is None:
                 return None
             if smallest_dist > distance:
                 best_target = target
 
-        print("best target ", best_target)
         return best_target
 
     def getAngleToCurrentTarget(self):
@@ -98,10 +111,10 @@ class RoutingController:
         if self.currentTarget is None:
             return None
         angle_to_target = math.degrees(math.atan2(self.currentTarget[1] - self.robot["y"], self.currentTarget[0] - self.robot["x"]))
-        self.degree = angle_to_target
         angle_difference = (angle_to_target - math.degrees(self.robot["rotation"]) + 360) % 360
-        angle_difference = angle_difference
-        return angle_difference if angle_difference <= 180 else angle_difference - 360
+        angle_difference = angle_difference if angle_difference <= 180 else angle_difference - 360
+        angle_dict = {"angleTarget": angle_to_target, "angleToTurn": angle_difference}
+        return angle_dict
 
     def getDistanceToCurrentTarget(self):
         if self.currentTarget is None:
@@ -115,13 +128,11 @@ class RoutingController:
     def checkCollisionsForAngle(self, angle):
         hit = cast_ray_at_angle(
                 player=self.robot,
-                angle=self.degree,
+                angle=angle,
                 max_distance=int(self.getDistanceToCurrentTarget()+2),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
                                 )
-        print("angle collisoin ", angle)
-        time.sleep(2)  # Only here So I can debug TODO: remove later
         if hit is None:
             return None
         return hit

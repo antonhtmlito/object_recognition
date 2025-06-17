@@ -99,9 +99,9 @@ while running:
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         # run this every second
-        routingController.handleTick(time=1) # TODO: Proper time
         obstacleController.update_obstacles()
         ballController.handleTick()
+        routingController.handleTick(time=1) # TODO: Proper time
         last_update_time = current_time
 
 

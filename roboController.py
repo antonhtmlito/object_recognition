@@ -2,14 +2,14 @@ from socket import *
 
 
 class RoboController:
-    def __init__(self, serverName = "192.168.0.40", serverPort = 8080):
+    def __init__(self, serverName = "172.20.10.3", serverPort = 8080):
         self.serverName = serverName
         self.serverPort = serverPort
 
     def send_command(self, command, entry=None):
         value = entry
         print(value)
-        return  # For debugging purposes, you can remove this line later
+        # return  # For debugging purposes, you can remove this line later
         try:
             if entry is not None:
                 message = f"{command}, {entry}" # Ensure correct format with a space after the comma
@@ -33,11 +33,11 @@ class RoboController:
     def backward(self, amount):
         self.send_command("backward", amount)
 
-    def rotate_clockwise(self, amountRad):
-        self.send_command("clockwise", amountRad)
+    def rotate_clockwise(self, amount):
+        self.send_command("clockwise", amount)
 
-    def rotate_counterClockwise(self, amountRad):
-        self.send_command("counterclockwise", amountRad)
+    def rotate_counterClockwise(self, amount):
+        self.send_command("counterclockwise", amount)
 
     def dropoff(self):
         self.send_command("dropoff")

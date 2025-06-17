@@ -63,15 +63,15 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
     if ids is not None:
+
         for i, marker_id in enumerate(ids.flatten()):
-            if marker_id == 5:
+            if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 break
 
-                
 
     # Only works for single marker
     frame = cv2.putText(frame, str(mean), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
