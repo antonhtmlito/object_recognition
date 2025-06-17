@@ -3,6 +3,7 @@ from roboController import RoboController
 from obstacle_controller import Obstacle_Controller
 from ballController import BallController
 from ray_functions import cast_ray_at_angle
+from Target import Target
 import time
 import Target
 import robodetectíon
@@ -55,7 +56,7 @@ class RoutingController:
         print("angle to rotate", angle)
         hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
         if hit is not None:
-            self.handle_detour(angle)
+            self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         if angle > -3 and angle < 3:
             self.roboController.forward(0.3)
@@ -71,8 +72,36 @@ class RoutingController:
                 raise Exception("Angle to turn somehow zero though it did not drive")
         self.handleTargetCollision()
 
-    def handle_detour(self, angle):
-        
+    def handle_detour(self, angle, hitPosition):
+        """ Creates a checkpoint for the robot to get a better angle for the target """
+        max_y = 1080
+        max_x = 1920
+        # Pick direction
+        hit_x = hitPosition[0]
+        hit_y = hitPosition[1]
+
+        if hit_x > max_x / 2:
+            x_direction = 1  # right
+        else:
+            x_direction = -1
+        if hit_y > max_y / 2:
+            y_direction = 1
+        else:
+            y_direction = -1
+
+        # offset from the hit position
+
+        offset_x = 100 * x_direction
+        offset_y = 100 * y_direction
+
+        new_target_x = hit_x + offset_x
+        new_target_y = hit_y + offset_y
+
+        # Create a new target
+        new_target = Target(targetType="checkpoint", x=new_target_x, y=new_target_y)
+        self.currentTarget = new_target
+        pygame.draw.circle(self.screen, "green", (new_target_x, new_target_y), 10)
+        # Go there
 
     def handleTargetCollision(self):
         """ Does checks for if a ball is colelcted or not and handles that """
@@ -112,6 +141,7 @@ class RoutingController:
                 return None
             if smallest_dist > distance:
                 best_target = target
+                smallest_dist = distance
 
         return best_target
 
