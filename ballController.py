@@ -6,7 +6,7 @@ import math
 
 
 class BallController:
-    def __init__(self, camera, max_distance=200, promote_after=5):
+    def __init__(self, camera, max_distance=200, promote_after=1):
         self.camera = camera
         self.balls = get_ball_positions(camera)
         self.targets = []
@@ -17,6 +17,7 @@ class BallController:
     def handleTick(self, time=1):
         self.update_ball_positions()
         self.update_target_candidates(self.balls)
+        print("balls object", self.balls)
 
     def update_ball_positions(self):
         self.balls = get_ball_positions(self.camera)

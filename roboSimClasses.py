@@ -34,13 +34,6 @@ player = {
     "width": 30,
     "height": 50,
     }
-obstacle = {
-    "x": 0,
-    "y": 0,
-}
-targets = {
-    "list": []
-}
 
 cap = cv2.VideoCapture(1)
 if not cap.isOpened():
@@ -65,9 +58,6 @@ routingController = RoutingController(
         screen=screen
         )
 
-score = False
-ballcount = 0
-
 while running:
     # pygame settings
     for event in pygame.event.get():
@@ -89,19 +79,16 @@ while running:
     screen.fill("black")
 
     # Draw player
-    # Create base player surface
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
-    if ballcount >= 4:
-        score = True
 # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         # run this every second
-        routingController.handleTick(time=1) # TODO: Proper time
         obstacleController.update_obstacles()
         ballController.handleTick()
+        routingController.handleTick(time=1) # TODO: Proper time
         last_update_time = current_time
 
 
