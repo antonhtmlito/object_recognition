@@ -17,6 +17,7 @@ class BallController:
     def handleTick(self, time=1):
         self.update_ball_positions()
         self.update_target_candidates(self.balls)
+        print("balls object", self.balls)
 
     def update_ball_positions(self):
         self.balls = get_ball_positions(self.camera)
