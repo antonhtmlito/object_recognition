@@ -3,7 +3,7 @@ import threading
 
 
 class RoboController:
-    def __init__(self, serverName = "172.20.10.3", serverPort = 8080):
+    def __init__(self, serverName = "172.20.10.6", serverPort = 8080):
         self.serverName = serverName
         self.serverPort = serverPort
         self.busy = False

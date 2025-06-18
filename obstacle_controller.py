@@ -29,4 +29,3 @@ class Obstacle_Controller:
     def get_obstacles_mask(self):
         """ Returns the obstacle mask as a pygame mask """
         return self.obstacle_mask
-

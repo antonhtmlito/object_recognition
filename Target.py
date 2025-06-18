@@ -17,7 +17,7 @@ class Target:
         "free": None
     }
 
-    def __init__(self, targetType: str, wallType: str, x, y):
+    def __init__(self, targetType: str, wallType: str, x, y, screen, mask):
         if targetType not in valid_types:
             raise ValueError(f"Invalid target type: {targetType}. Valid types are: {valid_types}")
         if wallType not in wall_types:
@@ -27,6 +27,9 @@ class Target:
         self.x = x
         self.y = y
         self.position = (x, y)
+        self.screen = screen
+        self.mask = mask
+
 
     def __repr__(self):
         return f"Target(type={self.targetType}, position=({self.x}, {self.y}))"

@@ -44,6 +44,7 @@ roboController = RoboController()
 
 ballController = BallController(
         camera=cap,
+        screen=screen,
         )
 
 obstacleController = Obstacle_Controller(

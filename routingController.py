@@ -66,16 +66,15 @@ class RoutingController:
         angle = self.getAngleToCurrentTarget()
         if angle is None:
             return
-        print("angle to rotate", angle)
-        hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
-        if hit is not None:
-            self.handle_detour(angle, hit)
-        angle = angle["angleToTurn"]
-        if -3 < angle < 3:
-            if self.currentTarget.approach_angle is not None:
-                angle_rad = math.radians(self.currentTarget.approach_angle)
-                checkpoint_x = self.currentTarget.x - 100 * math.cos(angle_rad)
-                checkpoint_y = self.currentTarget.y - 100 * math.sin(angle_rad)
+
+        if self.currentTarget.approach_angle is not None:
+            approach = self.currentTarget.approach_angle
+            if callable(approach):
+                approach = approach()
+            if isinstance(approach, (int, float)):
+                angle_rad = math.radians(approach)
+                checkpoint_x = self.currentTarget.x - 200 * math.cos(angle_rad)
+                checkpoint_y = self.currentTarget.y - 200 * math.sin(angle_rad)
                 checkpoint = (checkpoint_x, checkpoint_y)
 
                 distance_to_checkpoint = math.dist((self.robot["x"], self.robot["y"]), checkpoint)
@@ -94,6 +93,13 @@ class RoutingController:
                     else:
                         self.roboController.rotate_clockwise(angle_diff)
                     return
+
+        print("angle to rotate", angle)
+        hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
+        if hit is not None:
+            self.handle_detour(angle, hit)
+        angle = angle["angleToTurn"]
+        if -3 < angle < 3:
             self.roboController.forward(0.3)
         else:
             print("in else")
@@ -139,7 +145,14 @@ class RoutingController:
         new_target_y = hit_y + math.sin(math.radians(angle_from_hit)) * 300
 
         # Create a new target
-        new_target = Target(targetType="checkpoint", x=new_target_x, y=new_target_y)
+        new_target = Target(
+            targetType="checkpoint",
+            wallType="free",
+            x=new_target_x,
+            y=new_target_y,
+            screen=self.screen,
+            mask=self.obstacle_controller.get_obstacles_mask()
+        )
         # self.currentTarget = new_target
         pygame.draw.circle(self.screen, "green", (new_target_x, new_target_y), 10)
         # Go there

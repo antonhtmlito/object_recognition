@@ -3,19 +3,24 @@ from collections import defaultdict
 from Target import Target
 import math
 import pygame
+from obstacle_controller import Obstacle_Controller
+
 
 # Mostly just a quick adaptations from the target_tracking.py file
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=200, promote_after=20):
+    def __init__(self, camera, screen, max_distance=200, promote_after=20, obstacle_controller=None):
         self.camera = camera
+        self.screen = screen
+        if obstacle_controller is None:
+            obstacle_controller = Obstacle_Controller(camera, screen)
+        self.mask = obstacle_controller.get_obstacles_mask()
         self.balls = get_ball_positions(camera)
         self.targets = []
         self.target_candidates = defaultdict(dict)
         self.max_distance = max_distance
         self.promote_after = promote_after
-        self.screen = screen
         self.last_called = 0
 
     def handleTick(self, time=1):
@@ -40,7 +45,7 @@ class BallController:
         for target in self.targets:
             if target.targetType == targetType and (target.x, target.y) == (x, y):
                 return
-        target = Target(targetType=targetType, x=x, y=y)
+        target = Target(targetType=targetType, wallType="free", x=x, y=y, screen=self.screen, mask=self.mask )
 
     def update_target_candidates(self, ball_positions):
         for color_name, coords in ball_positions.items():
@@ -68,7 +73,7 @@ class BallController:
 
             for pos, hits in list(self.target_candidates[color_name].items()):
                 if hits >= self.promote_after and pos not in self.targets:
-                    target = Target(targetType=color_name, wallType="free", x=pos[0], y=pos[1])
+                    target = Target(targetType=color_name, wallType="free", x=pos[0], y=pos[1], screen=self.screen, mask=self.mask)
                     target.check_wall_ball()
                     self.targets.append(target)
                     print(f"🎯 Promoted target {color_name} at {pos}")
