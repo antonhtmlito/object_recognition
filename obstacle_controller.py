@@ -10,6 +10,14 @@ class Obstacle_Controller:
         mask_alpha = surface.convert_alpha()
         self.obstacle_mask = pygame.mask.from_surface(mask_alpha)
         self.screen = screen
+        self.last_called = 0
+
+    def handleTick(self):
+        current_time = pygame.time.get_ticks()
+
+        if current_time - self.last_called > 1000:
+            self.update_obstacles()
+            self.last_called = current_time
 
     def update_obstacles(self):
         """ Updates the obstacle mask based on the camera """

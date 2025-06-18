@@ -7,6 +7,7 @@ from Target import Target
 import time
 from Target import Target
 import robodetectíon
+import pygame
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -28,28 +29,40 @@ class RoutingController:
         self.storedBalls = 0
         self.screen = screen
         self.camera = camera
-        
-    def handleTick(self, time):
+        self.last_called = 0
+
+    def handleTick(self):
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
-        if self.currentTarget is None:
-            print("setting new target")
-            self.setCurrentTarget()  #Leave empty to auto calculate best target
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_called > 1000:
+            print("current time", current_time - self.last_called)
 
-        if self.storedBalls >= 4:
-            goalpos = robodetectíon.getGoalPosition(self.camera)
-            if goalpos is not None:
-                goal_x = goalpos["position"][0]
-                goal_y = goalpos["position"][1]
-                target = Target(targetType="goal", x=goal_x, y=goal_y)
-            if self.currentTarget != target:
-                self.setCurrentTarget(target)
-            self.driveToCurrentTarget()
-        else:
-            self.driveToCurrentTarget()
+            if self.currentTarget is None:
+                print("setting new target")
+                self.setCurrentTarget()  # Leave empty to auto calculate best target
+
+            if self.storedBalls >= 4:
+                goalpos = robodetectíon.getGoalPosition(self.camera)
+                if goalpos is not None:
+                    goal_x = goalpos["position"][0] - 150
+                    goal_y = goalpos["position"][1]
+                    target = Target(targetType="goal", x=goal_x, y=goal_y)
+                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
+                    if self.currentTarget is None:
+                        self.currentTarget = target
+                    if self.currentTarget.targetType != "goal":
+                        self.setCurrentTarget(target)
+                    self.driveToCurrentTarget()
+            else:
+                self.driveToCurrentTarget()
+            self.last_called = current_time
 
     def driveToCurrentTarget(self):
         """ makes the robot drive to the current target """
+        if self.handleTargetCollision():
+            print("found a target")
+            return
         angle = self.getAngleToCurrentTarget()
         if angle is None:
             return
@@ -70,7 +83,6 @@ class RoutingController:
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
-        self.handleTargetCollision()
 
     def handle_detour(self, angle, hitPosition):
         """ Creates a checkpoint for the robot to get a better angle for the target """
@@ -80,31 +92,40 @@ class RoutingController:
         hit_x = hitPosition[0]
         hit_y = hitPosition[1]
 
-        if hit_x > max_x / 2:
-            x_direction = 1  # right
+        angle_from_hit_right = angle["angleTarget"] + 90
+        angle_from_hit_left = angle["angleTarget"] - 90
+
+        distance_to_center_left = math.dist(
+                (hit_x + math.cos(math.radians(angle_from_hit_left)) * 300,
+                 hit_x + math.cos(math.radians(angle_from_hit_left)) * 300
+                 ),
+                (max_x / 2, max_y / 2)
+                )
+
+        distance_to_center_right = math.dist(
+                (hit_x + math.cos(math.radians(angle_from_hit_right)) * 300,
+                 hit_x + math.cos(math.radians(angle_from_hit_right)) * 300
+                 ),
+                (max_x / 2, max_y / 2)
+                )
+        if distance_to_center_right > distance_to_center_left:
+            angle_from_hit = angle_from_hit_left
         else:
-            x_direction = -1
-        if hit_y > max_y / 2:
-            y_direction = 1
-        else:
-            y_direction = -1
+            angle_from_hit = angle_from_hit_right
 
-        # offset from the hit position
-
-        offset_x = 100 * x_direction
-        offset_y = 100 * y_direction
-
-        new_target_x = hit_x + offset_x
-        new_target_y = hit_y + offset_y
+        new_target_x = hit_x + math.cos(math.radians(angle_from_hit)) * 300
+        new_target_y = hit_y + math.sin(math.radians(angle_from_hit)) * 300
 
         # Create a new target
         new_target = Target(targetType="checkpoint", x=new_target_x, y=new_target_y)
-        self.currentTarget = new_target
+        # self.currentTarget = new_target
         pygame.draw.circle(self.screen, "green", (new_target_x, new_target_y), 10)
         # Go there
 
     def handleTargetCollision(self):
         """ Does checks for if a ball is colelcted or not and handles that """
+        if self.currentTarget is None:
+            return False
         if self.getDistanceToCurrentTarget() < 50:
             if self.currentTarget.targetType == "whiteBall":
                 self.ballController.delete_target_at(self.currentTarget)
@@ -117,11 +138,20 @@ class RoutingController:
             if self.currentTarget.targetType == "checkpoint":
                 print("reached checkpoint")
             if self.currentTarget.targetType == "goal":
+                print("dropping off")
+                print(self.robot)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
+                self.turnToMatchAngle(angleToMatch=0)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
                 self.roboController.dropoff()
+                self.storedBalls = 0
                 print("scored a goal")
             self.currentTarget = None
+            return True
         else:
-            ...
+            return False
 
     def setRobot(self, robot):
         self.robot = robot
@@ -170,6 +200,21 @@ class RoutingController:
                     )
         return distance
 
+    def turnToMatchAngle(self, angleToMatch):
+        angle_difference = (angleToMatch - math.degrees(self.robot["rotation"]) + 360) % 360
+        angle_difference = angle_difference if angle_difference <= 180 else angle_difference - 360
+        time.sleep(2)
+        print("turning to match target: ", angle_difference)
+        print(self.robot)
+        if angle_difference < 0:
+            self.roboController.rotate_counterClockwise(abs(angle_difference))
+        else:
+            self.roboController.rotate_clockwise(abs(angle_difference))
+        time.sleep(2)
+
+
+
+
     def checkCollisionsForAngle(self, angle):
         hit = cast_ray_at_angle(
                 player=self.robot,
@@ -177,7 +222,31 @@ class RoutingController:
                 max_distance=int(self.getDistanceToCurrentTarget()+2),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
-                                )
+                          )
         if hit is None:
             return None
         return hit
+
+
+def get_front_corners(player):
+    cx, cy = player["x"], player["y"]
+    w, h = player["width"], player["height"]
+    rotation = player["rotation"]  # in radians
+
+    # Half dimensions
+    half_w, half_h = w / 2, h / 2
+
+    # Local coordinates of front corners relative to center
+    local_corners = [
+        ( half_w, -half_h),  # front-right
+        (-half_w, -half_h),  # front-left
+    ]
+
+    # Rotate and translate to global coordinates
+    corners = []
+    for lx, ly in local_corners:
+        gx = cx + lx * math.cos(rotation) - ly * math.sin(rotation)
+        gy = cy + lx * math.sin(rotation) + ly * math.cos(rotation)
+        corners.append((gx, gy))
+
+    return corners
