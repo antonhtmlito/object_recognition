@@ -138,7 +138,7 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if values.values.area_high < area > values.values.area_low:
+            if values.values.area_high > area > values.values.area_low:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue
@@ -162,7 +162,7 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if values.values.area_high < area > values.values.area_low:
+        if values.values.area_high > area > values.values.area_low:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
@@ -221,7 +221,7 @@ def find_obstacles(mask, name, frame):
 # ──────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     # Open webcam
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Could not open camera")
         exit(1)
