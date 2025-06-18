@@ -2,12 +2,13 @@ from detect_white_and_yellow_ball import get_ball_positions
 from collections import defaultdict
 from Target import Target
 import math
+import pygame
 
 # Mostly just a quick adaptations from the target_tracking.py file
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=200, promote_after=1):
+    def __init__(self, camera, screen, max_distance=200, promote_after=20):
         self.camera = camera
         self.balls = get_ball_positions(camera)
         self.targets = []
@@ -15,11 +16,15 @@ class BallController:
         self.max_distance = max_distance
         self.promote_after = promote_after
         self.screen = screen
+        self.last_called = 0
 
     def handleTick(self, time=1):
-        self.update_ball_positions()
-        self.update_target_candidates(self.balls)
-        print("balls object", self.balls)
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_called > 333:
+            print("updating balls")
+            self.update_ball_positions()
+            self.update_target_candidates(self.balls)
+            self.last_called = current_time
 
     def update_ball_positions(self):
         self.balls = get_ball_positions(self.camera)
@@ -27,7 +32,7 @@ class BallController:
     def delete_target_at(self, ballPosition):
         """ deletes a target at a given position with the balls position represented as a tuple (x,y)"""
         for target in self.targets[:]:  # weird syntax creates a shallow copy making the iteration not recaclulate when removing an element during
-            if math.dist(target, ballPosition) <= 50:
+            if math.dist(target.position, ballPosition.position) <= 50:
                 self.targets.remove(target)
 
     def add_target(self, targetType, x, y):
@@ -68,4 +73,3 @@ class BallController:
                     self.targets.append(target)
                     print(f"🎯 Promoted target {color_name} at {pos}")
                     del self.target_candidates[color_name][pos]
-        print(self.targets)
