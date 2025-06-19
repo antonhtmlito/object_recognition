@@ -1,3 +1,4 @@
+import time
 from detect_white_and_yellow_ball import get_ball_positions
 from collections import defaultdict
 from Target import Target
@@ -15,10 +16,27 @@ class BallController:
         self.max_distance = max_distance
         self.promote_after = promote_after
 
-    def handleTick(self, time=1):
+        self.target_last_seen = {}   # will map each Target → last seen timestamp
+        self.expire_after    = 2.0   # seconds before we remove an unseen target
+
+    def handleTick(self, dt=1):
         self.update_ball_positions()
         self.update_target_candidates(self.balls)
         print("balls object", self.balls)
+
+        now = time.time()
+        seen = {pt for coords in self.balls.values() for pt in coords}
+        for t in list(self.targets):
+            # if we see it again, reset its timer
+            if any(math.hypot(t.x-x, t.y-y) < self.max_distance
+                   for x,y in seen):
+                self.target_last_seen[t] = now
+            # otherwise, if it’s been invisible too long, delete it
+            elif now - self.target_last_seen.get(t, 0) > self.expire_after:
+                self.targets.remove(t)
+                del self.target_last_seen[t]
+                print(f"⏲️ Expired target at {(t.x, t.y)}")
+
 
     def update_ball_positions(self):
         self.balls = get_ball_positions(self.camera)
@@ -65,6 +83,8 @@ class BallController:
                 if hits >= self.promote_after and pos not in self.targets:
                     target = Target(targetType=color_name, x=pos[0], y=pos[1])
                     self.targets.append(target)
+                    self.target_last_seen[target] = time.time()   
+
                     print(f"🎯 Promoted target {color_name} at {pos}")
                     del self.target_candidates[color_name][pos]
         print(self.targets)
