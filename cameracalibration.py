@@ -1,27 +1,24 @@
 import cv2
 import numpy as np
-import time
 
 # === CONFIGURATION ===
-CHECKERBOARD = (10, 7)  # inner corners
-MIN_FRAMES = 30         # how many distinct frames to collect
-MAX_FRAMES = 100
-MOVEMENT_THRESHOLD = 50  # in pixels (average per-corner movement)
-CAPTURE_DELAY = 0.5     # seconds between valid captures
+CHECKERBOARD = (10, 7)  # Inner corners (columns, rows)
+MIN_FRAMES = 10  # Minimum frames to calibrate
 
-# === INITIALIZATION ===
+# Termination criteria for corner refinement
 criteria = (cv2.TermCriteria_EPS + cv2.TermCriteria_MAX_ITER, 30, 0.001)
-objp = np.zeros((CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+
+# 3D world coordinates for the checkerboard corners
+objp = np.zeros((CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
 objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 
-objpoints = []  # 3D points
-imgpoints = []  # 2D image points
+# Arrays to store object and image points
+objpoints = []  # 3D points in real world space
+imgpoints = []  # 2D points in image plane
 
-cap = cv2.VideoCapture(0)  # Change to 0 or another index if needed
-print("Move the checkerboard pattern around. It will auto-capture when changed.")
-print(f"Target: {MIN_FRAMES} unique frames. Press ESC to cancel.")
-
-last_capture_time = 0
+cap = cv2.VideoCapture(1)  # Change index if needed
+print("Press SPACE to capture a checkerboard frame.")
+print("Press ESC when done collecting frames.")
 
 while True:
     ret, frame = cap.read()
@@ -33,31 +30,18 @@ while True:
 
     display = frame.copy()
     if ret_corners:
-        corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-        should_capture = False
-
-        if len(imgpoints) == 0:
-            should_capture = True
-        else:
-            last = imgpoints[-1].reshape(-1, 2)
-            curr = corners2.reshape(-1, 2)
-            movement = np.mean(np.linalg.norm(curr - last, axis=1))
-            if movement > MOVEMENT_THRESHOLD and time.time() - last_capture_time > CAPTURE_DELAY:
-                should_capture = True
-
-        if should_capture:
-            objpoints.append(objp.copy())
-            imgpoints.append(corners2)
-            last_capture_time = time.time()
-            print(f"[INFO] Captured frame #{len(objpoints)}")
-
-        cv2.drawChessboardCorners(display, CHECKERBOARD, corners2, ret_corners)
+        cv2.drawChessboardCorners(display, CHECKERBOARD, corners, ret_corners)
 
     cv2.imshow("Calibration Feed", display)
     key = cv2.waitKey(1) & 0xFF
 
-    if key == 27 or len(objpoints) >= MAX_FRAMES:
+    if key == 27:  # ESC to exit
         break
+    elif key == 32 and ret_corners:  # SPACE to capture
+        corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+        objpoints.append(objp.copy())
+        imgpoints.append(corners2)
+        print(f"[INFO] Captured frame #{len(objpoints)}")
 
 cap.release()
 cv2.destroyAllWindows()
@@ -75,20 +59,24 @@ if len(objpoints) >= MIN_FRAMES:
 
     np.savez("calibration_data.npz", mtx=mtx, dist=dist)
 
-    # Optional live test
+    # === LIVE UNDISTORTED FEED ===
+    cap = cv2.VideoCapture(1)
     print("\n[INFO] Showing undistorted live feed (ESC to exit)...")
-    cap = cv2.VideoCapture(0)
+
     while True:
         ret, frame = cap.read()
         if not ret:
             break
+
         h, w = frame.shape[:2]
-        newcameramtx, _ = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
         undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
-        cv2.imshow("Undistorted Feed", undistorted)
+
+        cv2.imshow("Undistorted Live Feed", undistorted)
         if cv2.waitKey(1) & 0xFF == 27:
             break
+
     cap.release()
     cv2.destroyAllWindows()
 else:
-    print(f"[ERROR] Not enough frames captured ({len(objpoints)}). Need at least {MIN_FRAMES}.")
+    print(f"\n[ERROR] Not enough frames captured ({len(objpoints)}). Need at least {MIN_FRAMES}.")
