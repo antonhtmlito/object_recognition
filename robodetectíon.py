@@ -88,12 +88,6 @@ def getBotPosition(camera):
         # Define your marker size in real-world units (meters, cm, etc.)
         marker_size = 0.1  # Example: 5cm marker size
 
-        # Estimate pose using solvePnP
-        rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
-
-        # Optional: Draw axes on detected markers
-        for i in range(len(ids)):
-            cv2.drawFrameAxes(frame, newcameramtx, dist, rvecs[i], tvecs[i], marker_size * 0.5)
 
     if ids is not None:
 
@@ -101,8 +95,11 @@ def getBotPosition(camera):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
+                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(marker_corners, marker_size, newcameramtx, dist)
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
+                x = tvecs[0]
+                y = tvecs[1]
                 # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
@@ -110,7 +107,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": mean.tolist(), "angle": angle}
+        return {"position": (x,y), "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
