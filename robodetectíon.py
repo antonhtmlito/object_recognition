@@ -94,7 +94,7 @@ def getBotPosition(camera):
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 x,y,z = tvecs[i][0]
-                print("pos",x,z)
+                print("pos",x,y)
                 # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
@@ -102,7 +102,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": (x,z), "angle": angle}
+        return {"position": (x,y), "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
