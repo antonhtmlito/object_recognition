@@ -99,8 +99,8 @@ def getBotPosition(camera):
                 cy = mtx[1, 2]
 
                 # Estimate marker size in image (pixels)
-                width = math.abs(marker_corners[0] - marker_corners[1])
-                height = math.abs(marker_corners[1] - marker_corners[2])
+                width = math.dist(marker_corners[0], marker_corners[1])
+                height = math.dist(marker_corners[1], marker_corners[2])
                 avg_size_pixels = (width + height) / 2
 
                 # Known real-world size of the marker (10 cm)
