@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import values
-import math
 
 DEFAULT_ROBOT_ID = 4
 DEFAULT_GOAL_ID = 102
@@ -99,8 +98,8 @@ def getBotPosition(camera):
                 cy = mtx[1, 2]
 
                 # Estimate marker size in image (pixels)
-                width = math.dist(marker_corners[0], marker_corners[1])
-                height = math.dist(marker_corners[1], marker_corners[2])
+                width = np.linalg.norm(marker_corners[0] - marker_corners[1])
+                height = np.linalg.norm(marker_corners[1] - marker_corners[2])
                 avg_size_pixels = (width + height) / 2
 
                 # Known real-world size of the marker (10 cm)
@@ -124,7 +123,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": (x,y), "angle": angle}
+        return {"position": mean.tolist(), "angle": angle}
 
 
 if __name__ == "__main__":
