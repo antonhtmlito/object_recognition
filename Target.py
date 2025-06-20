@@ -72,5 +72,8 @@ class Target:
         self.x, self.y        = new_x, new_y
         self.position         = (new_x, new_y)
         
+        self.check_wall_ball()
+
+        
     def is_expired(self) -> bool:
         return self.frames_since_seen > self.expire_after_frames
