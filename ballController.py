@@ -2,18 +2,26 @@ from detect_white_and_yellow_ball import get_ball_positions
 from collections import defaultdict
 from Target import Target
 import math
+import pygame
+from obstacle_controller import Obstacle_Controller
+
 
 # Mostly just a quick adaptations from the target_tracking.py file
 
 
 class BallController:
-    def __init__(self, camera, max_distance=200, promote_after=5):
+    def __init__(self, camera, screen, max_distance=200, promote_after=20, obstacle_controller=None):
         self.camera = camera
+        self.screen = screen
+        if obstacle_controller is None:
+            obstacle_controller = Obstacle_Controller(camera, screen)
+        self.mask = obstacle_controller.get_obstacles_mask()
         self.balls = get_ball_positions(camera)
         self.targets = []
         self.target_candidates = defaultdict(dict)
         self.max_distance = max_distance
         self.promote_after = promote_after
+        self.last_called = 0
 
     def handleTick(self, dt=1):
         self.update_ball_positions()
@@ -39,7 +47,6 @@ class BallController:
     def delete_target_at(self, ballPosition):
         """ deletes a target at a given position with the balls position represented as a tuple (x,y)"""
         for target in self.targets[:]:  # weird syntax creates a shallow copy making the iteration not recaclulate when removing an element during
-            print(target.position, ballPosition)
             if math.dist(target.position, ballPosition.position) <= 50:
                 self.targets.remove(target)
 
@@ -48,7 +55,7 @@ class BallController:
         for target in self.targets:
             if target.targetType == targetType and (target.x, target.y) == (x, y):
                 return
-        target = Target(targetType=targetType, x=x, y=y)
+        target = Target(targetType=targetType, wallType="free", x=x, y=y, screen=self.screen, mask=self.mask )
 
     def update_target_candidates(self, ball_positions):
         for color_name, coords in ball_positions.items():

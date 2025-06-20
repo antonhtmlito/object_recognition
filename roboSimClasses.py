@@ -31,11 +31,11 @@ player = {
     "x": 0,
     "y": 0,
     "rotation": 0,
-    "width": 30,
-    "height": 50,
+    "width": 100,
+    "height": 120,
     }
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise Exception("camera not openened")
 
@@ -44,6 +44,7 @@ roboController = RoboController()
 
 ballController = BallController(
         camera=cap,
+        screen=screen,
         )
 
 obstacleController = Obstacle_Controller(
@@ -88,10 +89,11 @@ while running:
     current_time = time.time()
     if current_time - last_update_time > update_interval:
         # run this every second
-        obstacleController.update_obstacles()
-        ballController.handleTick()
-        routingController.handleTick(time=0.5) # TODO: Proper time
-        last_update_time = current_time
+        ...  # Should be handled in each class
+    obstacleController.handleTick()
+    ballController.handleTick()
+    routingController.handleTick()
+    last_update_time = current_time
 
 
     # Rotate the robot around its center
@@ -100,7 +102,6 @@ while running:
     rotated_rect = rotated_surface.get_rect(center=(player["x"], player["y"]))
 
     for target in ballController.targets:
-        print(target)
         pygame.draw.circle(screen, "red", (target.x, target.y), 5)
 
     # Draw the rotated player

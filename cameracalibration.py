@@ -5,6 +5,7 @@ import time
 # === CONFIGURATION ===
 CHECKERBOARD = (10, 7)  # inner corners
 MIN_FRAMES = 30         # how many distinct frames to collect
+MAX_FRAMES = 100
 MOVEMENT_THRESHOLD = 50  # in pixels (average per-corner movement)
 CAPTURE_DELAY = 0.5     # seconds between valid captures
 
@@ -16,7 +17,7 @@ objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 objpoints = []  # 3D points
 imgpoints = []  # 2D image points
 
-cap = cv2.VideoCapture(1)  # Change to 0 or another index if needed
+cap = cv2.VideoCapture(0)  # Change to 0 or another index if needed
 print("Move the checkerboard pattern around. It will auto-capture when changed.")
 print(f"Target: {MIN_FRAMES} unique frames. Press ESC to cancel.")
 
@@ -55,7 +56,7 @@ while True:
     cv2.imshow("Calibration Feed", display)
     key = cv2.waitKey(1) & 0xFF
 
-    if key == 27 or len(objpoints) >= MIN_FRAMES:
+    if key == 27 or len(objpoints) >= MAX_FRAMES:
         break
 
 cap.release()
@@ -76,7 +77,7 @@ if len(objpoints) >= MIN_FRAMES:
 
     # Optional live test
     print("\n[INFO] Showing undistorted live feed (ESC to exit)...")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
         if not ret:
