@@ -83,19 +83,14 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
 
-    # ADD THIS SECTION - Pose estimation using solvePnP
-    if len(corners) > 0:
-        # Define your marker size in real-world units (meters, cm, etc.)
-        marker_size = 0.1  # Example: 5cm marker size
-
 
     if ids is not None:
-
+        marker_size = 0.1  # Example: 5cm marker size
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, mtx, dist)
         for i, marker_id in enumerate(ids.flatten()):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
-                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 x,y,z = tvecs[i][0]
