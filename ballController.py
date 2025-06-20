@@ -10,7 +10,7 @@ from obstacle_controller import Obstacle_Controller
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=200, promote_after=10, obstacle_controller=None):
+    def __init__(self, camera, screen, max_distance=150, promote_after=10, obstacle_controller=None):
         self.camera = camera
         self.screen = screen
         if obstacle_controller is None:
@@ -35,7 +35,7 @@ class BallController:
         for t in list(self.targets):
             if any(math.hypot(t.x - x, t.y - y) < self.max_distance
                    for (x, y) in seen):
-                t.refresh()
+                t.refresh(x, y)
 
         for t in list(self.targets):
             if t.is_expired():
