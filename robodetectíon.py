@@ -112,28 +112,6 @@ def getBotPosition(camera):
     if angle != "":
         return {"position": mean.tolist(), "angle": angle}
 
-
-def my_estimatePoseSingleMarkers(corners, marker_size, mtx, distortion):
-    """
-    This will estimate the rvec and tvec for each of the marker corners detected by solvePnP
-    """
-    # Define the 3D object points for the ArUco marker corners in marker coordinate system
-    marker_points = np.array([[-marker_size / 2, marker_size / 2, 0],
-                              [marker_size / 2, marker_size / 2, 0],
-                              [marker_size / 2, -marker_size / 2, 0],
-                              [-marker_size / 2, -marker_size / 2, 0]], dtype=np.float32)
-
-    rvecs = []
-    tvecs = []
-
-    for c in corners:
-        success, R, t = cv2.solvePnP(marker_points, c, mtx, distortion, False, cv2.SOLVEPNP_IPPE_SQUARE)
-        rvecs.append(R)
-        tvecs.append(t)
-
-    return rvecs, tvecs
-
-
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
     if not cap.isOpened():
