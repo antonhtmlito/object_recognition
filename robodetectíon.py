@@ -102,7 +102,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": (x,y), "angle": angle}
+        return {"position": (x,z), "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
