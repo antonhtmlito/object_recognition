@@ -35,7 +35,7 @@ def cast_ray_at_angle(player, screen, angle, max_distance, mask):
         pygame.draw.line(screen, (100, 100, 100), origin, (end_x, end_y))
     return None
 
-def cast_rays_from_target(target, max_distance=50, screen=None, mask=None):
+def cast_rays_from_target(target, max_distance=100, screen=None, mask=None):
     """ casts 4 rays from each target in each direction """
     directions = [0, 90, 180, 270]
     results = []

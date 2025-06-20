@@ -10,7 +10,7 @@ from obstacle_controller import Obstacle_Controller
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=200, promote_after=20, obstacle_controller=None):
+    def __init__(self, camera, screen, max_distance=200, promote_after=10, obstacle_controller=None):
         self.camera = camera
         self.screen = screen
         if obstacle_controller is None:
@@ -84,7 +84,7 @@ class BallController:
             # 3) promote any that hit the threshold
             for pos, hits in list(self.target_candidates[color_name].items()):
                 if hits >= self.promote_after:
-                    t = Target(targetType=color_name, x=pos[0], y=pos[1])
+                    t = Target(targetType=color_name, x=pos[0], y=pos[1], mask=self.mask, screen=self.screen, wallType="free")
                     self.targets.append(t)
                     print(f"🎯 Promoted {t}")
                     del self.target_candidates[color_name][pos]

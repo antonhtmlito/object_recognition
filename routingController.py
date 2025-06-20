@@ -30,6 +30,7 @@ class RoutingController:
         self.screen = screen
         self.camera = camera
         self.last_called = 0
+        self.lastTargetTypeGotten = None
 
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
@@ -47,7 +48,7 @@ class RoutingController:
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - 150
                     goal_y = goalpos["position"][1]
-                    target = Target(targetType="goal", x=goal_x, y=goal_y)
+                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
                     if self.currentTarget is None:
                         self.currentTarget = target
@@ -67,32 +68,26 @@ class RoutingController:
         if angle is None:
             return
 
-        if self.currentTarget.approach_angle is not None:
-            approach = self.currentTarget.approach_angle
-            if callable(approach):
-                approach = approach()
-            if isinstance(approach, (int, float)):
+        if self.currentTarget.approach_angle() is not None:
+            print("calculating angle")
+            approach = self.currentTarget.approach_angle()
+            if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
                 checkpoint_x = self.currentTarget.x - 200 * math.cos(angle_rad)
                 checkpoint_y = self.currentTarget.y - 200 * math.sin(angle_rad)
-                checkpoint = (checkpoint_x, checkpoint_y)
-
-                distance_to_checkpoint = math.dist((self.robot["x"], self.robot["y"]), checkpoint)
-
-                if distance_to_checkpoint > 5:
-                    checkpoint_angle = math.degrees(math.atan2(
-                        checkpoint[1] - self.robot["y"],
-                        checkpoint[0] - self.robot["x"]))
-                    angle_diff = (checkpoint_angle - math.degrees(self.robot["rotation"]) + 360) % 360
-                    angle_diff = angle_diff if angle_diff <= 180 else angle_diff - 360
-
-                    if -3 < angle_diff < 3:
-                        self.roboController.forward(0.1)
-                    elif angle_diff < 0:
-                        self.roboController.rotate_counterClockwise(abs(angle_diff))
-                    else:
-                        self.roboController.rotate_clockwise(angle_diff)
-                    return
+                target = Target(
+                    targetType="checkpoint",
+                    wallType="free",
+                    x=checkpoint_x,
+                    y=checkpoint_y,
+                    screen=self.screen,
+                    mask=self.obstacle_controller.get_obstacles_mask()
+                )
+                self.currentTarget = target
+                pygame.draw.circle(self.screen, "green", (checkpoint_x, checkpoint_y), 5)
+            else:
+                print("target", self.currentTarget)
+                print("approach: ", approach)
 
         print("angle to rotate", angle)
         hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
@@ -146,14 +141,14 @@ class RoutingController:
 
         # Create a new target
         new_target = Target(
-            targetType="checkpoint",
+            targetType="checkpointDetour",
             wallType="free",
             x=new_target_x,
             y=new_target_y,
             screen=self.screen,
             mask=self.obstacle_controller.get_obstacles_mask()
         )
-        # self.currentTarget = new_target
+        self.currentTarget = new_target
         pygame.draw.circle(self.screen, "green", (new_target_x, new_target_y), 10)
         # Go there
 
@@ -165,13 +160,16 @@ class RoutingController:
             if self.currentTarget.targetType == "whiteBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
+                self.lastTargetTypeGotten = "whiteBall"
                 self.storedBalls += 1
             if self.currentTarget.targetType == "orangeBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
+                self.lastTargetTypeGotten = "orangeBall"
             if self.currentTarget.targetType == "checkpoint":
                 print("reached checkpoint")
+                self.lastTargetTypeGotten = "checkpoint"
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
                 print(self.robot)
@@ -183,6 +181,7 @@ class RoutingController:
                 self.roboController.dropoff()
                 self.storedBalls = 0
                 print("scored a goal")
+                self.lastTargetTypeGotten = "goal"
             self.currentTarget = None
             return True
         else:
