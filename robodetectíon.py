@@ -85,8 +85,8 @@ def getBotPosition(camera):
 
 
     if ids is not None:
-        marker_size = 1000  # Example: 5cm marker size
-        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, mtx, dist)
+        marker_size = 0.1  # Example: 5cm marker size
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
         for i, marker_id in enumerate(ids.flatten()):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
