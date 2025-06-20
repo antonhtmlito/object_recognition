@@ -95,11 +95,10 @@ def getBotPosition(camera):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
-                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(marker_corners, marker_size, newcameramtx, dist)
+                rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
-                x = tvecs[0]
-                y = tvecs[1]
+                x,y,z = tvecs[i][0]
                 # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
