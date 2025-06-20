@@ -103,17 +103,14 @@ def getBotPosition(camera):
                 avg_size_pixels = (width + height) / 2
 
                 # Known real-world size of the marker (10 cm)
-                marker_size = 0.10  # meters
+                marker_size = 10  # meters
 
                 # Estimate distance (Z)
-                z = (marker_size * fx) / avg_size_pixels
-
-                # Use mean (u, v) from earlier
-                u, v = mean
+                z = marker_size / avg_size_pixels
 
                 # Estimate real-world X, Y
-                x = (u - cx) * (z / fx)
-                y = (v - cy) * (z / fy)
+                x = mean[0] * z
+                y = mean[1] * z
 
                 break
 
