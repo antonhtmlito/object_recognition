@@ -83,6 +83,18 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
 
+    # ADD THIS SECTION - Pose estimation using solvePnP
+    if len(corners) > 0:
+        # Define your marker size in real-world units (meters, cm, etc.)
+        marker_size = 0.1  # Example: 5cm marker size
+
+        # Estimate pose using solvePnP
+        rvecs, tvecs = my_estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
+
+        # Optional: Draw axes on detected markers
+        for i in range(len(ids)):
+            cv2.drawFrameAxes(frame, newcameramtx, dist, rvecs[i], tvecs[i], marker_size * 0.5)
+
     if ids is not None:
 
         for i, marker_id in enumerate(ids.flatten()):
@@ -92,28 +104,6 @@ def getBotPosition(camera):
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 # Use calibration matrix for fx, fy, cx, cy
-                fx = mtx[0, 0]
-                fy = mtx[1, 1]
-                cx = mtx[0, 2]
-                cy = mtx[1, 2]
-
-                # Estimate marker size in image (pixels)
-                width = np.linalg.norm(marker_corners[0] - marker_corners[1])
-                height = np.linalg.norm(marker_corners[1] - marker_corners[2])
-                avg_size_pixels = (width + height) / 2
-
-                # Known real-world size of the marker (10 cm)
-                marker_size = 10  # meters
-
-                # Estimate distance (Z)
-                z = marker_size / avg_size_pixels
-
-                # Estimate real-world X, Y
-                x = mean[0] * z
-                y = mean[1] * z
-
-                break
-
 
     # Only works for single marker
     frame = cv2.putText(frame, str(mean), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
@@ -121,6 +111,27 @@ def getBotPosition(camera):
     cv2.imshow('Detected Markers', frame)
     if angle != "":
         return {"position": mean.tolist(), "angle": angle}
+
+
+def my_estimatePoseSingleMarkers(corners, marker_size, mtx, distortion):
+    """
+    This will estimate the rvec and tvec for each of the marker corners detected by solvePnP
+    """
+    # Define the 3D object points for the ArUco marker corners in marker coordinate system
+    marker_points = np.array([[-marker_size / 2, marker_size / 2, 0],
+                              [marker_size / 2, marker_size / 2, 0],
+                              [marker_size / 2, -marker_size / 2, 0],
+                              [-marker_size / 2, -marker_size / 2, 0]], dtype=np.float32)
+
+    rvecs = []
+    tvecs = []
+
+    for c in corners:
+        success, R, t = cv2.solvePnP(marker_points, c, mtx, distortion, False, cv2.SOLVEPNP_IPPE_SQUARE)
+        rvecs.append(R)
+        tvecs.append(t)
+
+    return rvecs, tvecs
 
 
 if __name__ == "__main__":
@@ -135,3 +146,4 @@ if __name__ == "__main__":
 
     cap.release()
     cv2.destroyAllWindows()
+

@@ -16,7 +16,7 @@ objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 objpoints = []  # 3D points in real world space
 imgpoints = []  # 2D points in image plane
 
-cap = cv2.VideoCapture(1)  # Change index if needed
+cap = cv2.VideoCapture(0)  # Change index if needed
 print("Press SPACE to capture a checkerboard frame.")
 print("Press ESC when done collecting frames.")
 
