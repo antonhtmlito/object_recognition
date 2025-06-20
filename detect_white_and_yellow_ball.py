@@ -162,7 +162,7 @@ def find_balls(mask, color_name, color, frame):
     detections = {}
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if values.values.area_high > area > values.values.area_low:
+        if values.values.area_high < area > values.values.area_low:
             perimeter = cv2.arcLength(cnt, True)
             if perimeter == 0:
                 continue
