@@ -89,7 +89,7 @@ def getBotPosition(camera):
         marker_size = 0.1  # Example: 5cm marker size
 
         # Estimate pose using solvePnP
-        rvecs, tvecs = my_estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
+        rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, mtx, dist)
 
         # Optional: Draw axes on detected markers
         for i in range(len(ids)):
