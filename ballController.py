@@ -33,9 +33,10 @@ class BallController:
 
         seen = [pt for coords in self.balls.values() for pt in coords]
         for t in list(self.targets):
-            if any(math.hypot(t.x - x, t.y - y) < self.max_distance
-                   for (x, y) in seen):
-                t.refresh(x, y)
+            for (sx, sy) in seen:
+                if math.hypot(t.x - sx, t.y - sy) < self.max_distance:
+                    t.refresh(sx, sy)   # now sx,sy are in scope
+                    break              # don’t refresh more than once per tick
 
         for t in list(self.targets):
             if t.is_expired():
