@@ -73,6 +73,11 @@ def getBotPosition(camera):
     mtx = data["mtx"]
     dist = data["dist"]
 
+    h, w = frame.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
@@ -84,26 +89,31 @@ def getBotPosition(camera):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
-                undistorted_corners = cv2.undistortPoints(marker_corners.reshape(-1,1,2), mtx, dist).reshape(-1,2)
                 angle = calcAngle(marker_corners)
-                mean = np.mean(undistorted_corners, axis=0) if len(corners) != 0 else ""
+                mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 # Use calibration matrix for fx, fy, cx, cy
+                fx = mtx[0, 0]
+                fy = mtx[1, 1]
+                cx = mtx[0, 2]
+                cy = mtx[1, 2]
 
                 # Estimate marker size in image (pixels)
-                width = np.linalg.norm(undistorted_corners[0] - undistorted_corners[1])
-                height = np.linalg.norm(undistorted_corners[1] - undistorted_corners[2])
-                avg_size = (width + height) / 2
+                width = np.linalg.norm(marker_corners[0] - marker_corners[1])
+                height = np.linalg.norm(marker_corners[1] - marker_corners[2])
+                avg_size_pixels = (width + height) / 2
 
                 # Known real-world size of the marker (10 cm)
                 marker_size = 0.10  # meters
 
                 # Estimate distance (Z)
-                z = marker_size  / avg_size
+                z = (marker_size * fx) / avg_size_pixels
 
+                # Use mean (u, v) from earlier
+                u, v = mean
 
                 # Estimate real-world X, Y
-                x = mean[0] - z
-                y = mean[1] - z
+                x = (u - cx) * (z / fx)
+                y = (v - cy) * (z / fy)
 
                 break
 
@@ -113,7 +123,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": (x,y), "angle": angle}
+        return {"position": mean.tolist(), "angle": angle}
 
 
 if __name__ == "__main__":
