@@ -94,6 +94,7 @@ def getBotPosition(camera):
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
                 x,y,z = tvecs[i][0]
+                print("pos",x,y)
                 # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
