@@ -112,8 +112,8 @@ def getBotPosition(camera):
                 u, v = mean
 
                 # Estimate real-world X, Y
-                x = (u - cx) * z / fx
-                y = (v - cy) * z / fy
+                x = (u - cx) * (z / fx)
+                y = (v - cy) * (z / fy)
 
                 break
 
@@ -123,7 +123,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": mean.tolist(), "angle": angle}
+        return {"position": (x,y), "angle": angle}
 
 
 if __name__ == "__main__":
