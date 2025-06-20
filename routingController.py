@@ -257,30 +257,52 @@ class RoutingController:
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
                           )
+
+        left, right = get_sides_for_player(self.robot)
+
+        if hit is None:
+            hitLeft = cast_ray_at_angle(
+                player=left,
+                angle=angle,
+                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                mask=self.obstacle_controller.get_obstacles_mask(),
+                screen=self.screen
+            )
+            hitRight = cast_ray_at_angle(
+                player=right,
+                angle=angle,
+                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                mask=self.obstacle_controller.get_obstacles_mask(),
+                screen=self.screen
+            )
+            if hitLeft is not None and hitRight is not None:
+                if hitLeft[2] < hitRight[2]:
+                    hit = hitLeft
+                else:
+                    hit = hitRight
+            elif hitLeft is not None:
+                hit = hitLeft
+            elif hitRight is not None:
+                hit = hitRight
+
         if hit is None:
             return None
         return hit
 
 
-def get_front_corners(player):
-    cx, cy = player["x"], player["y"]
-    w, h = player["width"], player["height"]
+def get_sides_for_player(player):
+    x, y = player["x"], player["y"]
+    w = player["width"]
     rotation = player["rotation"]  # in radians
 
-    # Half dimensions
-    half_w, half_h = w / 2, h / 2
+    left = (x - w / 2 * math.cos(rotation), y - w / 2 * math.sin(rotation))
+    right = (x + w / 2 * math.cos(rotation), y + w / 2 * math.sin(rotation))
 
-    # Local coordinates of front corners relative to center
-    local_corners = [
-        ( half_w, -half_h),  # front-right
-        (-half_w, -half_h),  # front-left
-    ]
+    playerleft = player.copy()
+    playerleft["x"] = left[0]
+    playerleft["y"] = left[1]
+    playerright = player.copy()
+    playerright["x"] = right[0]
+    playerright["y"] = right[1]
 
-    # Rotate and translate to global coordinates
-    corners = []
-    for lx, ly in local_corners:
-        gx = cx + lx * math.cos(rotation) - ly * math.sin(rotation)
-        gy = cy + lx * math.sin(rotation) + ly * math.cos(rotation)
-        corners.append((gx, gy))
-
-    return corners
+    return (playerleft, playerright)

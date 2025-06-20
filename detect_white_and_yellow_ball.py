@@ -138,7 +138,7 @@ def get_ball_positions(cap):
 
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if values.values.area_high < area > values.values.area_low:
+            if  area > values.values.area_low:
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0:
                     continue

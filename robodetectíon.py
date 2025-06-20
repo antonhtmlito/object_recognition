@@ -83,45 +83,30 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
 
-    if ids is not None:
 
+    if ids is not None:
+        marker_size = 0.1 # Example: 5cm marker size
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
         for i, marker_id in enumerate(ids.flatten()):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
+                x,y,z = tvecs[i][0]
+                # Project the marker's center to image space
+                object_points = np.array([[0.0, 0.0, 0.0]], dtype=np.float32)
+                image_points, _ = cv2.projectPoints(object_points, rvecs[i], tvecs[i], newcameramtx, dist)
+                pixel_position = tuple(image_points[0][0])  # (u, v)
+                print("pos",x,y)
                 # Use calibration matrix for fx, fy, cx, cy
-                fx = mtx[0, 0]
-                fy = mtx[1, 1]
-                cx = mtx[0, 2]
-                cy = mtx[1, 2]
-
-                # Estimate marker size in image (pixels)
-                width = np.linalg.norm(marker_corners[0] - marker_corners[1])
-                height = np.linalg.norm(marker_corners[1] - marker_corners[2])
-                avg_size_pixels = (width + height) / 2
-
-                # Known real-world size of the marker (10 cm)
-                marker_size = 10  # meters
-
-                # Estimate distance (Z)
-                z = marker_size / avg_size_pixels
-
-                # Estimate real-world X, Y
-                x = mean[0] * z
-                y = mean[1] * z
-
-                break
-
 
     # Only works for single marker
     frame = cv2.putText(frame, str(mean), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": mean.tolist(), "angle": angle}
-
+        return {"position": pixel_position, "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
@@ -135,3 +120,4 @@ if __name__ == "__main__":
 
     cap.release()
     cv2.destroyAllWindows()
+
