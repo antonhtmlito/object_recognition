@@ -82,6 +82,7 @@ def getBotPosition(camera):
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
     mean = ""
+
     if ids is not None:
 
         for i, marker_id in enumerate(ids.flatten()):
@@ -90,6 +91,30 @@ def getBotPosition(camera):
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
+                # Use calibration matrix for fx, fy, cx, cy
+                fx = mtx[0, 0]
+                fy = mtx[1, 1]
+                cx = mtx[0, 2]
+                cy = mtx[1, 2]
+
+                # Estimate marker size in image (pixels)
+                width = np.linalg.norm(marker_corners[0] - marker_corners[1])
+                height = np.linalg.norm(marker_corners[1] - marker_corners[2])
+                avg_size_pixels = (width + height) / 2
+
+                # Known real-world size of the marker (10 cm)
+                marker_size = 0.10  # meters
+
+                # Estimate distance (Z)
+                Z = (marker_size * fx) / avg_size_pixels
+
+                # Use mean (u, v) from earlier
+                u, v = mean
+
+                # Estimate real-world X, Y
+                X = (u - cx) * Z / fx
+                Y = (v - cy) * Z / fy
+
                 break
 
 
@@ -98,7 +123,7 @@ def getBotPosition(camera):
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": mean.tolist(), "angle": angle}
+        return {"position": [X,Y], "angle": angle}
 
 
 if __name__ == "__main__":
