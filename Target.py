@@ -68,7 +68,7 @@ class Target:
         self.frames_since_seen += 1
 
     def refresh(self):
-        self.frames_since_seen += 0
+        self.frames_since_seen = 0
 
     def is_expired(self) -> bool:
         return self.frames_since_seen > self.expire_after_frames
