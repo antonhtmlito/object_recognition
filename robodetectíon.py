@@ -30,8 +30,17 @@ def getGoalPosition(camera):
     ret, frame = camera.read()
     if not ret:
         return None
+    # Load calibration data
+    data = np.load("calibration_data.npz")
+    mtx = data["mtx"]
+    dist = data["dist"]
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    h, w = frame.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+    undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+
+    gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     mean = ""
     if ids is not None:
@@ -40,7 +49,7 @@ def getGoalPosition(camera):
         # Iterate through detected markers to find the goal marker
         for i, id_val in enumerate(ids):
             if id_val == goal_id:
-                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+                cv2.aruco.drawDetectedMarkers(undistorted, corners, ids)
                 c = corners[i][0]
                 mean = np.mean(c, axis=0)
                 return {"position": mean.tolist()}
@@ -58,28 +67,46 @@ def getBotPosition(camera):
     ret, frame = camera.read()
     if not ret:
         raise Exception("Can't get frame")
+    
+    # Load calibration data
+    data = np.load("calibration_data.npz")
+    mtx = data["mtx"]
+    dist = data["dist"]
+
+    h, w = frame.shape[:2]
+    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+
+    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
+
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
     mean = ""
-    if ids is not None:
 
+
+    if ids is not None:
+        marker_size = 0.1 # Example: 5cm marker size
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
         for i, marker_id in enumerate(ids.flatten()):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
-                break
-
+                x,y,z = tvecs[i][0]
+                # Project the marker's center to image space
+                object_points = np.array([[0.0, 0.0, 0.0]], dtype=np.float32)
+                image_points, _ = cv2.projectPoints(object_points, rvecs[i], tvecs[i], newcameramtx, dist)
+                pixel_position = tuple(image_points[0][0])  # (u, v)
+                print("pos",x,y)
+                # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
     frame = cv2.putText(frame, str(mean), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": mean.tolist(), "angle": angle}
-
+        return {"position": pixel_position, "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
@@ -93,3 +120,4 @@ if __name__ == "__main__":
 
     cap.release()
     cv2.destroyAllWindows()
+
