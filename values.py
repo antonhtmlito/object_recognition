@@ -13,7 +13,7 @@ values = Values()
 
 
 DEBUG_BALLS = False
-DEBUG_ROUTING = True
+DEBUG_ROUTING = False
 DEBUG_ROBOT = False
 DEBUG_ROBOT_CONTROLLER = True
 DEBUG_GOAL = False

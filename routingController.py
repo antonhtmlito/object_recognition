@@ -257,7 +257,8 @@ class RoutingController:
                 screen=self.screen
                           )
 
-        left, right = get_sides_for_player(self.robot)
+        print("angle to check ray at: ", angle)
+        left, right = self.get_sides_for_player(self.robot, angle)
 
         if hit is None:
             hitLeft = cast_ray_at_angle(
@@ -288,20 +289,22 @@ class RoutingController:
             return None
         return hit
 
+    def get_sides_for_player(self, player, angle):
+        x, y = player["x"], player["y"]
+        w = player["width"]
+        rotation =  math.radians(angle)
+        # rotation = rotation + math.pi / 2 # rotate angle to get the sides instead of the front and back
 
-def get_sides_for_player(player):
-    x, y = player["x"], player["y"]
-    w = player["width"]
-    rotation = player["rotation"]  # in radians
+        left = (x - math.sin(rotation) * w/2, y + w/2 * math.cos(rotation))
+        right = (x - math.sin(rotation) * (-w/2), y + (-w/2) * math.cos(rotation))
 
-    left = (x - w / 2 * math.cos(rotation), y - w / 2 * math.sin(rotation))
-    right = (x + w / 2 * math.cos(rotation), y + w / 2 * math.sin(rotation))
+        pygame.draw.circle(self.screen, "red", (int(left[0]), int(left[1])), 50)
+        pygame.draw.circle(self.screen, "blue", (int(right[0]), int(right[1])), 50)
+        playerleft = player.copy()
+        playerleft["x"] = left[0]
+        playerleft["y"] = left[1]
+        playerright = player.copy()
+        playerright["x"] = right[0]
+        playerright["y"] = right[1]
 
-    playerleft = player.copy()
-    playerleft["x"] = left[0]
-    playerleft["y"] = left[1]
-    playerright = player.copy()
-    playerright["x"] = right[0]
-    playerright["y"] = right[1]
-
-    return (playerleft, playerright)
+        return (playerleft, playerright)
