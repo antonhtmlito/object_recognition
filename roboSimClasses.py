@@ -111,6 +111,6 @@ while running:
     keys = pygame.key.get_pressed()
 
     pygame.display.flip()
-    clock.tick(20)
+    clock.tick(60)
 
 pygame.quit()

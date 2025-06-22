@@ -8,6 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
+from values import DEBUG_ROUTING
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -37,10 +38,10 @@ class RoutingController:
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
         if current_time - self.last_called > 1000:
-            print("current time", current_time - self.last_called)
+            print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
             if self.currentTarget is None:
-                print("setting new target")
+                print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
             if self.storedBalls >= 4:
@@ -69,7 +70,7 @@ class RoutingController:
             return
 
         if self.currentTarget.approach_angle() is not None:
-            print("calculating angle")
+            print("calculating angle") if DEBUG_ROUTING else None
             approach = self.currentTarget.approach_angle()
             if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
@@ -86,10 +87,10 @@ class RoutingController:
                 self.currentTarget = target
                 pygame.draw.circle(self.screen, "green", (checkpoint_x, checkpoint_y), 5)
             else:
-                print("target", self.currentTarget)
-                print("approach: ", approach)
+                print("target", self.currentTarget) if DEBUG_ROUTING else None
+                print("approach: ", approach) if DEBUG_ROUTING else None
 
-        print("angle to rotate", angle)
+        print("angle to rotate", angle) if DEBUG_ROUTING else None
         hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
         if hit is not None:
             self.handle_detour(angle, hit)
@@ -97,12 +98,11 @@ class RoutingController:
         if -3 < angle < 3:
             self.roboController.forward(0.3)
         else:
-            print("in else")
             if angle < 0:
-                print("rotate counter")
+                print("rotate counter") if DEBUG_ROUTING else None
                 self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
-                print("rotate")
+                print("rotate") if DEBUG_ROUTING else None
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
@@ -238,8 +238,7 @@ class RoutingController:
         angle_difference = (angleToMatch - math.degrees(self.robot["rotation"]) + 360) % 360
         angle_difference = angle_difference if angle_difference <= 180 else angle_difference - 360
         time.sleep(2)
-        print("turning to match target: ", angle_difference)
-        print(self.robot)
+        print("turning to match target: ", angle_difference) if DEBUG_ROUTING else None
         if angle_difference < 0:
             self.roboController.rotate_counterClockwise(abs(angle_difference))
         else:

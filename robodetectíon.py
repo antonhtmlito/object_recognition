@@ -98,7 +98,7 @@ def getBotPosition(camera):
                 object_points = np.array([[0.0, 0.0, 0.0]], dtype=np.float32)
                 image_points, _ = cv2.projectPoints(object_points, rvecs[i], tvecs[i], newcameramtx, dist)
                 pixel_position = tuple(image_points[0][0])  # (u, v)
-                print("pos",x,y)
+                print("pos",x,y) if values.DEBUG_ROBOT else None
                 # Use calibration matrix for fx, fy, cx, cy
 
     # Only works for single marker
