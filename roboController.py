@@ -37,7 +37,7 @@ class RoboController:
         if self.busy is True:
             print("command recieved and ignored as robot is busy") if DEBUG_ROBOT_CONTROLLER else None
             return
-        thread = threading.Thread(target=self.send_command_threadbound, args=(command, entry), daemon=True)
+        thread = threading.Thread(target=self.send_command_threadbound, args=(command, entry, speed), daemon=True)
         thread.start()
 
     def forward(self, amount, speed=35):
@@ -46,10 +46,10 @@ class RoboController:
     def backward(self, amount, speed=35):
         self.send_command("backward", amount, speed)
 
-    def rotate_clockwise(self, amount, speed=35):
+    def rotate_clockwise(self, amount, speed=6):
         self.send_command("clockwise", amount, speed)
 
-    def rotate_counterClockwise(self, amount, speed=35):
+    def rotate_counterClockwise(self, amount, speed=6):
         self.send_command("counterclockwise", amount, speed)
 
     def dropoff(self):
