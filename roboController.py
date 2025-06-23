@@ -18,10 +18,8 @@ class RoboController:
             value = entry
             # return  # For debugging purposes, you can remove this line later
             try:
-                if entry is not None and speed is not None:
+                if speed is not None:
                     message = f"{command}, {entry}, {speed}"  # Ensure correct format with a space after the comma
-                elif speed is not None:
-                    message = f"{command}, {speed}"
                 else:
                     message = f"{command}"
                 print("Sending command:", message) if DEBUG_ROBOT_CONTROLLER else None
