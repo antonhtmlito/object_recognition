@@ -8,6 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
+from values import DEBUG_ROUTING, GOAL_OFFSET
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -37,16 +38,16 @@ class RoutingController:
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
         if current_time - self.last_called > 1000:
-            print("current time", current_time - self.last_called)
+            print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
             if self.currentTarget is None:
-                print("setting new target")
+                print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
             if self.storedBalls >= 4:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
-                    goal_x = goalpos["position"][0] - 150
+                    goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
                     target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
@@ -69,7 +70,7 @@ class RoutingController:
             return
 
         if self.currentTarget.approach_angle() is not None:
-            print("calculating angle")
+            print("calculating angle") if DEBUG_ROUTING else None
             approach = self.currentTarget.approach_angle()
             if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
@@ -86,10 +87,14 @@ class RoutingController:
                 self.currentTarget = target
                 pygame.draw.circle(self.screen, "green", (checkpoint_x, checkpoint_y), 5)
             else:
-                print("target", self.currentTarget)
-                print("approach: ", approach)
+                print("target", self.currentTarget) if DEBUG_ROUTING else None
+                print("approach: ", approach) if DEBUG_ROUTING else None
 
-        print("angle to rotate", angle)
+        angle = self.getAngleToCurrentTarget()
+        if angle is None:
+            return
+
+        print("angle to rotate", angle) if DEBUG_ROUTING else None
         hit = self.checkCollisionsForAngle(angle=angle["angleTarget"]) # for now angle is not used as it is defined elsewhere
         if hit is not None:
             self.handle_detour(angle, hit)
@@ -97,12 +102,11 @@ class RoutingController:
         if -3 < angle < 3:
             self.roboController.forward(0.3)
         else:
-            print("in else")
             if angle < 0:
-                print("rotate counter")
+                print("rotate counter") if DEBUG_ROUTING else None
                 self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
-                print("rotate")
+                print("rotate") if DEBUG_ROUTING else None
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
@@ -238,8 +242,7 @@ class RoutingController:
         angle_difference = (angleToMatch - math.degrees(self.robot["rotation"]) + 360) % 360
         angle_difference = angle_difference if angle_difference <= 180 else angle_difference - 360
         time.sleep(2)
-        print("turning to match target: ", angle_difference)
-        print(self.robot)
+        print("turning to match target: ", angle_difference) if DEBUG_ROUTING else None
         if angle_difference < 0:
             self.roboController.rotate_counterClockwise(abs(angle_difference))
         else:
@@ -253,25 +256,26 @@ class RoutingController:
         hit = cast_ray_at_angle(
                 player=self.robot,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget()+2),
+                max_distance=int(self.getDistanceToCurrentTarget()),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
                           )
 
-        left, right = get_sides_for_player(self.robot)
+        print("angle to check ray at: ", angle)
+        left, right = self.get_sides_for_player(self.robot, angle)
 
         if hit is None:
             hitLeft = cast_ray_at_angle(
                 player=left,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
             hitRight = cast_ray_at_angle(
                 player=right,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
@@ -289,20 +293,22 @@ class RoutingController:
             return None
         return hit
 
+    def get_sides_for_player(self, player, angle):
+        x, y = player["x"], player["y"]
+        w = player["width"]
+        rotation =  math.radians(angle)
+        # rotation = rotation + math.pi / 2 # rotate angle to get the sides instead of the front and back
 
-def get_sides_for_player(player):
-    x, y = player["x"], player["y"]
-    w = player["width"]
-    rotation = player["rotation"]  # in radians
+        left = (x - math.sin(rotation) * w/2, y + w/2 * math.cos(rotation))
+        right = (x - math.sin(rotation) * (-w/2), y + (-w/2) * math.cos(rotation))
 
-    left = (x - w / 2 * math.cos(rotation), y - w / 2 * math.sin(rotation))
-    right = (x + w / 2 * math.cos(rotation), y + w / 2 * math.sin(rotation))
+        pygame.draw.circle(self.screen, "red", (int(left[0]), int(left[1])), 50)
+        pygame.draw.circle(self.screen, "blue", (int(right[0]), int(right[1])), 50)
+        playerleft = player.copy()
+        playerleft["x"] = left[0]
+        playerleft["y"] = left[1]
+        playerright = player.copy()
+        playerright["x"] = right[0]
+        playerright["y"] = right[1]
 
-    playerleft = player.copy()
-    playerleft["x"] = left[0]
-    playerleft["y"] = left[1]
-    playerright = player.copy()
-    playerright["x"] = right[0]
-    playerright["y"] = right[1]
-
-    return (playerleft, playerright)
+        return (playerleft, playerright)

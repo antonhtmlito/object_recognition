@@ -10,3 +10,17 @@ class Values:
 
 
 values = Values()
+
+
+DEBUG_BALLS = False
+DEBUG_ROUTING = False
+DEBUG_ROBOT = False
+DEBUG_ROBOT_CONTROLLER = True
+DEBUG_GOAL = False
+
+
+GOAL_OFFSET = 160
+
+OBSTACLE_UPDATE_INERVAL = 1000  # milliseconds
+ROBOT_UPDATE_INTERVAL = 300  # milliseconds
+BALL_UPDATE_INTERVAL = 100  # milliseconds

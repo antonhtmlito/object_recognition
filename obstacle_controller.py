@@ -1,5 +1,6 @@
 from obstacle_detection_function import get_obstacles, get_surface
 import pygame  # could be moved to only required functions
+from values import OBSTACLE_UPDATE_INERVAL
 
 
 class Obstacle_Controller:
@@ -15,7 +16,7 @@ class Obstacle_Controller:
     def handleTick(self):
         current_time = pygame.time.get_ticks()
 
-        if current_time - self.last_called > 1000:
+        if current_time - self.last_called > OBSTACLE_UPDATE_INERVAL:
             self.update_obstacles()
             self.last_called = current_time
 

@@ -81,10 +81,6 @@ while running:
 
     screen.fill("black")
 
-    # Draw player
-    player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
-    pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
-
     # Update data
     current_time = time.time()
     if current_time - last_update_time > update_interval:
@@ -94,6 +90,11 @@ while running:
     ballController.handleTick()
     routingController.handleTick()
     last_update_time = current_time
+
+    # Draw player
+    player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
+    pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
+
 
 
     # Rotate the robot around its center
@@ -111,6 +112,6 @@ while running:
     keys = pygame.key.get_pressed()
 
     pygame.display.flip()
-    clock.tick(20)
+    clock.tick(60)
 
 pygame.quit()

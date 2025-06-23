@@ -4,6 +4,7 @@ from Target import Target
 import math
 import pygame
 from obstacle_controller import Obstacle_Controller
+from values import DEBUG_BALLS
 
 
 # Mostly just a quick adaptations from the target_tracking.py file
@@ -26,7 +27,7 @@ class BallController:
     def handleTick(self, dt=1):
         self.update_ball_positions()
         self.update_target_candidates(self.balls)
-        print("balls object", self.balls)
+        print("balls object", self.balls) if DEBUG_BALLS else None
 
         for t in self.targets:
             t.age_one_frame()
@@ -87,5 +88,5 @@ class BallController:
                 if hits >= self.promote_after:
                     t = Target(targetType=color_name, x=pos[0], y=pos[1], mask=self.mask, screen=self.screen, wallType="free")
                     self.targets.append(t)
-                    print(f"🎯 Promoted {t}")
+                    print(f"🎯 Promoted {t}") if DEBUG_BALLS else None
                     del self.target_candidates[color_name][pos]

@@ -110,14 +110,7 @@ while True:
     lower_bound = np.array(obstacle_color["colorLowerBound"])
     upper_bound = np.array(obstacle_color["colorUpperBound"])
 
-        # Load calibration data
-    data = np.load("calibration_data.npz")
-    mtx = data["mtx"]
-    dist = data["dist"]
 
-    h, w = frame.shape[:2]
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
     frame = warm_frame(frame, red_gain=0.9, blue_gain=1.1)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
