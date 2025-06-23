@@ -8,7 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
-from values import DEBUG_ROUTING
+from values import DEBUG_ROUTING, GOAL_OFFSET
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -47,7 +47,7 @@ class RoutingController:
             if self.storedBalls >= 4:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
-                    goal_x = goalpos["position"][0] - 150
+                    goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
                     target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
@@ -264,14 +264,14 @@ class RoutingController:
             hitLeft = cast_ray_at_angle(
                 player=left,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
             hitRight = cast_ray_at_angle(
                 player=right,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget()-100),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
