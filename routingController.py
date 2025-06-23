@@ -49,7 +49,7 @@ class RoutingController:
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
-                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
+                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e")
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 50)
                     if self.currentTarget is None:
                         self.currentTarget = target
@@ -74,7 +74,7 @@ class RoutingController:
             approach = self.currentTarget.approach_angle()
             if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
-                checkpoint_x = self.currentTarget.x - 200 * math.cos(angle_rad)
+                checkpoint_x = self.currentTarget.x + 200 * math.cos(angle_rad)
                 checkpoint_y = self.currentTarget.y - 200 * math.sin(angle_rad)
                 target = Target(
                     targetType="checkpoint",
@@ -145,7 +145,7 @@ class RoutingController:
 
         # Create a new target
         new_target = Target(
-            targetType="checkpointDetour",
+            targetType="checkpointDetour", 
             wallType="free",
             x=new_target_x,
             y=new_target_y,
@@ -166,30 +166,34 @@ class RoutingController:
                 print("collected white ball")
                 self.lastTargetTypeGotten = "whiteBall"
                 self.storedBalls += 1
+
             if self.currentTarget.targetType == "orangeBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
-            if self.getDistanceToCurrentTarget() < 50:
-                if self.currentTarget.targetType == "checkpoint":
-                    print("reached checkpoint")
-                    self.lastTargetTypeGotten = "checkpoint"
-                if self.currentTarget.targetType == "detourcheckpoint":
-                    print("reached checkpoint detour")
-                    self.lastTargetTypeGotten = "checkpoint"
-                if self.currentTarget.targetType == "goal":
-                    print("dropping off")
-                    print(self.robot)
-                    while self.roboController.busy is True:
-                        time.sleep(0.1)
-                    self.turnToMatchAngle(angleToMatch=0)
-                    while self.roboController.busy is True:
-                        time.sleep(0.1)
-                    self.roboController.dropoff()
-                    self.storedBalls = 0
-                    print("scored a goal")
-                    self.lastTargetTypeGotten = "goal"
+
+            if self.currentTarget.targetType == "checkpoint":
+                print("reached checkpoint")
+                self.lastTargetTypeGotten = "checkpoint"
+
+            if self.currentTarget.targetType == "checkpointDetour":
+                print("reached checkpoint detour")
+                self.lastTargetTypeGotten = "checkpointDetour"
+
+            if self.currentTarget.targetType == "goal":
+                print("dropping off")
+                print(self.robot)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
+                self.turnToMatchAngle(angleToMatch=0)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
+                self.roboController.dropoff()
+                self.storedBalls = 0
+                print("scored a goal")
+                self.lastTargetTypeGotten = "goal"
+
             self.currentTarget = None
             return True
         else:
