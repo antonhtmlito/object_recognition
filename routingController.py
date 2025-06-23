@@ -117,11 +117,13 @@ class RoutingController:
         else:
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
-                self.roboController.drivestop()
+                if self.roboController.driving is True:
+                    self.roboController.drivestop()
                 self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
-                self.roboController.drivestop()
+                if self.roboController.driving is True:
+                    self.roboController.drivestop()
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
