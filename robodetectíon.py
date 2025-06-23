@@ -63,7 +63,7 @@ def getBotPosition(camera):
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
     mean = ""
-    camera_height = 183
+    camera_height = 190
     corner_height = 15
     target_height = 3
 
