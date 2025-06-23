@@ -9,6 +9,8 @@ class RoboController:
         self.serverPort = serverPort
         self.busy = False
         self.lock = threading.Lock()
+        self.driving = False
+
 
     def send_command_threadbound(self, command, entry=None, speed=None):
         with self.lock:
@@ -16,7 +18,7 @@ class RoboController:
             value = entry
             # return  # For debugging purposes, you can remove this line later
             try:
-                if entry is not None and speed is not None:
+                if speed is not None:
                     message = f"{command}, {entry}, {speed}"  # Ensure correct format with a space after the comma
                 else:
                     message = f"{command}"
@@ -54,3 +56,11 @@ class RoboController:
 
     def dropoff(self):
         self.send_command("dropoff")
+    
+    def drivestart(self,speed):
+        self.driving = True
+        self.send_command("drivestart", speed=speed)
+
+    def drivestop(self):
+        self.driving = False
+        self.send_command("drivestop")

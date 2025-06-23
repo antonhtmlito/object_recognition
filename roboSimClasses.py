@@ -95,7 +95,10 @@ while running:
     player_surface = pygame.Surface((player["width"], player["height"]), pygame.SRCALPHA)
     pygame.draw.rect(player_surface, "blue", player_surface.get_rect())
 
-
+    # Draw current target
+    if routingController.currentTarget is not None:
+        x, y = routingController.currentTarget.position
+        pygame.draw.circle(screen, "purple", (x, y), 10)
 
     # Rotate the robot around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )

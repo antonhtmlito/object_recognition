@@ -8,7 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
-from values import DEBUG_ROUTING, GOAL_OFFSET
+from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -31,12 +31,19 @@ class RoutingController:
         self.screen = screen
         self.camera = camera
         self.last_called = 0
+        self.last_calledstop = 0
         self.lastTargetTypeGotten = None
 
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
+        if current_time - self.last_calledstop > 200:
+            if self.currentTarget is not None and self.roboController.driving is True:
+                if self.getDistanceToCurrentTarget() < 50:
+                    self.roboController.drivestop()
+
+
         if current_time - self.last_called > 1000:
             print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
@@ -44,13 +51,13 @@ class RoutingController:
                 print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
-            if self.storedBalls >= 4:
+            if self.storedBalls >= 1:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
-                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
-                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
+                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e")
+                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 50)
                     if self.currentTarget is None:
                         self.currentTarget = target
                     if self.currentTarget.targetType != "goal":
@@ -59,6 +66,7 @@ class RoutingController:
             else:
                 self.driveToCurrentTarget()
             self.last_called = current_time
+
 
     def driveToCurrentTarget(self):
         """ makes the robot drive to the current target """
@@ -74,7 +82,7 @@ class RoutingController:
             approach = self.currentTarget.approach_angle()
             if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
-                checkpoint_x = self.currentTarget.x - 200 * math.cos(angle_rad)
+                checkpoint_x = self.currentTarget.x + 200 * math.cos(angle_rad)
                 checkpoint_y = self.currentTarget.y - 200 * math.sin(angle_rad)
                 target = Target(
                     targetType="checkpoint",
@@ -100,13 +108,22 @@ class RoutingController:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         if -3 < angle < 3:
-            self.roboController.forward(0.3)
+            if self.roboController.driving is False:
+                if self.getDistanceToCurrentTarget() < 500:
+                    self.roboController.drivestart(speed=10)
+                if self.getDistanceToCurrentTarget() > 500:
+                    self.roboController.drivestart(speed=35)
+
         else:
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
+                if self.roboController.driving is True:
+                    self.roboController.drivestop()
                 self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
+                if self.roboController.driving is True:
+                    self.roboController.drivestop()
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
@@ -145,7 +162,7 @@ class RoutingController:
 
         # Create a new target
         new_target = Target(
-            targetType="checkpointDetour",
+            targetType="checkpointDetour", 
             wallType="free",
             x=new_target_x,
             y=new_target_y,
@@ -160,20 +177,27 @@ class RoutingController:
         """ Does checks for if a ball is colelcted or not and handles that """
         if self.currentTarget is None:
             return False
-        if self.getDistanceToCurrentTarget() < 50:
+        if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
                 self.lastTargetTypeGotten = "whiteBall"
                 self.storedBalls += 1
+
             if self.currentTarget.targetType == "orangeBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
+
             if self.currentTarget.targetType == "checkpoint":
                 print("reached checkpoint")
                 self.lastTargetTypeGotten = "checkpoint"
+
+            if self.currentTarget.targetType == "checkpointDetour":
+                print("reached checkpoint detour")
+                self.lastTargetTypeGotten = "checkpointDetour"
+
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
                 print(self.robot)
@@ -186,6 +210,7 @@ class RoutingController:
                 self.storedBalls = 0
                 print("scored a goal")
                 self.lastTargetTypeGotten = "goal"
+
             self.currentTarget = None
             return True
         else:
