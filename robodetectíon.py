@@ -34,6 +34,13 @@ def getGoalPosition(camera):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     mean = ""
+    camera_height = 190
+    corner_height = 10
+    target_height = 3
+
+    # Camera resolution, really scuffed
+    frame_w = 1920
+    frame_h = 1080
     if ids is not None:
         ids = ids.flatten()
 
@@ -43,7 +50,11 @@ def getGoalPosition(camera):
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 c = corners[i][0]
                 mean = np.mean(c, axis=0)
-                return {"position": mean.tolist()}
+                x,y = mean.tolist()
+                factor = (camera_height - corner_height) / (camera_height - target_height)
+                u, v = frame_w / 2, frame_h / 2
+                rx,ry = factor * (x  - u) + u, factor * (y  - v) + v
+                return {"position": (rx,ry)}
 
 
     # If the goal marker is not found in the current frame
