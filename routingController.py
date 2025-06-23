@@ -50,7 +50,7 @@ class RoutingController:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
                     target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
-                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
+                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 50)
                     if self.currentTarget is None:
                         self.currentTarget = target
                     if self.currentTarget.targetType != "goal":
@@ -174,6 +174,9 @@ class RoutingController:
             if self.getDistanceToCurrentTarget() < 50:
                 if self.currentTarget.targetType == "checkpoint":
                     print("reached checkpoint")
+                    self.lastTargetTypeGotten = "checkpoint"
+                if self.currentTarget.targetType == "detourcheckpoint":
+                    print("reached checkpoint detour")
                     self.lastTargetTypeGotten = "checkpoint"
                 if self.currentTarget.targetType == "goal":
                     print("dropping off")
