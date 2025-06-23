@@ -31,12 +31,20 @@ class RoutingController:
         self.screen = screen
         self.camera = camera
         self.last_called = 0
+        self.last_calledstop = 0
         self.lastTargetTypeGotten = None
 
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
+        if current_time - self.last_calledstop > 200:
+            if self.currentTarget is not None and self.roboController.driving is True:
+                if self.getDistanceToCurrentTarget < 30:
+                    self.roboController.drivestop()
+                    self.roboController.driving = False
+
+
         if current_time - self.last_called > 1000:
             print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
@@ -59,6 +67,7 @@ class RoutingController:
             else:
                 self.driveToCurrentTarget()
             self.last_called = current_time
+
 
     def driveToCurrentTarget(self):
         """ makes the robot drive to the current target """
@@ -100,13 +109,24 @@ class RoutingController:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         if -3 < angle < 3:
-            self.roboController.forward(0.3)
+            if self.roboController.driving is False:
+                if self.getDistanceToCurrentTarget < 100:
+                    self.roboController.drivestart(speed=10)
+                    self.roboController.driving = True
+                if self.getDistanceToCurrentTarget > 100:
+                    self.roboController.drivestart(speed=35)
+                    self.roboController.driving = True
+
         else:
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
+                self.roboController.drivestop()
+                self.roboController.driving = False
                 self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
+                self.roboController.drivestop()
+                self.roboController.driving = False
                 self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
