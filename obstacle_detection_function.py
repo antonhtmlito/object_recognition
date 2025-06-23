@@ -44,14 +44,7 @@ def get_obstacles(cam):
     ret, frame = cam.read()
     if not ret:
         raise Exception("no open cam")
-    data = np.load("calibration_data.npz")
-    mtx = data["mtx"]
-    dist = data["dist"]
 
-    h, w = frame.shape[:2]
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-
-    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
     mask = cv2.inRange(hsv, lower_bound, upper_bound)
