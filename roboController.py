@@ -60,7 +60,9 @@ class RoboController:
         self.send_command("dropoff")
     
     def drivestart(self,speed):
+        self.driving = True
         self.send_command("drivestart", speed=speed)
 
     def drivestop(self):
+        self.driving = False
         self.send_command("drivestop")
