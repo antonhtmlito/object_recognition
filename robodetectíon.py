@@ -82,31 +82,35 @@ def getBotPosition(camera):
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
     mean = ""
+    camera_height = 183
+    corner_height = 15
+    target_height = 3
+
+    # Camera resolution, really scuffed
+    frame_w = 1920
+    frame_h = 1080
 
 
     if ids is not None:
-        marker_size = 0.1 # Example: 5cm marker size
-        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, newcameramtx, dist)
         for i, marker_id in enumerate(ids.flatten()):
             if marker_id == 4:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
                 mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
-                x,y,z = tvecs[i][0]
+                x,y = mean.tolist()
                 # Project the marker's center to image space
-                object_points = np.array([[0.0, 0.0, 0.0]], dtype=np.float32)
-                image_points, _ = cv2.projectPoints(object_points, rvecs[i], tvecs[i], newcameramtx, dist)
-                pixel_position = tuple(image_points[0][0])  # (u, v)
-                print("pos",x,y) if values.DEBUG_ROBOT else None
                 # Use calibration matrix for fx, fy, cx, cy
+                factor = (camera_height - corner_height) / (camera_height - target_height)
+                u, v = frame_w / 2, frame_h / 2
+                rx,ry = factor * (x  - u) + u, factor * (y  - v) + v
 
     # Only works for single marker
     frame = cv2.putText(frame, str(mean), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     frame = cv2.putText(frame, str(angle), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('Detected Markers', frame)
     if angle != "":
-        return {"position": pixel_position, "angle": angle}
+        return {"position": (rx,ry), "angle": angle}
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(2)
