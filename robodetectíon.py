@@ -67,16 +67,6 @@ def getBotPosition(camera):
     ret, frame = camera.read()
     if not ret:
         raise Exception("Can't get frame")
-    
-    # Load calibration data
-    data = np.load("calibration_data.npz")
-    mtx = data["mtx"]
-    dist = data["dist"]
-
-    h, w = frame.shape[:2]
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-
-    frame = cv2.undistort(frame, mtx, dist, None, newcameramtx)
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
