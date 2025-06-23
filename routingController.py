@@ -8,7 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
-from values import DEBUG_ROUTING, GOAL_OFFSET
+from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -44,7 +44,7 @@ class RoutingController:
                 print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
-            if self.storedBalls >= 4:
+            if self.storedBalls >= 1:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
@@ -160,7 +160,7 @@ class RoutingController:
         """ Does checks for if a ball is colelcted or not and handles that """
         if self.currentTarget is None:
             return False
-        if self.getDistanceToCurrentTarget() < 50:
+        if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
@@ -171,21 +171,22 @@ class RoutingController:
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
-            if self.currentTarget.targetType == "checkpoint":
-                print("reached checkpoint")
-                self.lastTargetTypeGotten = "checkpoint"
-            if self.currentTarget.targetType == "goal":
-                print("dropping off")
-                print(self.robot)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
-                self.turnToMatchAngle(angleToMatch=0)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
-                self.roboController.dropoff()
-                self.storedBalls = 0
-                print("scored a goal")
-                self.lastTargetTypeGotten = "goal"
+            if self.getDistanceToCurrentTarget() < 50:
+                if self.currentTarget.targetType == "checkpoint":
+                    print("reached checkpoint")
+                    self.lastTargetTypeGotten = "checkpoint"
+                if self.currentTarget.targetType == "goal":
+                    print("dropping off")
+                    print(self.robot)
+                    while self.roboController.busy is True:
+                        time.sleep(0.1)
+                    self.turnToMatchAngle(angleToMatch=0)
+                    while self.roboController.busy is True:
+                        time.sleep(0.1)
+                    self.roboController.dropoff()
+                    self.storedBalls = 0
+                    print("scored a goal")
+                    self.lastTargetTypeGotten = "goal"
             self.currentTarget = None
             return True
         else:
