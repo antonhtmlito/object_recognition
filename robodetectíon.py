@@ -30,17 +30,8 @@ def getGoalPosition(camera):
     ret, frame = camera.read()
     if not ret:
         return None
-    # Load calibration data
-    data = np.load("calibration_data.npz")
-    mtx = data["mtx"]
-    dist = data["dist"]
 
-    h, w = frame.shape[:2]
-    newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-
-    undistorted = cv2.undistort(frame, mtx, dist, None, newcameramtx)
-
-    gray = cv2.cvtColor(undistorted, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     mean = ""
     if ids is not None:
@@ -49,7 +40,7 @@ def getGoalPosition(camera):
         # Iterate through detected markers to find the goal marker
         for i, id_val in enumerate(ids):
             if id_val == goal_id:
-                cv2.aruco.drawDetectedMarkers(undistorted, corners, ids)
+                cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 c = corners[i][0]
                 mean = np.mean(c, axis=0)
                 return {"position": mean.tolist()}
