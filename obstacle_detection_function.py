@@ -4,6 +4,8 @@ import json
 import numpy as np
 import pygame
 
+from detect_white_and_yellow_ball import warm_frame
+
 def load_color_mapping(file_path):
     try:
         with open(file_path, "r") as f:
@@ -45,6 +47,7 @@ def get_obstacles(cam):
     if not ret:
         raise Exception("no open cam")
 
+    frame = warm_frame(frame, red_gain=0.9, blue_gain=1.1)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
     mask = cv2.inRange(hsv, lower_bound, upper_bound)
