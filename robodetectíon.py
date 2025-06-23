@@ -34,8 +34,8 @@ def getGoalPosition(camera):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = detector.detectMarkers(gray)
     mean = ""
-    camera_height = 190
-    corner_height = 10
+    camera_height = 186.5
+    corner_height = 11
     target_height = 3
 
     # Camera resolution, really scuffed
@@ -74,8 +74,8 @@ def getBotPosition(camera):
     corners, ids, rejected = detector.detectMarkers(gray)
     angle = ""
     mean = ""
-    camera_height = 190
-    corner_height = 15
+    camera_height = 186.5
+    corner_height = 16.5
     target_height = 3
 
     # Camera resolution, really scuffed
