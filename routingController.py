@@ -43,6 +43,7 @@ class RoutingController:
             if self.currentTarget is not None and self.roboController.driving is True:
                 if self.getDistanceToCurrentTarget() < 80:
                     self.roboController.drivestop()
+                    self.handleTargetCollision()
 
         if current_time - self.last_called > ROUTING_UPDATE_INTERVAL:
             print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
