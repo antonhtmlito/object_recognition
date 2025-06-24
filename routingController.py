@@ -245,11 +245,12 @@ class RoutingController:
                 if self.time_without_target > 10:
                     self.seekGoal = True
                     self.time_without_target = 0
+                    print("no targets for a long time, seeking goal") if DEBUG_ROUTING else None
                 else:
                     self.time_without_target += 1
             else:
-                self.time_without_target = 0
-                self.seekGoal = False
+                self.time_without_target -= 1 
+                #self.seekGoal = False
                 self.currentTarget = self.calculateTarget()
         else:
             self.currentTarget = target
@@ -264,7 +265,7 @@ class RoutingController:
         for target in self.ballController.targets:
             distance = math.dist(target.position, (self.robot["x"], self.robot["y"]))
             if target.targetType == "orangeBall":
-                disttance += 2000
+                distance += 2000
             if distance is None:
                 return None
             if smallest_dist > distance:

@@ -31,8 +31,8 @@ player = {
     "x": 0,
     "y": 0,
     "rotation": 0,
-    "width": 100,
-    "height": 120,
+    "width": 130,
+    "height": 150,
     }
 
 cap = cv2.VideoCapture(0)
