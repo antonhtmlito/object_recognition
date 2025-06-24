@@ -219,12 +219,6 @@ class RoutingController:
 
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
-                print(self.robot)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
-                self.turnToMatchAngle(angleToMatch=0)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
                 self.roboController.dropoff()
                 self.storedBalls = 0
                 print("scored a goal")
