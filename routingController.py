@@ -109,7 +109,7 @@ class RoutingController:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         print("angle to turn: ", angle) if DEBUG_ROUTING else None
-        if -3 < angle < 3:
+        if -5 < angle < 5:
             print("no angle to turn, driving forward") if DEBUG_ROUTING else None
             if self.currentTarget.approach_angle() is not None:
                 if self.roboController.driving is False:
@@ -125,15 +125,19 @@ class RoutingController:
                 distance = self.getDistanceToCurrentTarget()
                 speed = distance*0.1+5
                 self.roboController.drivestart(speed = speed)
-                if self.getDistanceToCurrentTarget() < 250:
-                    self.roboController.drivestop()
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
-                if self.roboController.driving is False:
+                if self.roboController.driving is True:
+                    if self.getDistanceToCurrentTarget() < 150:
+                        self.roboController.drivestop()
+                elif self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
-                if self.roboController.driving is False:
+                if self.roboController.driving is True:
+                    if self.getDistanceToCurrentTarget() < 150:
+                        self.roboController.drivestop()
+                elif self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
@@ -189,7 +193,7 @@ class RoutingController:
             return False
         if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
-                if self.currentTarget.approach_angle() is not None:
+                if self.currentTarget.approach_angle is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
@@ -197,30 +201,29 @@ class RoutingController:
                 self.storedBalls += 1
 
             if self.currentTarget.targetType == "orangeBall":
-                if self.currentTarget.approach_angle() is not None:
+                if self.currentTarget.approach_angle is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
 
-            if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL - 30:
-                if self.currentTarget.targetType == "checkpoint":
-                    print("reached checkpoint")
-                    self.lastTargetTypeGotten = "checkpoint"
+            if self.currentTarget.targetType == "checkpoint":
+                print("reached checkpoint")
+                self.lastTargetTypeGotten = "checkpoint"
 
-                if self.currentTarget.targetType == "checkpointDetour":
-                    print("reached checkpoint detour")
-                    self.lastTargetTypeGotten = "checkpointDetour"
+            if self.currentTarget.targetType == "checkpointDetour":
+                print("reached checkpoint detour")
+                self.lastTargetTypeGotten = "checkpointDetour"
 
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
                 print(self.robot)
-                #while self.roboController.busy is True:
-                    #time.sleep(0.1)
-                #self.turnToMatchAngle(angleToMatch=0)
-                #while self.roboController.busy is True:
-                    #time.sleep(0.1)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
+                self.turnToMatchAngle(angleToMatch=0)
+                while self.roboController.busy is True:
+                    time.sleep(0.1)
                 self.roboController.dropoff()
                 self.storedBalls = 0
                 print("scored a goal")
@@ -246,12 +249,11 @@ class RoutingController:
                 if self.time_without_target > 10:
                     self.seekGoal = True
                     self.time_without_target = 0
-                    print("no targets for a long time, seeking goal") if DEBUG_ROUTING else None
                 else:
                     self.time_without_target += 1
             else:
-                self.time_without_target -= 1 
-                #self.seekGoal = False
+                self.time_without_target = 0
+                self.seekGoal = False
                 self.currentTarget = self.calculateTarget()
         else:
             self.currentTarget = target
@@ -265,8 +267,6 @@ class RoutingController:
         best_target = None
         for target in self.ballController.targets:
             distance = math.dist(target.position, (self.robot["x"], self.robot["y"]))
-            if target.targetType == "orangeBall":
-                distance += 2000
             if distance is None:
                 return None
             if smallest_dist > distance:
