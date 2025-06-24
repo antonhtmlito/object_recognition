@@ -125,7 +125,7 @@ class RoutingController:
                 distance = self.getDistanceToCurrentTarget()
                 speed = distance*0.1+5
                 self.roboController.drivestart(speed = speed)
-                if self.getDistanceToCurrentTarget() < 200:
+                if self.getDistanceToCurrentTarget() < 250:
                     self.roboController.drivestop()
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
