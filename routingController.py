@@ -115,7 +115,7 @@ class RoutingController:
                     self.roboController.drivestart(speed=5)
                 else:
                     distance = self.getDistanceToCurrentTarget()
-                    speed = distance*0.01+10
+                    speed = distance*0.1+10
                     self.roboController.drivestart(speed = speed)
 
 
