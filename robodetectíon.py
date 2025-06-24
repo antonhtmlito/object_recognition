@@ -86,7 +86,7 @@ def getBotPosition(camera):
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
-                mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
+                mean = np.mean((marker_corners[2], marker_corners[3]), axis=0) if len(corners) != 0 else ""
                 x,y = mean.tolist()
                 # Project the marker's center to image space
                 # Use calibration matrix for fx, fy, cx, cy
