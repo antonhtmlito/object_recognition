@@ -61,7 +61,7 @@ class RoutingController:
                     if self.currentTarget is None:
                         self.currentTarget = target
                     if self.currentTarget.targetType != "goal":
-                        self.setCurrentTarget(target)
+                        self.currentTarget = target
                     self.driveToCurrentTarget()
             else:
                 self.driveToCurrentTarget()
