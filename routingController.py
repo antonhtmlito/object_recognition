@@ -109,9 +109,11 @@ class RoutingController:
         angle = angle["angleToTurn"]
         if -3 < angle < 3:
             if self.roboController.driving is False:
-                if self.getDistanceToCurrentTarget() < 300:
+                if self.currentTarget.approach_angle is not None:
                     self.roboController.drivestart(speed=5)
-                if self.getDistanceToCurrentTarget() > 300:
+                elif self.getDistanceToCurrentTarget() < 500:
+                    self.roboController.drivestart(speed=10)
+                elif self.getDistanceToCurrentTarget() > 500:
                     self.roboController.drivestart(speed=25)
 
         else:
