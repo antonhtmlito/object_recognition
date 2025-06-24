@@ -18,11 +18,12 @@ class Target:
         "free": None
     }
 
-    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20):
+    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20, walltypeIsLocked=False):
         if targetType not in valid_types:
             raise ValueError(f"Invalid target type: {targetType}. Valid types are: {valid_types}")
         if wallType not in wall_types:
             raise ValueError(f"Invalid wall type: {wallType}. Valid types are: {wall_types}")
+        self.wallTypeIsLocked = walltypeIsLocked
         self.targetType = targetType
         self.x = x
         self.y = y
@@ -30,7 +31,8 @@ class Target:
         self.screen = screen
         self.mask = mask
         self.wallType = wallType
-        self.check_wall_ball()
+        if self.wallTypeIsLocked is False:
+            self.check_wall_ball()
 
         self.expire_after_frames = expire_after_frames
         self.frames_since_seen = 0
