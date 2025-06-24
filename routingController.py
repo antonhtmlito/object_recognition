@@ -224,6 +224,9 @@ class RoutingController:
     def setRobot(self, robot):
         self.robot = robot
 
+    def backoff_after_target(self):
+        self.roboController.backward(0.2, 30)
+
     def setCurrentTarget(self, target=None):
         if target is None:
             if self.ballController.targets == []:
@@ -234,6 +237,7 @@ class RoutingController:
                 else:
                     self.time_without_target += 1
             else:
+                self.time_without_target = 0
                 self.seekGoal = False
                 self.currentTarget = self.calculateTarget()
         else:

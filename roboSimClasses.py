@@ -123,6 +123,10 @@ while running:
 
     keys = pygame.key.get_pressed()
 
+    font = pygame.font.Font(None, 36)
+    fps = str(int(clock.get_fps()))
+    fps_t = font.render(fps , 1, pygame.Color("RED"))
+    screen.blit(fps_t,(0,0))
     pygame.display.flip()
     clock.tick(60)
 

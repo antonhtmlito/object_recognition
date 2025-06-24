@@ -4,8 +4,8 @@
         "type": "ball",
         "colorLowerBound": [
             0,
-            156,
-            148
+            189,
+            154
         ],
         "colorUpperBound": [
             31,
@@ -17,13 +17,13 @@
         "name": "whiteBall",
         "type": "ball",
         "colorLowerBound": [
-            0,
-            41,
+            8,
+            12,
             155
         ],
         "colorUpperBound": [
-            33,
-            153,
+            32,
+            131,
             255
         ]
     },
