@@ -82,7 +82,7 @@ def start_server(host='', port=8080):
 
             if content == "forward":
                 fake_distance = 15  # Simulated obstacle distance
-                play_music_file("/test/sounds/fein.wav")
+                play_music_file("/test/sounds/pacman_chomp.wav")
                 if fake_distance < 10:
                     print("wall in the way")
                 else:
