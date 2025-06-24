@@ -41,7 +41,7 @@ class RoutingController:
         current_time = pygame.time.get_ticks()
         if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
-                if self.getDistanceToCurrentTarget() < 80:
+                if self.getDistanceToCurrentTarget() < 75:
                     self.roboController.drivestop()
                     self.handleTargetCollision()
 
