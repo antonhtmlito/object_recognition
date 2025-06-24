@@ -8,7 +8,7 @@ wall_types = ["n", "s", "w", "e", "nw", "ne", "sw", "se", "free"]
 class Target:
     wall_approach_angles = {
         "n": 0,
-        "e": 0,
+        "e": 270,
         "s": 180,
         "w": 90,
         "ne": 315,
@@ -48,7 +48,7 @@ class Target:
             mask=self.mask,
         )
         hit_directions = []
-        directions = {0: "s", 90: "w", 180: "n", 270: "e"}
+        directions = {0: "s", 270: "w", 180: "n", 90: "e"}
 
         for angle, hit in zip(directions.keys(), ray_results):
             if hit is not None:
