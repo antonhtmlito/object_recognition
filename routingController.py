@@ -109,7 +109,7 @@ class RoutingController:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         print("angle to turn: ", angle) if DEBUG_ROUTING else None
-        if -5 < angle < 5:
+        if -3 < angle < 3:
             print("no angle to turn, driving forward") if DEBUG_ROUTING else None
             if self.currentTarget.approach_angle() is not None:
                 if self.roboController.driving is False:
@@ -128,14 +128,14 @@ class RoutingController:
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 250:
+                    if self.getDistanceToCurrentTarget() < 200:
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 250:
+                    if self.getDistanceToCurrentTarget() < 200:
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
