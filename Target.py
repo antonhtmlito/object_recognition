@@ -2,7 +2,7 @@ import math
 from ray_functions import cast_rays_from_target
 
 valid_types = ["whiteBall", "orangeBall", "checkpoint", "checkpointDetour", "goal"]
-wall_types = ["n", "s", "w", "e", "nw", "en", "sw", "se", "free"]
+wall_types = ["n", "s", "w", "e", "nw", "en", "sw", "es", "free"]
 
 
 class Target:
