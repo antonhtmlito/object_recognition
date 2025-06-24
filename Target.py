@@ -8,7 +8,7 @@ wall_types = ["n", "s", "w", "e", "nw", "ne", "sw", "se", "free"]
 class Target:
     wall_approach_angles = {
         "n": 0,
-        "e": 270,
+        "e": 0,
         "s": 180,
         "w": 90,
         "ne": 315,

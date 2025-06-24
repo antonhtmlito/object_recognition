@@ -5,7 +5,6 @@ from ballController import BallController
 from ray_functions import cast_ray_at_angle
 from Target import Target
 import time
-from Target import Target
 import robodetectíon
 import pygame
 from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL, ROUTING_UPDATE_INTERVAL
@@ -108,10 +107,12 @@ class RoutingController:
         if hit is not None:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
+        print("angle to turn: ", angle) if DEBUG_ROUTING else None
         if -3 < angle < 3:
+            print("no angle to turn, driving forward") if DEBUG_ROUTING else None
             if self.roboController.driving is False:
                 if self.currentTarget.approach_angle is not None:
-                    self.roboController.drivestart(speed=5)
+                    self.roboController.drivestart(speed=7)
                 elif self.getDistanceToCurrentTarget() < 500:
                     self.roboController.drivestart(speed=20)
                 elif self.getDistanceToCurrentTarget() > 500:
