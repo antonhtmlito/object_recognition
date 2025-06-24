@@ -31,8 +31,8 @@ player = {
     "x": 0,
     "y": 0,
     "rotation": 0,
-    "width": 100,
-    "height": 120,
+    "width": 130,
+    "height": 150,
     }
 
 cap = cv2.VideoCapture(0)
@@ -98,7 +98,16 @@ while running:
     # Draw current target
     if routingController.currentTarget is not None:
         x, y = routingController.currentTarget.position
-        pygame.draw.circle(screen, "purple", (x, y), 10)
+        if routingController.currentTarget.targetType == "goal":
+            pygame.draw.circle(screen, "blue", (x, y), 10)
+        if routingController.currentTarget.targetType == "whiteBall":
+            pygame.draw.circle(screen, "yellow", (x, y), 10)
+        if routingController.currentTarget.targetType == "orangeBall":
+            pygame.draw.circle(screen, "orange", (x, y), 10)
+        if routingController.currentTarget.targetType == "checkpoint":
+            pygame.draw.circle(screen, "purple", (x, y), 10)
+        if routingController.currentTarget.targetType == "checkpointDetour":
+            pygame.draw.circle(screen, "pink", (x, y), 10)
 
     # Rotate the robot around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )
@@ -114,6 +123,10 @@ while running:
 
     keys = pygame.key.get_pressed()
 
+    font = pygame.font.Font(None, 12)
+    fps = str(int(clock.get_fps()))
+    fps_t = font.render(fps , 1, pygame.Color("RED"))
+    screen.blit(fps_t,(20,10))
     pygame.display.flip()
     clock.tick(60)
 

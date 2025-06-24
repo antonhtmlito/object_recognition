@@ -37,10 +37,11 @@ class RoboController:
 
     def send_command(self, command, entry=None, speed=None):
         if self.busy is True:
-            print("command recieved and ignored as robot is busy") if DEBUG_ROBOT_CONTROLLER else None
-            return
+            print("command received and ignored as robot is busy") if DEBUG_ROBOT_CONTROLLER else None
+            return False
         thread = threading.Thread(target=self.send_command_threadbound, args=(command, entry, speed), daemon=True)
         thread.start()
+        return True
 
     def forward(self, amount, speed=35):
         self.send_command("forward", amount, speed)
@@ -58,9 +59,11 @@ class RoboController:
         self.send_command("dropoff")
     
     def drivestart(self,speed):
-        self.driving = True
-        self.send_command("drivestart", speed=speed)
+        if self.send_command("drivestart", speed=speed):
+            self.driving = True
+
 
     def drivestop(self):
-        self.driving = False
-        self.send_command("drivestop")
+        if self.send_command("drivestop"):
+            self.driving = False
+

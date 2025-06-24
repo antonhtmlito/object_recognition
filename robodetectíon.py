@@ -2,9 +2,6 @@ import cv2
 import numpy as np
 import values
 
-DEFAULT_ROBOT_ID = 4
-DEFAULT_GOAL_ID = 102
-
 def calcAngle(corners):
     middle = np.mean(corners, axis=0)
     mean = np.mean(np.array((corners[0], corners[1])), axis=0)
@@ -75,7 +72,7 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
     camera_height = 186.5
-    corner_height = 16.5
+    corner_height = 24
     target_height = 3
 
     # Camera resolution, really scuffed
@@ -85,11 +82,11 @@ def getBotPosition(camera):
 
     if ids is not None:
         for i, marker_id in enumerate(ids.flatten()):
-            if marker_id == 4:
+            if marker_id == values.values.robot_id:
                 cv2.aruco.drawDetectedMarkers(frame, corners, ids)
                 marker_corners = corners[i][0]
                 angle = calcAngle(marker_corners)
-                mean = np.mean(marker_corners, axis=0) if len(corners) != 0 else ""
+                mean = np.mean((marker_corners[2], marker_corners[3]), axis=0) if len(corners) != 0 else ""
                 x,y = mean.tolist()
                 # Project the marker's center to image space
                 # Use calibration matrix for fx, fy, cx, cy

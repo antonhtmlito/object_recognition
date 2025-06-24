@@ -111,7 +111,7 @@ while True:
     upper_bound = np.array(obstacle_color["colorUpperBound"])
 
 
-    frame = warm_frame(frame, red_gain=0.9, blue_gain=1.1)
+    frame = warm_frame(frame, red_gain=0.6, blue_gain=1.4)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
 

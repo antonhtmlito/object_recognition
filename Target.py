@@ -2,27 +2,28 @@ import math
 from ray_functions import cast_rays_from_target
 
 valid_types = ["whiteBall", "orangeBall", "checkpoint", "checkpointDetour", "goal"]
-wall_types = ["n", "s", "w", "e", "nw", "ne", "sw", "se", "free"]
+wall_types = ["n", "s", "w", "e", "nw", "en", "sw", "es", "free"]
 
 
 class Target:
     wall_approach_angles = {
-        "n": 0,
-        "e": 270,
-        "s": 180,
-        "w": 90,
-        "ne": 315,
-        "nw": 45,
-        "se": 225,
-        "sw": 135,
+        "n": 270,
+        "e": 180,
+        "s": 90,
+        "w": 0,
+        "en": 225,
+        "nw": 315,
+        "es": 135,
+        "sw": 45,
         "free": None
     }
 
-    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20):
+    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20, walltypeIsLocked=False):
         if targetType not in valid_types:
             raise ValueError(f"Invalid target type: {targetType}. Valid types are: {valid_types}")
         if wallType not in wall_types:
             raise ValueError(f"Invalid wall type: {wallType}. Valid types are: {wall_types}")
+        self.wallTypeIsLocked = walltypeIsLocked
         self.targetType = targetType
         self.x = x
         self.y = y
@@ -30,7 +31,8 @@ class Target:
         self.screen = screen
         self.mask = mask
         self.wallType = wallType
-        self.check_wall_ball()
+        if self.wallTypeIsLocked is False:
+            self.check_wall_ball()
 
         self.expire_after_frames = expire_after_frames
         self.frames_since_seen = 0
@@ -46,7 +48,7 @@ class Target:
             mask=self.mask,
         )
         hit_directions = []
-        directions = {0: "s", 90: "w", 180: "n", 270: "e"}
+        directions = {0: "e", 90: "s", 180: "w", 270: "n"}
 
         for angle, hit in zip(directions.keys(), ray_results):
             if hit is not None:
@@ -67,8 +69,13 @@ class Target:
     def age_one_frame(self):
         self.frames_since_seen += 1
 
-    def refresh(self):
+    def refresh(self, new_x: int, new_y: int):
         self.frames_since_seen = 0
+        self.x, self.y = new_x, new_y
+        self.position = (new_x, new_y)
+
+        if self.wallTypeIsLocked is False:
+            self.check_wall_ball()
 
     def is_expired(self) -> bool:
         return self.frames_since_seen > self.expire_after_frames

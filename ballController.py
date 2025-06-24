@@ -11,7 +11,7 @@ from values import DEBUG_BALLS
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=200, promote_after=10, obstacle_controller=None):
+    def __init__(self, camera, screen, max_distance=20, promote_after=10, obstacle_controller=None):
         self.camera = camera
         self.screen = screen
         if obstacle_controller is None:
@@ -34,9 +34,10 @@ class BallController:
 
         seen = [pt for coords in self.balls.values() for pt in coords]
         for t in list(self.targets):
-            if any(math.hypot(t.x - x, t.y - y) < self.max_distance
-                   for (x, y) in seen):
-                t.refresh()
+            for (sx, sy) in seen:
+                if math.hypot(t.x - sx, t.y - sy) < self.max_distance:
+                    t.refresh(sx, sy)   # now sx,sy are in scope
+                    break              # don’t refresh more than once per tick
 
         for t in list(self.targets):
             if t.is_expired():

@@ -5,10 +5,9 @@ from ballController import BallController
 from ray_functions import cast_ray_at_angle
 from Target import Target
 import time
-from Target import Target
 import robodetectíon
 import pygame
-from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL
+from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL, ROUTING_UPDATE_INTERVAL
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -33,35 +32,37 @@ class RoutingController:
         self.last_called = 0
         self.last_calledstop = 0
         self.lastTargetTypeGotten = None
+        self.seekGoal = False
+        self.time_without_target = 0
 
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_calledstop > 200:
+        if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
-                if self.getDistanceToCurrentTarget() < 30:
+                if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
                     self.roboController.drivestop()
+                    self.handleTargetCollision()
 
-
-        if current_time - self.last_called > 1000:
+        if current_time - self.last_called > ROUTING_UPDATE_INTERVAL:
             print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
             if self.currentTarget is None:
                 print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
-            if self.storedBalls >= 1:
+            if self.seekGoal is True:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
-                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="free")
-                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 10)
+                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e", walltypeIsLocked=True)
+                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 20)
                     if self.currentTarget is None:
                         self.currentTarget = target
-                    if self.currentTarget.targetType != "goal":
-                        self.setCurrentTarget(target)
+                    if self.currentTarget.targetType != "goal" and self.currentTarget.targetType != "checkpoint" and self.currentTarget.targetType != "checkpoint":
+                        self.currentTarget = target
                     self.driveToCurrentTarget()
             else:
                 self.driveToCurrentTarget()
@@ -82,7 +83,7 @@ class RoutingController:
             approach = self.currentTarget.approach_angle()
             if approach is not None and self.lastTargetTypeGotten != "checkpoint":
                 angle_rad = math.radians(approach)
-                checkpoint_x = self.currentTarget.x - 200 * math.cos(angle_rad)
+                checkpoint_x = self.currentTarget.x + 200 * math.cos(angle_rad)
                 checkpoint_y = self.currentTarget.y - 200 * math.sin(angle_rad)
                 target = Target(
                     targetType="checkpoint",
@@ -107,24 +108,37 @@ class RoutingController:
         if hit is not None:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
+        print("angle to turn: ", angle) if DEBUG_ROUTING else None
         if -3 < angle < 3:
-            if self.roboController.driving is False:
-                if self.getDistanceToCurrentTarget() < 100:
-                    self.roboController.drivestart(speed=10)
-                if self.getDistanceToCurrentTarget() > 100:
-                    self.roboController.drivestart(speed=35)
+            print("no angle to turn, driving forward") if DEBUG_ROUTING else None
+            if self.currentTarget.approach_angle() is not None:
+                if self.roboController.driving is False:
+                    self.roboController.drivestart(speed=5)
+            elif self.currentTarget.approach_angle() is None:
+                distance = self.getDistanceToCurrentTarget()
+                speed = distance*0.15+2
+                self.roboController.drivestart(speed = speed)
+
 
         else:
+            if self.roboController.driving is True and self.currentTarget.approach_angle is None:
+                distance = self.getDistanceToCurrentTarget()
+                speed = distance*0.15+2
+                self.roboController.drivestart(speed = speed)
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    self.roboController.drivestop()
-                self.roboController.rotate_counterClockwise(abs(angle))
+                    if self.getDistanceToCurrentTarget() < 200:
+                        self.roboController.drivestop()
+                elif self.roboController.driving is False:
+                    self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    self.roboController.drivestop()
-                self.roboController.rotate_clockwise(abs(angle))
+                    if self.getDistanceToCurrentTarget() < 200:
+                        self.roboController.drivestop()
+                elif self.roboController.driving is False:
+                    self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
 
@@ -179,31 +193,37 @@ class RoutingController:
             return False
         if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
+                if self.currentTarget.approach_angle is not None:
+                    self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
                 self.lastTargetTypeGotten = "whiteBall"
                 self.storedBalls += 1
+
             if self.currentTarget.targetType == "orangeBall":
+                if self.currentTarget.approach_angle is not None:
+                    self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
-            if self.getDistanceToCurrentTarget() < 50:
+
+            if self.getDistanceToCurrentTarget() < 40:
                 if self.currentTarget.targetType == "checkpoint":
                     print("reached checkpoint")
                     self.lastTargetTypeGotten = "checkpoint"
-                if self.currentTarget.targetType == "goal":
-                    print("dropping off")
-                    print(self.robot)
-                    while self.roboController.busy is True:
-                        time.sleep(0.1)
-                    self.turnToMatchAngle(angleToMatch=0)
-                    while self.roboController.busy is True:
-                        time.sleep(0.1)
-                    self.roboController.dropoff()
-                    self.storedBalls = 0
-                    print("scored a goal")
-                    self.lastTargetTypeGotten = "goal"
+
+                if self.currentTarget.targetType == "checkpointDetour":
+                    print("reached checkpoint detour")
+                    self.lastTargetTypeGotten = "checkpointDetour"
+
+            if self.currentTarget.targetType == "goal":
+                print("dropping off")
+                self.roboController.dropoff()
+                self.storedBalls = 0
+                print("scored a goal")
+                self.lastTargetTypeGotten = "goal"
+
             self.currentTarget = None
             return True
         else:
@@ -212,9 +232,25 @@ class RoutingController:
     def setRobot(self, robot):
         self.robot = robot
 
+    def backoff_after_target(self):
+        time.sleep(3)
+        while self.roboController.busy is True:
+            time.sleep(0.1)
+        self.roboController.backward(0.3, 15)
+
     def setCurrentTarget(self, target=None):
         if target is None:
-            self.currentTarget = self.calculateTarget()
+            if self.ballController.targets == []:
+                print("no targets to set current target")
+                if self.time_without_target > 10:
+                    self.seekGoal = True
+                    self.time_without_target = 0
+                else:
+                    self.time_without_target += 1
+            else:
+                self.time_without_target = 0
+                self.seekGoal = False
+                self.currentTarget = self.calculateTarget()
         else:
             self.currentTarget = target
 
