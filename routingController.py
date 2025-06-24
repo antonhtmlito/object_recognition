@@ -263,6 +263,8 @@ class RoutingController:
         best_target = None
         for target in self.ballController.targets:
             distance = math.dist(target.position, (self.robot["x"], self.robot["y"]))
+            if target.targetType == "orangeBall":
+                disttance += 2000
             if distance is None:
                 return None
             if smallest_dist > distance:
