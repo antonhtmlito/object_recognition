@@ -64,6 +64,6 @@ class RoboController:
 
 
     def drivestop(self):
-        self.send_command("drivestop")
-        self.driving = False
+        if self.send_command("drivestop"):
+            self.driving = False
 
