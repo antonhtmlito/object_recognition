@@ -1,5 +1,6 @@
 import socket
 from time import sleep
+from sounds import play_music_file
 
 def driveForward(speed, times):
     print("driving forward")
@@ -62,6 +63,7 @@ def start_server(host='', port=8080):
     server_socket.bind((host, port))
     server_socket.listen(1)
     print("the server is ready")
+    play_music_file("/test/sounds/music.wav")
 
     try:
         while True:
@@ -98,6 +100,10 @@ def start_server(host='', port=8080):
 
             elif content == "dropoff":
                 dropoff()
+
+            elif content == "playmusic":
+                print("Playing test music file asynchronously")
+                play_music_file("/test/sounds/music.wav")
 
             connectionSocket.send("request completed".encode())
             connectionSocket.close()
