@@ -60,7 +60,7 @@ class RoutingController:
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 20)
                     if self.currentTarget is None:
                         self.currentTarget = target
-                    if self.currentTarget.targetType != "goal" and self.currentTarget.targetType != "checkpoint" and self.currentTarget.targetType != "checkpoint" \:
+                    if self.currentTarget.targetType != "goal" and self.currentTarget.targetType != "checkpoint" and self.currentTarget.targetType != "checkpoint":
                         self.currentTarget = target
                     self.driveToCurrentTarget()
             else:
