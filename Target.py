@@ -7,14 +7,14 @@ wall_types = ["n", "s", "w", "e", "nw", "ne", "sw", "se", "free"]
 
 class Target:
     wall_approach_angles = {
-        "n": 180,
-        "e": 270,
-        "s": 0,
-        "w": 90,
-        "ne": 45,
-        "nw": 315,
-        "se": 135,
-        "sw": 45,
+        "n": 90,
+        "e": 180,
+        "s": 270,
+        "w": 0,
+        "ne": 135,
+        "nw": 45,
+        "se": 225,
+        "sw": 315,
         "free": None
     }
 
@@ -49,7 +49,7 @@ class Target:
         )
         hit_directions = []
         #, 270: "w", 0: "n", 90: "e"
-        directions = {180: "s"}
+        directions = {0: "e", 90: "s", 180: "w", 270: "n"}
 
         for angle, hit in zip(directions.keys(), ray_results):
             if hit is not None:
