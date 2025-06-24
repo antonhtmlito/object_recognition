@@ -75,7 +75,7 @@ def getBotPosition(camera):
     angle = ""
     mean = ""
     camera_height = 186.5
-    corner_height = 26
+    corner_height = 24
     target_height = 3
 
     # Camera resolution, really scuffed
