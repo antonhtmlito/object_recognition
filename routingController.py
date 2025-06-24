@@ -184,12 +184,16 @@ class RoutingController:
             return False
         if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
+                if self.currentTarget.approach_angle is not None:
+                    self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
                 self.lastTargetTypeGotten = "whiteBall"
                 self.storedBalls += 1
 
             if self.currentTarget.targetType == "orangeBall":
+                if self.currentTarget.approach_angle is not None:
+                    self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
@@ -225,7 +229,7 @@ class RoutingController:
         self.robot = robot
 
     def backoff_after_target(self):
-        self.roboController.backward(0.2, 30)
+        self.roboController.backward(0.3, 15)
 
     def setCurrentTarget(self, target=None):
         if target is None:
