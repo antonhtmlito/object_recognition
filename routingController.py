@@ -238,6 +238,7 @@ class RoutingController:
         self.robot = robot
 
     def backoff_after_target(self):
+        time.sleep(3)
         while self.roboController.busy is True:
             time.sleep(0.1)
         self.roboController.backward(0.3, 15)
