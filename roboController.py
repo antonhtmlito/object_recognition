@@ -1,6 +1,7 @@
 from socket import *
 import threading
 from values import DEBUG_ROBOT_CONTROLLER
+from sounds import play_music_file
 
 
 class RoboController:
@@ -10,6 +11,7 @@ class RoboController:
         self.busy = False
         self.lock = threading.Lock()
         self.driving = False
+        play_music_file("/test/sounds/fein.wav")
 
 
     def send_command_threadbound(self, command, entry=None, speed=None):
@@ -45,6 +47,7 @@ class RoboController:
 
     def forward(self, amount, speed=35):
         self.send_command("forward", amount, speed)
+        play_music_file("/test/sounds/pacman_chomp.wav")
 
     def backward(self, amount, speed=35):
         self.send_command("backward", amount, speed)
