@@ -57,7 +57,7 @@ class RoutingController:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
                     target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e", walltypeIsLocked=True)
-                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 50)
+                    pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 20)
                     if self.currentTarget is None:
                         self.currentTarget = target
                     if self.currentTarget.targetType != "goal":

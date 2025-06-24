@@ -99,7 +99,7 @@ while running:
     if routingController.currentTarget is not None:
         x, y = routingController.currentTarget.position
         if routingController.currentTarget.targetType == "goal":
-            pygame.draw.circle(screen, "green", (x, y), 10)
+            pygame.draw.circle(screen, "blue", (x, y), 10)
         if routingController.currentTarget.targetType == "whiteBall":
             pygame.draw.circle(screen, "yellow", (x, y), 10)
         if routingController.currentTarget.targetType == "orangeBall":
