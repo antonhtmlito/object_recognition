@@ -189,7 +189,7 @@ class RoutingController:
             return False
         if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
-                if self.currentTarget.approach_angle is not None:
+                if self.currentTarget.approach_angle() is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
@@ -197,14 +197,14 @@ class RoutingController:
                 self.storedBalls += 1
 
             if self.currentTarget.targetType == "orangeBall":
-                if self.currentTarget.approach_angle is not None:
+                if self.currentTarget.approach_angle() is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
 
-            if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL - 40:
+            if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL - 30:
                 if self.currentTarget.targetType == "checkpoint":
                     print("reached checkpoint")
                     self.lastTargetTypeGotten = "checkpoint"
