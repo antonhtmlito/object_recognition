@@ -48,7 +48,7 @@ class Target:
             mask=self.mask,
         )
         hit_directions = []
-        directions = {0: "s", 270: "w", 180: "n", 90: "e"}
+        directions = {90: "s", 0: "w", 270: "n", 180: "e"}
 
         for angle, hit in zip(directions.keys(), ray_results):
             if hit is not None:
