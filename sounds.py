@@ -17,12 +17,13 @@ def play_sound_thread(text=None, tones=None):
             sound.tone(tones)
     threading.Thread(target=_play, daemon=True).start()
 
-def play_music_file(file_path):
+def play_music_file(file_path, volume=100):
     def _play_music():
         if sound is None:
             print(f"[Simulated Playback] Playing {file_path}")
             return
         try:
+            sound.volume = volume
             sound.play_file(file_path, play_type=Sound.PLAY_WAIT_FOR_COMPLETE)
         except Exception as e:
             print(f"Error playing file: {e}")
