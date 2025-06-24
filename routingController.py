@@ -8,7 +8,7 @@ import time
 from Target import Target
 import robodetectíon
 import pygame
-from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL
+from values import DEBUG_ROUTING, GOAL_OFFSET, TARGET_DISTANCE_FOR_REMOVING_BALL, ROUTING_UPDATE_INTERVAL
 
 # targets are in the form (x,y) or [x,y]
 # robot is in the form currently found in roboSim for player
@@ -33,6 +33,8 @@ class RoutingController:
         self.last_called = 0
         self.last_calledstop = 0
         self.lastTargetTypeGotten = None
+        self.seekGoal = False
+        self.time_without_target = 0
 
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
@@ -43,20 +45,19 @@ class RoutingController:
                 if self.getDistanceToCurrentTarget() < 50:
                     self.roboController.drivestop()
 
-
-        if current_time - self.last_called > 1000:
+        if current_time - self.last_called > ROUTING_UPDATE_INTERVAL:
             print("current time", current_time - self.last_called) if DEBUG_ROUTING else None
 
             if self.currentTarget is None:
                 print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
-            if self.storedBalls >= 12:
+            if self.seekGoal is True:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
                     goal_y = goalpos["position"][1]
-                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e")
+                    target = Target(targetType="goal", x=goal_x, y=goal_y, screen=self.screen, mask=self.obstacle_controller.get_obstacles_mask(), wallType="e", walltypeIsLocked=True)
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 50)
                     if self.currentTarget is None:
                         self.currentTarget = target
@@ -164,7 +165,7 @@ class RoutingController:
 
         # Create a new target
         new_target = Target(
-            targetType="checkpointDetour", 
+            targetType="checkpointDetour",
             wallType="free",
             x=new_target_x,
             y=new_target_y,
@@ -223,7 +224,16 @@ class RoutingController:
 
     def setCurrentTarget(self, target=None):
         if target is None:
-            self.currentTarget = self.calculateTarget()
+            if self.ballController.targets == []:
+                print("no targets to set current target")
+                if self.time_without_target > 10:
+                    self.seekGoal = True
+                    self.time_without_target = 0
+                else:
+                    self.time_without_target += 1
+            else:
+                self.seekGoal = False
+                self.currentTarget = self.calculateTarget()
         else:
             self.currentTarget = target
 

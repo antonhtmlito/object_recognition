@@ -98,7 +98,16 @@ while running:
     # Draw current target
     if routingController.currentTarget is not None:
         x, y = routingController.currentTarget.position
-        pygame.draw.circle(screen, "purple", (x, y), 10)
+        if routingController.currentTarget.targetType == "goal":
+            pygame.draw.circle(screen, "green", (x, y), 10)
+        if routingController.currentTarget.targetType == "whiteBall":
+            pygame.draw.circle(screen, "yellow", (x, y), 10)
+        if routingController.currentTarget.targetType == "orangeBall":
+            pygame.draw.circle(screen, "orange", (x, y), 10)
+        if routingController.currentTarget.targetType == "checkpoint":
+            pygame.draw.circle(screen, "purple", (x, y), 10)
+        if routingController.currentTarget.targetType == "checkpointDetour":
+            pygame.draw.circle(screen, "pink", (x, y), 10)
 
     # Rotate the robot around its center
     rotated_surface = pygame.transform.rotate(player_surface, (math.degrees(player["rotation"] + math.pi) - 90) % 360 )

@@ -17,9 +17,9 @@
         "name": "whiteBall",
         "type": "ball",
         "colorLowerBound": [
-            101,
-            11,
-            4
+            0,
+            24,
+            60
         ],
         "colorUpperBound": [
             30,
