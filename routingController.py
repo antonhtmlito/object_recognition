@@ -51,7 +51,7 @@ class RoutingController:
                 print("setting new target") if DEBUG_ROUTING else None
                 self.setCurrentTarget()  # Leave empty to auto calculate best target
 
-            if self.storedBalls >= 1:
+            if self.storedBalls >= 12:
                 goalpos = robodetectíon.getGoalPosition(self.camera)
                 if goalpos is not None:
                     goal_x = goalpos["position"][0] - GOAL_OFFSET
