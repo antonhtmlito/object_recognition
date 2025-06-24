@@ -125,19 +125,15 @@ class RoutingController:
                 distance = self.getDistanceToCurrentTarget()
                 speed = distance*0.1+5
                 self.roboController.drivestart(speed = speed)
+                if self.getDistanceToCurrentTarget() < 150:
+                    self.roboController.drivestop()
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
-                if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 150:
-                        self.roboController.drivestop()
-                elif self.roboController.driving is False:
+                if self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
-                if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 150:
-                        self.roboController.drivestop()
-                elif self.roboController.driving is False:
+                if self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
             else:
                 raise Exception("Angle to turn somehow zero though it did not drive")
