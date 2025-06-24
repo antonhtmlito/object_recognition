@@ -39,9 +39,9 @@ class RoutingController:
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_calledstop > 200:
+        if current_time - self.last_calledstop > 100:
             if self.currentTarget is not None and self.roboController.driving is True:
-                if self.getDistanceToCurrentTarget() < 50:
+                if self.getDistanceToCurrentTarget() < 70:
                     self.roboController.drivestop()
 
         if current_time - self.last_called > ROUTING_UPDATE_INTERVAL:
@@ -110,13 +110,13 @@ class RoutingController:
         print("angle to turn: ", angle) if DEBUG_ROUTING else None
         if -3 < angle < 3:
             print("no angle to turn, driving forward") if DEBUG_ROUTING else None
-            if self.roboController.driving is False:
-                if self.currentTarget.approach_angle() is not None:
+            if self.currentTarget.approach_angle() is not None:
+                if self.roboController.driving is False:
                     self.roboController.drivestart(speed=5)
-                elif self.currentTarget.approach_angle() is None:
-                    distance = self.getDistanceToCurrentTarget()
-                    speed = distance*0.05+5
-                    self.roboController.drivestart(speed = speed)
+            elif self.currentTarget.approach_angle() is None:
+                distance = self.getDistanceToCurrentTarget()
+                speed = distance*0.05+5
+                self.roboController.drivestart(speed = speed)
 
 
         else:

@@ -11,7 +11,7 @@ from values import DEBUG_BALLS
 
 
 class BallController:
-    def __init__(self, camera, screen, max_distance=150, promote_after=10, obstacle_controller=None):
+    def __init__(self, camera, screen, max_distance=40, promote_after=10, obstacle_controller=None):
         self.camera = camera
         self.screen = screen
         if obstacle_controller is None:
