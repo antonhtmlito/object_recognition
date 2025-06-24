@@ -204,22 +204,23 @@ class RoutingController:
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
 
-            if self.currentTarget.targetType == "checkpoint":
-                print("reached checkpoint")
-                self.lastTargetTypeGotten = "checkpoint"
+            if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL - 40:
+                if self.currentTarget.targetType == "checkpoint":
+                    print("reached checkpoint")
+                    self.lastTargetTypeGotten = "checkpoint"
 
-            if self.currentTarget.targetType == "checkpointDetour":
-                print("reached checkpoint detour")
-                self.lastTargetTypeGotten = "checkpointDetour"
+                if self.currentTarget.targetType == "checkpointDetour":
+                    print("reached checkpoint detour")
+                    self.lastTargetTypeGotten = "checkpointDetour"
 
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
                 print(self.robot)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
-                self.turnToMatchAngle(angleToMatch=0)
-                while self.roboController.busy is True:
-                    time.sleep(0.1)
+                #while self.roboController.busy is True:
+                    #time.sleep(0.1)
+                #self.turnToMatchAngle(angleToMatch=0)
+                #while self.roboController.busy is True:
+                    #time.sleep(0.1)
                 self.roboController.dropoff()
                 self.storedBalls = 0
                 print("scored a goal")

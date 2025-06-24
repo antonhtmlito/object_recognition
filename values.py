@@ -6,7 +6,7 @@ class Values:
     area_high:  int = 270
     radius_low: int = 20
     robot_id:   int = 4
-    goal_id:    int = 102
+    goal_id:    int = 101
 
 
 values = Values()
