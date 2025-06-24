@@ -39,7 +39,7 @@ class RoutingController:
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_calledstop > 50:
+        if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
                 if self.getDistanceToCurrentTarget() < 80:
                     self.roboController.drivestop()
