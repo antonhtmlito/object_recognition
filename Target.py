@@ -54,14 +54,17 @@ class Target:
             if hit is not None:
                 hit_directions.append(directions[angle])
 
+        print("Hit directions:", hit_directions)
         if hit_directions != []:
             sorted_hit = ''.join(sorted(hit_directions))
+            print("sorted_hit:", sorted_hit)
             if sorted_hit in wall_types:
                 self.wallType = sorted_hit
             else:
                 self.wallType = "free"
         else:
             self.wallType = "free"
+        print("wall type: ", self.wallType)
 
     def approach_angle(self):
         return self.wall_approach_angles.get(self.wallType)
