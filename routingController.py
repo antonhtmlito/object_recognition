@@ -208,13 +208,14 @@ class RoutingController:
                 self.storedBalls += 1
                 self.lastTargetTypeGotten = "orangeBall"
 
-            if self.currentTarget.targetType == "checkpoint":
-                print("reached checkpoint")
-                self.lastTargetTypeGotten = "checkpoint"
+            if self.getDistanceToCurrentTarget() < 40:
+                if self.currentTarget.targetType == "checkpoint":
+                    print("reached checkpoint")
+                    self.lastTargetTypeGotten = "checkpoint"
 
-            if self.currentTarget.targetType == "checkpointDetour":
-                print("reached checkpoint detour")
-                self.lastTargetTypeGotten = "checkpointDetour"
+                if self.currentTarget.targetType == "checkpointDetour":
+                    print("reached checkpoint detour")
+                    self.lastTargetTypeGotten = "checkpointDetour"
 
             if self.currentTarget.targetType == "goal":
                 print("dropping off")
