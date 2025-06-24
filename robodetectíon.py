@@ -3,7 +3,7 @@ import numpy as np
 import values
 
 DEFAULT_ROBOT_ID = 4
-DEFAULT_GOAL_ID = 102
+DEFAULT_GOAL_ID = 101
 
 def calcAngle(corners):
     middle = np.mean(corners, axis=0)
