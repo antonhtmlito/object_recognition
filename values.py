@@ -21,7 +21,7 @@ DEBUG_GOAL = False
 
 GOAL_OFFSET = 140
 
-ROUTING_UPDATE_INTERVAL = 500  # milliseconds
+ROUTING_UPDATE_INTERVAL = 100  # milliseconds
 OBSTACLE_UPDATE_INERVAL = 1000  # milliseconds
 ROBOT_UPDATE_INTERVAL = 300  # milliseconds
 BALL_UPDATE_INTERVAL = 100  # milliseconds
