@@ -111,11 +111,11 @@ class RoutingController:
         if -3 < angle < 3:
             print("no angle to turn, driving forward") if DEBUG_ROUTING else None
             if self.roboController.driving is False:
-                if self.currentTarget.approach_angle is None:
+                if self.currentTarget.approach_angle() is not None:
                     self.roboController.drivestart(speed=5)
-                else:
+                elif self.currentTarget.approach_angle() is None:
                     distance = self.getDistanceToCurrentTarget()
-                    speed = distance*0.1+10
+                    speed = distance*0.05+5
                     self.roboController.drivestart(speed = speed)
 
 
