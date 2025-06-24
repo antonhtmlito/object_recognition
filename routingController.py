@@ -116,7 +116,7 @@ class RoutingController:
                     self.roboController.drivestart(speed=5)
             elif self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.1+5
+                speed = distance*0.2+2
                 self.roboController.drivestart(speed = speed)
 
 
