@@ -2,7 +2,7 @@ import math
 from ray_functions import cast_rays_from_target
 
 valid_types = ["whiteBall", "orangeBall", "checkpoint", "checkpointDetour", "goal"]
-wall_types = ["n", "s", "w", "e", "nw", "ne", "sw", "se", "free"]
+wall_types = ["n", "s", "w", "e", "nw", "en", "sw", "se", "free"]
 
 
 class Target:
@@ -11,9 +11,9 @@ class Target:
         "e": 180,
         "s": 90,
         "w": 0,
-        "ne": 225,
+        "en": 225,
         "nw": 315,
-        "se": 135,
+        "es": 135,
         "sw": 45,
         "free": None
     }
@@ -48,7 +48,6 @@ class Target:
             mask=self.mask,
         )
         hit_directions = []
-        #, 270: "w", 0: "n", 90: "e"
         directions = {0: "e", 90: "s", 180: "w", 270: "n"}
 
         for angle, hit in zip(directions.keys(), ray_results):
