@@ -60,7 +60,7 @@ class RoutingController:
                     pygame.draw.circle(self.screen, "green", (goal_x, goal_y), 20)
                     if self.currentTarget is None:
                         self.currentTarget = target
-                    if self.currentTarget.targetType != "goal":
+                    if self.currentTarget.targetType != "goal" and self.currentTarget.targetType != "checkpoint" and self.currentTarget.targetType != "checkpoint" \:
                         self.currentTarget = target
                     self.driveToCurrentTarget()
             else:
@@ -108,7 +108,7 @@ class RoutingController:
             self.handle_detour(angle, hit)
         angle = angle["angleToTurn"]
         print("angle to turn: ", angle) if DEBUG_ROUTING else None
-        if -3 < angle < 3:
+        if -5 < angle < 5:
             print("no angle to turn, driving forward") if DEBUG_ROUTING else None
             if self.currentTarget.approach_angle() is not None:
                 if self.roboController.driving is False:
@@ -229,6 +229,8 @@ class RoutingController:
         self.robot = robot
 
     def backoff_after_target(self):
+        while self.roboController.busy is True:
+            time.sleep(0.1)
         self.roboController.backward(0.3, 15)
 
     def setCurrentTarget(self, target=None):
