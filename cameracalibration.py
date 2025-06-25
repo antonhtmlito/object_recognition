@@ -82,6 +82,3 @@ for i in range(len(objpoints)):
 
 mean_error /= len(objpoints)
 print(f"[INFO] Average reprojection error: {mean_error:.4f} pixels")
-
-else:
-    print(f"\n[ERROR] Only {capture_count} frames saved. Need at least {MIN_FRAMES}.")
