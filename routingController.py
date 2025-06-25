@@ -41,7 +41,10 @@ class RoutingController:
         current_time = pygame.time.get_ticks()
         if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
-                if self.getDistanceToCurrentTarget() < 75:
+                if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL and self.currentTarget.targetType != "checkpoint":
+                    self.roboController.drivestop()
+                    self.handleTargetCollision()
+                elif self.getDistanceToCurrentTarget() < 40 and self.currentTarget.targetType == "checkpoint":
                     self.roboController.drivestop()
                     self.handleTargetCollision()
 
@@ -116,14 +119,14 @@ class RoutingController:
                     self.roboController.drivestart(speed=5)
             elif self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.15+2
+                speed = distance*0.1+3
                 self.roboController.drivestart(speed = speed)
 
 
         else:
             if self.roboController.driving is True and self.currentTarget.approach_angle is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.15+2
+                speed = distance*0.1+3
                 self.roboController.drivestart(speed = speed)
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
@@ -193,7 +196,7 @@ class RoutingController:
             return False
         if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL:
             if self.currentTarget.targetType == "whiteBall":
-                if self.currentTarget.approach_angle is not None:
+                if self.currentTarget.approach_angle() is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected white ball")
@@ -201,7 +204,7 @@ class RoutingController:
                 self.storedBalls += 1
 
             if self.currentTarget.targetType == "orangeBall":
-                if self.currentTarget.approach_angle is not None:
+                if self.currentTarget.approach_angle() is not None:
                     self.backoff_after_target()
                 self.ballController.delete_target_at(self.currentTarget)
                 print("collected orange ball")
@@ -265,6 +268,8 @@ class RoutingController:
             distance = math.dist(target.position, (self.robot["x"], self.robot["y"]))
             if distance is None:
                 return None
+            if target.targetType == "orangeBall":
+                distance += 2000
             if smallest_dist > distance:
                 best_target = target
                 smallest_dist = distance
