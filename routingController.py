@@ -123,27 +123,28 @@ class RoutingController:
                     self.roboController.drivestart(speed=5)
             elif self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.12+3
+                speed = distance*0.1+3
+                speed = min(speed, 100)  # Ensure max speed
                 self.roboController.drivestart(speed = speed)
 
 
         else:
             if self.roboController.driving is True and self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.12+3
+                speed = distance*0.1+3
                 speed = min(speed, 100)  # Ensure max speed
                 self.roboController.drivestart(speed = speed)
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 200 or angle > abs(15):
+                    if self.getDistanceToCurrentTarget() < 350 or angle > abs(15):
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 200 or angle > abs(15):
+                    if self.getDistanceToCurrentTarget() < 350 or angle > abs(15):
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
@@ -249,6 +250,9 @@ class RoutingController:
 
     def setCurrentTarget(self, target=None):
         if target is None:
+            while self.roboController.driving is True:
+                self.roboController.drivestop()
+                time.sleep(0.5)
             if self.ballController.targets == []:
                 print("no targets to set current target")
                 if self.time_without_target > 10:
