@@ -101,7 +101,7 @@ class RoutingController:
             else:
                 print("target", self.currentTarget) if DEBUG_ROUTING else None
                 print("approach: ", approach) if DEBUG_ROUTING else None
-
+            
         angle = self.getAngleToCurrentTarget()
         if angle is None:
             return
@@ -124,7 +124,7 @@ class RoutingController:
 
 
         else:
-            if self.roboController.driving is True and self.currentTarget.approach_angle is None:
+            if self.roboController.driving is True and self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
                 speed = distance*0.12+3
                 speed = min(speed, 100)  # Ensure max speed
