@@ -39,7 +39,7 @@ class RoutingController:
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
-        if current_time > 420000:
+        if current_time > 390000:
             seekGoal = True
         if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
@@ -97,7 +97,7 @@ class RoutingController:
                     y=checkpoint_y,
                     screen=self.screen,
                     mask=self.obstacle_controller.get_obstacles_mask(),
-                    forceTarget=self.currentTarget
+                    forceTarget=self.currentTarget if self.currentTarget.targetType != "goal" else None
                 )
                 self.currentTarget = target
                 pygame.draw.circle(self.screen, "green", (checkpoint_x, checkpoint_y), 5)
@@ -137,14 +137,14 @@ class RoutingController:
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 350 or angle > abs(15):
+                    if self.getDistanceToCurrentTarget() < 450 or angle > abs(15):
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 350 or angle > abs(15):
+                    if self.getDistanceToCurrentTarget() < 450 or angle > abs(15):
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
