@@ -39,6 +39,8 @@ class RoutingController:
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
         current_time = pygame.time.get_ticks()
+        if current_time > 420000:
+            seekGoal = True
         if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
                 if self.getDistanceToCurrentTarget() < TARGET_DISTANCE_FOR_REMOVING_BALL and self.currentTarget.targetType != "checkpoint":
@@ -94,7 +96,8 @@ class RoutingController:
                     x=checkpoint_x,
                     y=checkpoint_y,
                     screen=self.screen,
-                    mask=self.obstacle_controller.get_obstacles_mask()
+                    mask=self.obstacle_controller.get_obstacles_mask(),
+                    forceTarget=self.currentTarget
                 )
                 self.currentTarget = target
                 pygame.draw.circle(self.screen, "green", (checkpoint_x, checkpoint_y), 5)
@@ -215,6 +218,8 @@ class RoutingController:
             if self.getDistanceToCurrentTarget() < 40:
                 if self.currentTarget.targetType == "checkpoint":
                     print("reached checkpoint")
+                    if self.currentTarget.forceTarget is not None:
+                        self.currentTarget = self.currentTarget.forceTarget
                     self.lastTargetTypeGotten = "checkpoint"
 
                 if self.currentTarget.targetType == "checkpointDetour":

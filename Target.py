@@ -18,7 +18,7 @@ class Target:
         "free": None
     }
 
-    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20, walltypeIsLocked=False):
+    def __init__(self, targetType: str, wallType: str, x: int, y: int, screen, mask, expire_after_frames: int = 20, walltypeIsLocked=False, forceTarget = None):
         if targetType not in valid_types:
             raise ValueError(f"Invalid target type: {targetType}. Valid types are: {valid_types}")
         if wallType not in wall_types:
@@ -36,6 +36,7 @@ class Target:
 
         self.expire_after_frames = expire_after_frames
         self.frames_since_seen = 0
+        self.forceTarget = forceTarget
 
     def __repr__(self):
         return f"Target(type={self.targetType}, position=({self.x}, {self.y}, wall_type={self.wallType}, approach_angle={self.approach_angle()})"
