@@ -38,8 +38,9 @@ class RoutingController:
     def handleTick(self):
         """ handles the actions for a given tick in the simulation
         We only want to do certain actions every now and then and we handle this with a timestamp"""
+        self.roboController.dropoff()
         current_time = pygame.time.get_ticks()
-        if current_time > 390000:
+        if current_time > 240000:
             seekGoal = True
         if current_time - self.last_calledstop > 10:
             if self.currentTarget is not None and self.roboController.driving is True:
