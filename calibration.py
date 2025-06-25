@@ -2,7 +2,9 @@ import cv2
 import json
 import os
 import numpy as np
+from detect_white_and_yellow_ball import warm_frame
 
+print("calibration.py loaded")
 
 def load_color_mapping(file_path):
     try:
@@ -40,7 +42,7 @@ lower_bound = np.array(obstacle_color["colorLowerBound"])
 upper_bound = np.array(obstacle_color["colorUpperBound"])
 
 # Open video capture
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Error: Could not open video capture")
     exit(1)
@@ -108,6 +110,8 @@ while True:
     lower_bound = np.array(obstacle_color["colorLowerBound"])
     upper_bound = np.array(obstacle_color["colorUpperBound"])
 
+
+    frame = warm_frame(frame, red_gain=0.6, blue_gain=1.4)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsv = cv2.GaussianBlur(hsv, (15, 15), 0)
 

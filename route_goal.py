@@ -4,6 +4,7 @@ from roboController import RoboController
 
 roboController = RoboController()
 
+
 def go_to_goal(cap):
     goalpos = robodetectíon.getGoalPosition(cap)
     if goalpos is not None:
