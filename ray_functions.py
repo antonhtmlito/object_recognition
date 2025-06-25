@@ -19,7 +19,7 @@ def cast_ray_at_angle(player, screen, angle, max_distance, mask):
     dx = math.cos(angle)
     origin = (int(player["x"]), int(player["y"]))
 
-    for distance in range(0, max_distance, 2):  # step size 5 pixels
+    for distance in range(0, max_distance, 1):  # step size 5 pixels
         target_x = int(origin[0] + dx * distance)
         target_y = int(origin[1] + dy * distance)
 

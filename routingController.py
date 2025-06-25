@@ -119,26 +119,27 @@ class RoutingController:
                     self.roboController.drivestart(speed=5)
             elif self.currentTarget.approach_angle() is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.1+3
+                speed = distance*0.12+3
                 self.roboController.drivestart(speed = speed)
 
 
         else:
             if self.roboController.driving is True and self.currentTarget.approach_angle is None:
                 distance = self.getDistanceToCurrentTarget()
-                speed = distance*0.1+3
+                speed = distance*0.12+3
+                speed = min(speed, 100)  # Ensure max speed
                 self.roboController.drivestart(speed = speed)
             if angle < 0:
                 print("rotate counter") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 200:
+                    if self.getDistanceToCurrentTarget() < 200 or angle < -80:
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_counterClockwise(abs(angle))
             elif angle > 0:
                 print("rotate") if DEBUG_ROUTING else None
                 if self.roboController.driving is True:
-                    if self.getDistanceToCurrentTarget() < 200:
+                    if self.getDistanceToCurrentTarget() < 200 or angle > 80:
                         self.roboController.drivestop()
                 elif self.roboController.driving is False:
                     self.roboController.rotate_clockwise(abs(angle))
@@ -236,9 +237,8 @@ class RoutingController:
         self.robot = robot
 
     def backoff_after_target(self):
-        time.sleep(3)
         while self.roboController.busy is True:
-            time.sleep(0.1)
+            time.sleep(0.3)
         self.roboController.backward(0.3, 15)
 
     def setCurrentTarget(self, target=None):
@@ -327,19 +327,19 @@ class RoutingController:
             hitLeft = cast_ray_at_angle(
                 player=left,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.75),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
             hitRight = cast_ray_at_angle(
                 player=right,
                 angle=angle,
-                max_distance=int(self.getDistanceToCurrentTarget() * 0.9),
+                max_distance=int(self.getDistanceToCurrentTarget() * 0.75),
                 mask=self.obstacle_controller.get_obstacles_mask(),
                 screen=self.screen
             )
             if hitLeft is not None and hitRight is not None:
-                if hitLeft[2] < hitRight[2]:
+                if hitLeft[1] < hitRight[1]:
                     hit = hitLeft
                 else:
                     hit = hitRight

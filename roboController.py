@@ -49,10 +49,14 @@ class RoboController:
     def backward(self, amount, speed=35):
         self.send_command("backward", amount, speed)
 
-    def rotate_clockwise(self, amount, speed=6):
+    def rotate_clockwise(self, amount, speed=10):
+        if abs(amount) < 7:
+            speed = 6
         self.send_command("clockwise", amount, speed)
 
-    def rotate_counterClockwise(self, amount, speed=6):
+    def rotate_counterClockwise(self, amount, speed=10):
+        if abs(amount) < 7:
+            speed = 6
         self.send_command("counterclockwise", amount, speed)
 
     def dropoff(self):

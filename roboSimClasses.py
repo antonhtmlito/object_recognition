@@ -31,7 +31,7 @@ player = {
     "x": 0,
     "y": 0,
     "rotation": 0,
-    "width": 130,
+    "width": 140,
     "height": 150,
     }
 
