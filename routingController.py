@@ -163,14 +163,14 @@ class RoutingController:
 
         distance_to_center_left = math.dist(
                 (hit_x + math.cos(math.radians(angle_from_hit_left)) * 300,
-                 hit_x + math.cos(math.radians(angle_from_hit_left)) * 300
+                 hit_y + math.cos(math.radians(angle_from_hit_left)) * 300
                  ),
                 (max_x / 2, max_y / 2)
                 )
 
         distance_to_center_right = math.dist(
                 (hit_x + math.cos(math.radians(angle_from_hit_right)) * 300,
-                 hit_x + math.cos(math.radians(angle_from_hit_right)) * 300
+                 hit_y + math.cos(math.radians(angle_from_hit_right)) * 300
                  ),
                 (max_x / 2, max_y / 2)
                 )
